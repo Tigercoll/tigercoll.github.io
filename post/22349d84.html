@@ -22,34 +22,28 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="Celery 是一个 基于python开发的分布式异步消息任务队列，通过它可以轻松的实现任务的异步处理， 如果你的业务场景中需要用到异步任务，就可以考虑使用celery， 举几个实例场景中可用的例子:  异步任务：将耗时的操作任务提交给Celery去异步执行，比如发送短信&#x2F;邮件、消息推送、音频处理等等 做一个定时任务，比如每天定时执行爬虫爬取指定内容 还可以使用celery实现简单的分布">
+    <meta name="description" content="万丈高楼平地起,勿在浮沙筑高台">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Celery 介绍">
-<meta property="og:url" content="https://tigercoll.top/post/983a2c20.html">
+<meta property="og:title" content="linux基础">
+<meta property="og:url" content="https://tigercoll.top/post/22349d84.html">
 <meta property="og:site_name" content="Tigercoll&#39;s Blog">
-<meta property="og:description" content="Celery 是一个 基于python开发的分布式异步消息任务队列，通过它可以轻松的实现任务的异步处理， 如果你的业务场景中需要用到异步任务，就可以考虑使用celery， 举几个实例场景中可用的例子:  异步任务：将耗时的操作任务提交给Celery去异步执行，比如发送短信&#x2F;邮件、消息推送、音频处理等等 做一个定时任务，比如每天定时执行爬虫爬取指定内容 还可以使用celery实现简单的分布">
+<meta property="og:description" content="万丈高楼平地起,勿在浮沙筑高台">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://tigercoll.top/images/Celery-%E4%BB%8B%E7%BB%8D/1.png">
-<meta property="og:image" content="https://tigercoll.top/images/Celery-%E4%BB%8B%E7%BB%8D/image-20210119220136204.png">
-<meta property="og:image" content="https://tigercoll.top/images/Celery-%E4%BB%8B%E7%BB%8D/image-20210119221336068.png">
-<meta property="og:image" content="https://tigercoll.top/images/Celery-%E4%BB%8B%E7%BB%8D/image-20210119221812325.png">
-<meta property="article:published_time" content="2022-04-15T02:57:37.000Z">
-<meta property="article:modified_time" content="2022-04-15T02:57:37.000Z">
+<meta property="article:published_time" content="1970-01-01T00:00:00.000Z">
+<meta property="article:modified_time" content="2022-09-28T01:07:34.717Z">
 <meta property="article:author" content="Tigercoll">
-<meta property="article:tag" content="异步消息">
-<meta property="article:tag" content="celery">
+<meta property="article:tag" content="linux">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://tigercoll.top/images/Celery-%E4%BB%8B%E7%BB%8D/1.png">
 
 
-<link rel="canonical" href="https://tigercoll.top/post/983a2c20.html">
+<link rel="canonical" href="https://tigercoll.top/post/22349d84.html">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/983a2c20.html","path":"post/983a2c20.html","title":"Celery 介绍"}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/22349d84.html","path":"post/22349d84.html","title":"linux基础"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>Celery 介绍 | Tigercoll's Blog</title>
+<title>linux基础 | Tigercoll's Blog</title>
   
 
 
@@ -142,7 +136,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+    <div class="sidebar-inner sidebar-overview-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -155,7 +149,6 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
-            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Celery%E6%9C%89%E4%BB%A5%E4%B8%8B%E4%BC%98%E7%82%B9%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">Celery有以下优点：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B"><span class="nav-number">2.</span> <span class="nav-text">执行流程:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%84%E6%88%90%E6%A8%A1%E5%9D%97"><span class="nav-number">3.</span> <span class="nav-text">组成模块:</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%88%9D%E8%AF%86Celery"><span class="nav-number">4.</span> <span class="nav-text">初识Celery</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85Celery"><span class="nav-number">4.1.</span> <span class="nav-text">安装Celery</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%9B%E5%BB%BAtasks"><span class="nav-number">4.2.</span> <span class="nav-text">创建tasks</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BF%90%E8%A1%8Cworker"><span class="nav-number">4.3.</span> <span class="nav-text">运行worker</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B0%83%E7%94%A8%E4%BB%BB%E5%8A%A1"><span class="nav-number">4.4.</span> <span class="nav-text">调用任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%8E%B7%E5%8F%96%E7%BB%93%E6%9E%9C"><span class="nav-number">4.5.</span> <span class="nav-text">获取结果</span></a></li></ol></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -228,7 +221,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/983a2c20.html">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/22349d84.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -241,12 +234,12 @@
     </span>
     
     <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="Celery 介绍 | Tigercoll's Blog">
+      <meta itemprop="name" content="linux基础 | Tigercoll's Blog">
       <meta itemprop="description" content="">
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          Celery 介绍
+          linux基础
         </h1>
 
         <div class="post-meta-container">
@@ -257,7 +250,14 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2022-04-15 10:57:37" itemprop="dateCreated datePublished" datetime="2022-04-15T10:57:37+08:00">2022-04-15</time>
+      <time title="创建时间：1970-01-01 08:00:00" itemprop="dateCreated datePublished" datetime="1970-01-01T08:00:00+08:00">1970-01-01</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2022-09-28 09:07:34" itemprop="dateModified" datetime="2022-09-28T09:07:34+08:00">2022-09-28</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -265,7 +265,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E5%BC%82%E6%AD%A5%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97/" itemprop="url" rel="index"><span itemprop="name">异步消息队列</span></a>
+          <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
         </span>
     </span>
 
@@ -279,61 +279,7 @@
     
     
     <div class="post-body" itemprop="articleBody">
-        <p>Celery 是一个 基于python开发的分布式异步消息任务队列，通过它可以轻松的实现任务的异步处理， 如果你的业务场景中需要用到异步任务，就可以考虑使用celery， 举几个实例场景中可用的例子:</p>
-<ul>
-<li>异步任务：将耗时的操作任务提交给Celery去异步执行，比如发送短信&#x2F;邮件、消息推送、音频处理等等</li>
-<li>做一个定时任务，比如每天定时执行爬虫爬取指定内容</li>
-<li>还可以使用celery实现简单的分布式爬虫系统等等</li>
-</ul>
-<span id="more"></span>
-
-<h2 id="Celery有以下优点："><a href="#Celery有以下优点：" class="headerlink" title="Celery有以下优点："></a>Celery有以下优点：</h2><ul>
-<li>简单：Celery 易于使用和维护，并且它 不需要配置文件 ，并且配置和使用还是比较简单的（后面会讲到配置文件可以有）</li>
-<li>高可用：当任务执行失败或执行过程中发生连接中断，celery 会自动尝试重新执行任务</li>
-<li>快速：单个 Celery 进程每分钟可处理数以百万计的任务，而保持往返延迟在亚毫秒级</li>
-<li>灵活： Celery 几乎所有部分都可以扩展或单独使用，各个部分可以自定义。</li>
-</ul>
-<h2 id="执行流程"><a href="#执行流程" class="headerlink" title="执行流程:"></a>执行流程:</h2><p><img data-src="/../images/Celery-%E4%BB%8B%E7%BB%8D/1.png" alt="1"></p>
-<h2 id="组成模块"><a href="#组成模块" class="headerlink" title="组成模块:"></a>组成模块:</h2><ul>
-<li>任务模块 Task<ul>
-<li>用来创建异步任务,或者定时任务</li>
-</ul>
-</li>
-<li>消息中间件 Broker<ul>
-<li>用来调度生产者创建的任务,并将其放入消息队列(celery本身不提供消息队列, 官方推荐RabbitMQ 和 Redis 等)</li>
-</ul>
-</li>
-<li>任务执行单元 Worker<ul>
-<li>监控消息队列里的任务并执行。</li>
-</ul>
-</li>
-<li>结果存储 Backend<ul>
-<li>用于存储任务执行的结果。</li>
-</ul>
-</li>
-</ul>
-<h2 id="初识Celery"><a href="#初识Celery" class="headerlink" title="初识Celery"></a>初识Celery</h2><h3 id="安装Celery"><a href="#安装Celery" class="headerlink" title="安装Celery"></a>安装Celery</h3><p>我们直接通过pip来安装</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">pip install celery</span></span><br></pre></td></tr></table></figure>
-
-<h3 id="创建tasks"><a href="#创建tasks" class="headerlink" title="创建tasks"></a>创建tasks</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导入Celery对象</span></span><br><span class="line"><span class="keyword">from</span> celery <span class="keyword">import</span> Celery</span><br><span class="line"><span class="comment"># 配置消息中间件的地址，推荐用redis或者RabbitMQ</span></span><br><span class="line"><span class="comment"># 这里我们用redis</span></span><br><span class="line"><span class="comment"># redis://密码@地址:端口号/db</span></span><br><span class="line">broker=<span class="string">&#x27;redis://127.0.0.1:6379/1&#x27;</span></span><br><span class="line"><span class="comment"># 配置结果存放地址</span></span><br><span class="line">backend = <span class="string">&#x27;redis://127.0.0.1:6379/2&#x27;</span></span><br><span class="line"><span class="comment"># 实例化</span></span><br><span class="line"><span class="comment"># 第一个参数为命名，可以随便取</span></span><br><span class="line"><span class="comment"># 第二个参数为broker</span></span><br><span class="line"><span class="comment"># 第三个参数为backend</span></span><br><span class="line">app = Celery(<span class="string">&#x27;test&#x27;</span>,broker=broker,backend=backend)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 创建一个task函数</span></span><br><span class="line"><span class="meta">@app.task</span></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">add</span>(<span class="params">x,y</span>):</span><br><span class="line">    <span class="keyword">return</span> x+y</span><br></pre></td></tr></table></figure>
-
-<h3 id="运行worker"><a href="#运行worker" class="headerlink" title="运行worker"></a>运行worker</h3><p>在刚才创建的目录下</p>
-<figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta prompt_"># </span><span class="language-bash">运行worker</span></span><br><span class="line"><span class="meta prompt_"></span></span><br><span class="line"><span class="meta prompt_">$ </span><span class="language-bash">celery -A tasks worker --loglevel=info</span></span><br></pre></td></tr></table></figure>
-
-<p>成功后会输入如下信息</p>
-<p><img data-src="/../images/Celery-%E4%BB%8B%E7%BB%8D/image-20210119220136204.png" alt="image-20210119220136204"></p>
-<h3 id="调用任务"><a href="#调用任务" class="headerlink" title="调用任务"></a>调用任务</h3><p>打开<code>ipython</code></p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导入任务</span></span><br><span class="line">In[<span class="number">3</span>]: <span class="keyword">from</span> tasks <span class="keyword">import</span> add</span><br><span class="line"><span class="comment"># 运行任务</span></span><br><span class="line">In[<span class="number">4</span>]: add.delay(<span class="number">1</span>,<span class="number">2</span>)</span><br><span class="line"><span class="comment"># 输出结果ID</span></span><br><span class="line">Out[<span class="number">4</span>]: &lt;AsyncResult: 070956a9-0791-43c6-9bb6-55af6460cc37&gt;</span><br></pre></td></tr></table></figure>
-
-<p>我们可以看到我们启动的worker已经把结果计算完了</p>
-<p><img data-src="/../images/Celery-%E4%BB%8B%E7%BB%8D/image-20210119221336068.png" alt="image-20210119221336068"></p>
-<p>我们还可以去<code>redis</code>中查看</p>
-<p><img data-src="/../images/Celery-%E4%BB%8B%E7%BB%8D/image-20210119221812325.png" alt="image-20210119221812325"></p>
-<h3 id="获取结果"><a href="#获取结果" class="headerlink" title="获取结果"></a>获取结果</h3><p>那么我们如何获取到执行的结果呢？</p>
-<p>我们可以</p>
-<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> celery.result <span class="keyword">import</span> AsyncResult</span><br><span class="line">res=AsyncResult(<span class="string">&quot;070956a9-0791-43c6-9bb6-55af6460cc37&quot;</span>) <span class="comment"># 参数为task id</span></span><br><span class="line">res.result</span><br></pre></td></tr></table></figure>
-
-
+        
     </div>
 
     
@@ -356,21 +302,17 @@
 </div>
 
           <div class="post-tags">
-              <a href="/tags/%E5%BC%82%E6%AD%A5%E6%B6%88%E6%81%AF/" rel="tag"># 异步消息</a>
-              <a href="/tags/celery/" rel="tag"># celery</a>
+              <a href="/tags/linux/" rel="tag"># linux</a>
           </div>
 
         
 
           <div class="post-nav">
             <div class="post-nav-item">
-                <a href="/post/4c6977a9.html" rel="prev" title="Mysql新建用户与授权">
-                  <i class="fa fa-chevron-left"></i> Mysql新建用户与授权
-                </a>
             </div>
             <div class="post-nav-item">
-                <a href="/post/d140a83b.html" rel="next" title="JWT json-web-token 介绍">
-                  JWT json-web-token 介绍 <i class="fa fa-chevron-right"></i>
+                <a href="/post/c05c69b3.html" rel="next" title="Protocol Buffers">
+                  Protocol Buffers <i class="fa fa-chevron-right"></i>
                 </a>
             </div>
           </div>
