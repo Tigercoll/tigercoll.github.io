@@ -22,29 +22,33 @@
 
 <script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
 
-    <meta name="description" content="万丈高楼平地起,勿在浮沙筑高台">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Tigercoll&#39;s Blog">
-<meta property="og:url" content="https://tigercoll.top/tags/%E8%BD%AE%E6%92%AD%E5%9B%BE/index.html">
+    <meta name="description" content="AS（自治域系统）内部使用内部网关协议； AS与AS之间使用外部网关协议  静态路由：由网络管理员根据数据访问需求手动在每台设备上进行添加和维护。 动态路由：路由器自动进行路由信息的更新和同步，在网络拓扑改变时能够自动进行收敛。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="动态路由协议-RIP">
+<meta property="og:url" content="https://tigercoll.top/post/5cc00ef5.html">
 <meta property="og:site_name" content="Tigercoll&#39;s Blog">
-<meta property="og:description" content="万丈高楼平地起,勿在浮沙筑高台">
+<meta property="og:description" content="AS（自治域系统）内部使用内部网关协议； AS与AS之间使用外部网关协议  静态路由：由网络管理员根据数据访问需求手动在每台设备上进行添加和维护。 动态路由：路由器自动进行路由信息的更新和同步，在网络拓扑改变时能够自动进行收敛。">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tigercoll.top/images/%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE-RIP/v2-ab114dbc49679c6c173257148a3531d4_720w.webp">
+<meta property="og:image" content="https://tigercoll.top/images/%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE-RIP/image-20230315154406871.png">
+<meta property="og:image" content="https://tigercoll.top/images/%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE-RIP/image-20230315154808191.png">
+<meta property="article:published_time" content="2023-03-15T07:40:53.000Z">
+<meta property="article:modified_time" content="2023-03-15T07:40:53.000Z">
 <meta property="article:author" content="Tigercoll">
-<meta property="article:tag" content="blog">
-<meta property="article:tag" content="tigercoll">
-<meta property="article:tag" content="python">
-<meta property="article:tag" content="学习">
+<meta property="article:tag" content="路由">
+<meta property="article:tag" content="RIP">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tigercoll.top/images/%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE-RIP/v2-ab114dbc49679c6c173257148a3531d4_720w.webp">
 
 
-<link rel="canonical" href="https://tigercoll.top/tags/%E8%BD%AE%E6%92%AD%E5%9B%BE/">
+<link rel="canonical" href="https://tigercoll.top/post/5cc00ef5.html">
 
 
 
-<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":false,"lang":"zh-CN","comments":"","permalink":"","path":"tags/轮播图/index.html","title":""}</script>
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/5cc00ef5.html","path":"post/5cc00ef5.html","title":"动态路由协议-RIP"}</script>
 
 <script class="next-config" data-name="calendar" type="application/json">""</script>
-<title>标签: 轮播图 | Tigercoll's Blog</title>
+<title>动态路由协议-RIP | Tigercoll's Blog</title>
   
 
 
@@ -137,7 +141,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -150,6 +154,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#RIP-%E5%8D%8F%E8%AE%AE%E7%9A%84%E4%BC%98%E7%BC%BA%E7%82%B9"><span class="nav-number">1.</span> <span class="nav-text">RIP 协议的优缺点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BC%98%E7%82%B9%EF%BC%9A"><span class="nav-number">2.</span> <span class="nav-text">优点：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BC%BA%E7%82%B9%EF%BC%9A"><span class="nav-number">3.</span> <span class="nav-text">缺点：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B%EF%BC%9A"><span class="nav-number">4.</span> <span class="nav-text">示例：</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE"><span class="nav-number">5.</span> <span class="nav-text">配置:</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -211,51 +216,148 @@
 </noscript>
 
 
-    <div class="main-inner tag posts-collapse">
+    <div class="main-inner post posts-expand">
 
 
   
+
+
+<div class="post-block">
   
   
-  <div class="post-block">
-    <div class="post-content">
-      <div class="collection-title">
-        <h1 class="collection-header">轮播图
-          <small>标签</small>
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/5cc00ef5.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="动态路由协议-RIP | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          动态路由协议-RIP
         </h1>
-      </div>
 
-      
-    <div class="collection-year">
-      <span class="collection-header">2022</span>
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-03-15 15:40:53" itemprop="dateCreated datePublished" datetime="2023-03-15T15:40:53+08:00">2023-03-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%B7%AF%E7%94%B1/" itemprop="url" rel="index"><span itemprop="name">路由</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p><img data-src="/../images/%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE-RIP/v2-ab114dbc49679c6c173257148a3531d4_720w.webp" alt="img"></p>
+<p>AS（自治域系统）内部使用内部网关协议； AS与AS之间使用外部网关协议</p>
+<ul>
+<li><strong>静态路由：</strong>由网络管理员根据数据访问需求手动在每台设备上进行添加和维护。</li>
+<li><strong>动态路由：</strong>路由器自动进行路由信息的更新和同步，在网络拓扑改变时能够自动进行收敛。</li>
+</ul>
+<span id="more"></span>
+
+<h3 id="RIP-协议的优缺点"><a href="#RIP-协议的优缺点" class="headerlink" title="RIP 协议的优缺点"></a><strong>RIP 协议的优缺点</strong></h3><h3 id="优点："><a href="#优点：" class="headerlink" title="优点："></a><strong>优点：</strong></h3><ul>
+<li>RIP 协议非常适合小型网络 - 易于理解和配置。</li>
+<li>RIP 路由保证支持几乎所有的路由器。</li>
+<li>RIP 不需要每次网络拓扑更改时都进行更新。</li>
+</ul>
+<h3 id="缺点："><a href="#缺点：" class="headerlink" title="缺点："></a><strong>缺点：</strong></h3><ul>
+<li>RIP 可能会造成流量瓶颈，因为它每 30 秒广播一次更新，由于 RIP 中的任何路由更新都会<strong>占用大量带宽</strong>，因此关键 IT 流程的资源是有限的。</li>
+<li>RIP 的跳数限制为 <strong>15</strong> 跳，因此超出该距离的任何路由器都被视为无穷大，因此无法访问。</li>
+<li>收敛速度很慢，当任何链接出现故障时，选择替代路线需要花费大量时间。</li>
+<li>RIP 不支持同一路由上的多条路径，这可能会产生更多的路由环路，使用固定跳数度量来选择最佳路由时，根据实时数据比较路由时，RIP 无法工作，由于重复的过程，这会导致数据包丢失和网络操作过载。</li>
+</ul>
+<h3 id="示例："><a href="#示例：" class="headerlink" title="示例："></a><strong>示例：</strong></h3><p><img data-src="/../images/%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE-RIP/image-20230315154406871.png" alt="image-20230315154406871"></p>
+<h3 id="配置"><a href="#配置" class="headerlink" title="配置:"></a>配置:</h3><p>R1</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 配置进程号</span></span><br><span class="line">[R1]rip 1</span><br><span class="line"><span class="comment"># 配置版本 </span></span><br><span class="line">[R1-rip-1]version 2</span><br><span class="line"><span class="comment"># 宣告</span></span><br><span class="line">[R1-rip-1] network 192.168.1.0</span><br><span class="line">[R1-rip-1] network 12.0.0.0</span><br></pre></td></tr></table></figure>
+
+<p>R2</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 配置进程号</span></span><br><span class="line">[R1]rip 1</span><br><span class="line"><span class="comment"># 配置版本 </span></span><br><span class="line">[R1-rip-1]version 2</span><br><span class="line"><span class="comment"># 宣告</span></span><br><span class="line">[R1-rip-1] network 23.0.0.0</span><br><span class="line">[R1-rip-1] network 12.0.0.0</span><br></pre></td></tr></table></figure>
+
+<p>R3</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 配置进程号</span></span><br><span class="line">[R1]rip 1</span><br><span class="line"><span class="comment"># 配置版本 </span></span><br><span class="line">[R1-rip-1]version 2</span><br><span class="line"><span class="comment"># 宣告</span></span><br><span class="line">[R1-rip-1] network 23.0.0.0</span><br><span class="line">[R1-rip-1] network 192.168.3.0</span><br></pre></td></tr></table></figure>
+
+<p>验证</p>
+<p><img data-src="/../images/%E5%8A%A8%E6%80%81%E8%B7%AF%E7%94%B1%E5%8D%8F%E8%AE%AE-RIP/image-20230315154808191.png" alt="image-20230315154808191"></p>
+<p>RIP 的配置还是非常简单的</p>
+
     </div>
 
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-      <div class="post-meta-container">
-        <time itemprop="dateCreated"
-              datetime="2022-04-19T14:31:07+08:00"
-              content="2022-04-19">
-          04-19
-        </time>
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Tigercoll 微信">
+        <span>微信</span>
       </div>
 
-      <div class="post-title">
-          <a class="post-title-link" href="/post/ae4e76ad.html" itemprop="url">
-            <span itemprop="name">vue实现轮播图</span>
-          </a>
-      </div>
-
-      
-    </header>
-  </article>
-
-    </div>
   </div>
-  
-  
-  
+</div>
 
+          <div class="post-tags">
+              <a href="/tags/%E8%B7%AF%E7%94%B1/" rel="tag"># 路由</a>
+              <a href="/tags/RIP/" rel="tag"># RIP</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/fdbc3202.html" rel="prev" title="静态路由">
+                  <i class="fa fa-chevron-left"></i> 静态路由
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
 </div>
   </main>
 
