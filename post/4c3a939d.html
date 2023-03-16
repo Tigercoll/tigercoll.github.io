@@ -30,7 +30,7 @@
 <meta property="og:description" content="问题现象之前由于日志文件,导致磁盘满了.删除log日志后,查看发现磁盘占用率还是很满">
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://tigercoll.top/images/linux%E7%A3%81%E7%9B%98%E6%BB%A1-%E6%B8%85%E7%90%86%E5%90%8E%E7%A9%BA%E9%97%B4%E5%8D%A0%E7%94%A8%E7%8E%87%E8%BF%98%E6%98%AF%E5%BE%88%E9%AB%98-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/image-20230316160733238.png">
-<meta property="og:image" content="https://tigercoll.top/images/linux%E7%A3%81%E7%9B%98%E6%BB%A1-%E6%B8%85%E7%90%86%E5%90%8E%E7%A9%BA%E9%97%B4%E5%8D%A0%E7%94%A8%E7%8E%87%E8%BF%98%E6%98%AF%E5%BE%88%E9%AB%98-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/image-20230316161350907.png">
+<meta property="og:image" content="https://tigercoll.top/images/linux%E7%A3%81%E7%9B%98%E6%BB%A1-%E6%B8%85%E7%90%86%E5%90%8E%E7%A9%BA%E9%97%B4%E5%8D%A0%E7%94%A8%E7%8E%87%E8%BF%98%E6%98%AF%E5%BE%88%E9%AB%98-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/image-20230316161639586.png">
 <meta property="article:published_time" content="2023-03-16T08:05:17.000Z">
 <meta property="article:modified_time" content="2023-03-16T08:05:17.000Z">
 <meta property="article:author" content="Tigercoll">
@@ -285,7 +285,7 @@
 <p>一个文件在文件系统中存放分为两个部分：</p>
 <p>指针部分：指针位于文件系统的meta-data中，在将数据删除后，这个指针就从meta-data中清除了。<br>数据部分：而数据部分存储在磁盘中。<br>将数据对应的指针从meta-data中清除后，文件数据部分占用的空间就可以被覆盖并写入新的内容。之所以出现删除log文件后，空间还没有释放，就是因为进程还在一直向这个文件写入内容，导致虽然删除了log文件，但是由于进程锁定，文件对应的指针部分并未从meta-data中清除，而由于指针并未删除，系统内核就默认文件并未被删除，因此查询文件系统使用率时，显示空间并未释放。</p>
 <h2 id="解决方案"><a href="#解决方案" class="headerlink" title="解决方案"></a>解决方案</h2><p>输入命令<code>lsof -n |grep delete</code></p>
-<p><img data-src="/../images/linux%E7%A3%81%E7%9B%98%E6%BB%A1-%E6%B8%85%E7%90%86%E5%90%8E%E7%A9%BA%E9%97%B4%E5%8D%A0%E7%94%A8%E7%8E%87%E8%BF%98%E6%98%AF%E5%BE%88%E9%AB%98-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/image-20230316161350907.png" alt="image-20230316161350907"></p>
+<p><img data-src="/../images/linux%E7%A3%81%E7%9B%98%E6%BB%A1-%E6%B8%85%E7%90%86%E5%90%8E%E7%A9%BA%E9%97%B4%E5%8D%A0%E7%94%A8%E7%8E%87%E8%BF%98%E6%98%AF%E5%BE%88%E9%AB%98-%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88/image-20230316161639586.png" alt="image-20230316161639586"></p>
 <p>可以看到进程被锁住了.所以我们只需要kill掉进程就好了.</p>
 
     </div>
