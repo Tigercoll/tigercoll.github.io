@@ -164,18 +164,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives">
-          <span class="site-state-item-count">38</span>
+          <span class="site-state-item-count">39</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories">
-        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-count">28</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags">
-        <span class="site-state-item-count">53</span>
+        <span class="site-state-item-count">55</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -212,6 +212,91 @@
 
 
     <div class="main-inner index posts-expand">
+
+    
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/87db578c.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="undefined | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          <a href="/post/87db578c.html" class="post-title-link" itemprop="url">ospf基本命令</a>
+        </h2>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-03-27 09:44:29" itemprop="dateCreated datePublished" datetime="2023-03-27T09:44:29+08:00">2023-03-27</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/OSPF/" itemprop="url" rel="index"><span itemprop="name">OSPF</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+          <h3 id="OSPF基本命令"><a href="#OSPF基本命令" class="headerlink" title="OSPF基本命令"></a>OSPF基本命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">ospf 1 router-id 1.1.1.1   # 开启ospf.进程号为1手动配置Router ID</span><br><span class="line">area 0/0.0.0.0  # 配置区域</span><br><span class="line">network 192.168.1.0 0.0.0.255 # 宣告网络使用反掩码来匹配(255.255.255.255-掩码)</span><br><span class="line">display ospf peer [brief] # 显示OSPF邻居信息</span><br><span class="line">ospf timer hello 10 # 修改hello包发送间隔</span><br><span class="line">ospf timer dead 40 # 修改hello包超时时间</span><br><span class="line">display ospf interface g0/0/0  # 显示OSPF接口信息</span><br><span class="line">ospf dr-priority 100 # 修改OSPF接口优先级</span><br><span class="line">ospf cost 10 # 修改开销,范围1~65535,默认为1</span><br><span class="line">bandwidth-reference 100 # 调整带宽参考值,默认为100Mbps 需要在整个OSPF网络中统一调整</span><br><span class="line">reset ospf process # 重启OSPF进程</span><br></pre></td></tr></table></figure>
+
+<h3 id="OSPF-认证命令"><a href="#OSPF-认证命令" class="headerlink" title="OSPF 认证命令"></a>OSPF 认证命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">int g0/0/0 </span><br><span class="line">	ospf authentication-mode md5 1 cipher password # 配置接口认证</span><br><span class="line">	</span><br><span class="line">ospf 1</span><br><span class="line">	area 0</span><br><span class="line">	 	authentication-mode md5 1 cipher password # 配置区域认证</span><br><span class="line"><span class="meta prompt_">	 </span></span><br><span class="line"><span class="meta prompt_"># </span><span class="language-bash">2个同时配置 接口优先</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="OSPF缺省理由"><a href="#OSPF缺省理由" class="headerlink" title="OSPF缺省理由"></a>OSPF缺省理由</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ip router-static 0.0.0.0 0.0.0.0</span><br><span class="line">default-router-advertise [always] # 发布缺省路由 always参数: 强制发布,不需要路由表事先存在缺省路由</span><br></pre></td></tr></table></figure>
+
+
+
+
+      
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+</div>
+
+
+
 
     
 
@@ -986,98 +1071,6 @@
           <!--noindex-->
             <div class="post-button">
               <a class="btn" href="/post/ee6ba771.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-
-    <footer class="post-footer">
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-</div>
-
-
-
-
-    
-
-
-<div class="post-block">
-  
-  
-
-  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/d69fe3be.html">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.jpg">
-      <meta itemprop="name" content="Tigercoll">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Tigercoll's Blog">
-      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
-    </span>
-    
-    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
-      <meta itemprop="name" content="undefined | Tigercoll's Blog">
-      <meta itemprop="description" content="">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          <a href="/post/d69fe3be.html" class="post-title-link" itemprop="url">centos 更新yum源</a>
-        </h2>
-
-        <div class="post-meta-container">
-          <div class="post-meta">
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar"></i>
-      </span>
-      <span class="post-meta-item-text">发表于</span>
-
-      <time title="创建时间：2022-09-03 00:00:00" itemprop="dateCreated datePublished" datetime="2022-09-03T00:00:00+08:00">2022-09-03</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-calendar-check"></i>
-      </span>
-      <span class="post-meta-item-text">更新于</span>
-      <time title="修改时间：2022-09-27 16:32:42" itemprop="dateModified" datetime="2022-09-27T16:32:42+08:00">2022-09-27</time>
-    </span>
-    <span class="post-meta-item">
-      <span class="post-meta-item-icon">
-        <i class="far fa-folder"></i>
-      </span>
-      <span class="post-meta-item-text">分类于</span>
-        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/linux/" itemprop="url" rel="index"><span itemprop="name">linux</span></a>
-        </span>
-    </span>
-
-  
-</div>
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-          <p>centos的yum源是国外的,有时候我们访问的速度会很慢,所以我们要把yum的源 设置成国内的镜像</p>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/post/d69fe3be.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
