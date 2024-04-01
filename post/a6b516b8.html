@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-minimal.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="docker-compose 是一个用于定义和运行多个 Docker 容器的工具，它通过一个单独的配置文件来管理和组织多个容器的部署。使用 docker-compose，您可以轻松地定义一个包含多个服务的应用程序，每个服务可以运行在一个独立的 Docker 容器中，然后通过一个命令就可以启动、停止和管理整个应用程序的容器。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="docker-compose安装gitlab">
+<meta property="og:url" content="https://tigercoll.top/post/a6b516b8.html">
+<meta property="og:site_name" content="Tigercoll&#39;s Blog">
+<meta property="og:description" content="docker-compose 是一个用于定义和运行多个 Docker 容器的工具，它通过一个单独的配置文件来管理和组织多个容器的部署。使用 docker-compose，您可以轻松地定义一个包含多个服务的应用程序，每个服务可以运行在一个独立的 Docker 容器中，然后通过一个命令就可以启动、停止和管理整个应用程序的容器。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-08-24T06:24:39.000Z">
+<meta property="article:modified_time" content="2023-08-24T06:24:39.000Z">
+<meta property="article:author" content="Tigercoll">
+<meta property="article:tag" content="gitlab">
+<meta property="article:tag" content="docker-compose">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://tigercoll.top/post/a6b516b8.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/a6b516b8.html","path":"post/a6b516b8.html","title":"docker-compose安装gitlab"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>docker-compose安装gitlab | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#docker-compose%E5%AE%89%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">docker-compose安装</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#docker-compose-%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8"><span class="nav-number">2.</span> <span class="nav-text">docker-compose 基本使用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#gitlab%E5%AE%89%E8%A3%85"><span class="nav-number">3.</span> <span class="nav-text">gitlab安装</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">49</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">68</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Tigercoll" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/a6b516b8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="docker-compose安装gitlab | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          docker-compose安装gitlab
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-08-24 14:24:39" itemprop="dateCreated datePublished" datetime="2023-08-24T14:24:39+08:00">2023-08-24</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/gitlab/" itemprop="url" rel="index"><span itemprop="name">gitlab</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p><code>docker-compose</code> 是一个用于定义和运行多个 Docker 容器的工具，它通过一个单独的配置文件来管理和组织多个容器的部署。使用 <code>docker-compose</code>，您可以轻松地定义一个包含多个服务的应用程序，每个服务可以运行在一个独立的 Docker 容器中，然后通过一个命令就可以启动、停止和管理整个应用程序的容器。</p>
+<span id="more"></span>
+
+<h2 id="docker-compose安装"><a href="#docker-compose安装" class="headerlink" title="docker-compose安装"></a>docker-compose安装</h2><p>具体查看<a target="_blank" rel="noopener" href="https://docs.docker.com.zh.xy2401.com/compose/install/">https://docs.docker.com.zh.xy2401.com/compose/install/</a></p>
+<h2 id="docker-compose-基本使用"><a href="#docker-compose-基本使用" class="headerlink" title="docker-compose 基本使用"></a>docker-compose 基本使用</h2><p>以下是一些关键概念和 <code>docker-compose</code> 的基本使用方法：</p>
+<p><strong>关键概念：</strong></p>
+<ol>
+<li>**服务 (Service)**：一个服务对应一个应用程序的组件，通常运行在一个独立的 Docker 容器中。例如，一个 web 应用程序可能包括一个后端服务和一个前端服务。</li>
+<li>**容器 (Container)**：Docker 容器是一个独立的运行环境，包含应用程序及其依赖。<code>docker-compose</code> 允许您定义和管理多个容器。</li>
+<li><strong>docker-compose.yml 文件</strong>：这是 <code>docker-compose</code> 的配置文件，使用 YAML 格式编写。在这个文件中，您可以定义需要的服务、它们的镜像、容器设置、网络配置等信息。</li>
+</ol>
+<p><strong>基本使用方法：</strong></p>
+<ol>
+<li><strong>安装 Docker 和 Docker Compose</strong>：首先，确保您的系统上已经安装了 Docker 和 Docker Compose。您可以从 Docker 官方网站上获得安装指南。</li>
+<li><strong>创建 docker-compose.yml 文件</strong>：在您的项目根目录中创建一个名为 <code>docker-compose.yml</code> 的文件。</li>
+<li><strong>编写配置</strong>：在 <code>docker-compose.yml</code> 文件中，您可以定义您的各个服务。以下是一个简单的示例：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">yamlCopy codeversion: &#x27;3&#x27;</span><br><span class="line">services:</span><br><span class="line">  web:</span><br><span class="line">    image: nginx:latest</span><br><span class="line">    ports:</span><br><span class="line">      - &quot;80:80&quot;</span><br><span class="line">  database:</span><br><span class="line">    image: mysql:latest</span><br><span class="line">    environment:</span><br><span class="line">      MYSQL_ROOT_PASSWORD: example</span><br></pre></td></tr></table></figure>
+
+<p>在这个示例中，我们定义了两个服务：<code>web</code> 和 <code>database</code>。<code>web</code> 服务使用最新版本的 Nginx 镜像，并将主机的 80 端口映射到容器的 80 端口。<code>database</code> 服务使用最新版本的 MySQL 镜像，并设置了一个环境变量以配置 MySQL 的 root 密码。</p>
+<ol>
+<li><strong>运行应用程序</strong>：在项目目录中，打开终端并运行以下命令来启动应用程序：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose up</span><br></pre></td></tr></table></figure>
+
+<p>这将会根据配置文件创建并启动定义的服务。</p>
+<ol>
+<li><strong>停止应用程序</strong>：要停止应用程序，只需在终端中按下 <code>Ctrl + C</code>，或者在另一个终端中运行以下命令：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose down</span><br></pre></td></tr></table></figure>
+
+<p>这将停止并移除所有相关的容器、网络和卷。</p>
+<h2 id="gitlab安装"><a href="#gitlab安装" class="headerlink" title="gitlab安装"></a>gitlab安装</h2><p>创建<code>gitlab_docker</code>目录,并在下面创建<code>docker-compose.yml</code>文件</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">[root@localhost ~]<span class="comment"># cd  /usr/local/</span></span><br><span class="line">[root@localhost <span class="built_in">local</span>]<span class="comment"># mkdir docker/</span></span><br><span class="line">[root@localhost <span class="built_in">local</span>]<span class="comment"># cd docker/</span></span><br><span class="line">[root@localhost docker]<span class="comment"># mkdir gitlab_docker/</span></span><br><span class="line">[root@localhost docker]<span class="comment"># cd gitlab_docker/</span></span><br><span class="line">[root@localhost gitlab_docker]<span class="comment"># vim docker-compose.yml </span></span><br></pre></td></tr></table></figure>
+
+<p>当然需要先拉去镜像,我这边用的是中文版的gitlab</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker pull twang2218/gitlab-ce-zh:latest</span><br></pre></td></tr></table></figure>
+
+
+
+<p>打开<code>docker-compose.yml</code></p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">version:</span> <span class="string">&#x27;3.1&#x27;</span></span><br><span class="line"><span class="attr">services:</span></span><br><span class="line">  <span class="attr">gitlab:</span></span><br><span class="line">    <span class="attr">image:</span> <span class="string">&#x27;twang2218/gitlab-ce-zh:latest&#x27;</span></span><br><span class="line">	<span class="attr">container_name:</span> <span class="string">gitlab</span></span><br><span class="line">	<span class="attr">restart:</span> <span class="string">always</span></span><br><span class="line">    <span class="attr">environment:</span></span><br><span class="line">	  <span class="attr">GITLAB_OMNIBUS_CONFIG:</span> <span class="string">|</span></span><br><span class="line">	    <span class="string">external_url</span> <span class="string">&#x27;http://192.168.205.252:8929&#x27;</span></span><br><span class="line">		<span class="string">gitlab_rails[&#x27;gitlab_shell_ssh_port&#x27;]</span> <span class="string">=</span> <span class="number">2224</span></span><br><span class="line">	<span class="attr">ports:</span></span><br><span class="line">	  <span class="bullet">-</span> <span class="string">&#x27;8929:8929&#x27;</span></span><br><span class="line">	  <span class="bullet">-</span> <span class="string">&#x27;2224:2224&#x27;</span></span><br><span class="line">    <span class="attr">volumes:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">&#x27;./config:/etc/gitlab&#x27;</span></span><br><span class="line">	  <span class="bullet">-</span> <span class="string">&#x27;./logs:/var/log/gitlab&#x27;</span></span><br><span class="line">	  <span class="bullet">-</span> <span class="string">&#x27;./data:/var/opt/gitlab&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>运行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker-compose up -d</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Tigercoll 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/gitlab/" rel="tag"># gitlab</a>
+              <a href="/tags/docker-compose/" rel="tag"># docker-compose</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/49f13f70.html" rel="prev" title="局域网打印机突然连接不上/不能打印0x0000011b 正式解决方案（无需卸载补丁）">
+                  <i class="fa fa-chevron-left"></i> 局域网打印机突然连接不上/不能打印0x0000011b 正式解决方案（无需卸载补丁）
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/a547ee48.html" rel="next" title="YAML的基本语法，以及每个语法元素与Python语法的对应示例">
+                  YAML的基本语法，以及每个语法元素与Python语法的对应示例 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true,"react":{"opacity":0.7}}});</script></body>
+</html>

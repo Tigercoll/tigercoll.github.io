@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-minimal.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="NumPy 是一个运行速度非常快的数学库，主要用于数组计算，包含：  一个强大的N维数组对象 ndarray 广播功能函数 整合 C&#x2F;C++&#x2F;Fortran 代码的工具 线性代数、傅里叶变换、随机数生成等功能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="numpy使用">
+<meta property="og:url" content="https://tigercoll.top/post/40d74989.html">
+<meta property="og:site_name" content="Tigercoll&#39;s Blog">
+<meta property="og:description" content="NumPy 是一个运行速度非常快的数学库，主要用于数组计算，包含：  一个强大的N维数组对象 ndarray 广播功能函数 整合 C&#x2F;C++&#x2F;Fortran 代码的工具 线性代数、傅里叶变换、随机数生成等功能">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220630161950742.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704104818993.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704105615223.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704111543026.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704132615078.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704132758892.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704133905777.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704142321831.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704144755072.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704152400609.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704152806987.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704154531580.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704161835043.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704162631249.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704165159077.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704165505336.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704170008231.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704170030568.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704170308261.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704172931919.png">
+<meta property="og:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220704173034060.png">
+<meta property="article:published_time" content="2022-06-29T08:21:51.000Z">
+<meta property="article:modified_time" content="2022-06-29T08:21:51.000Z">
+<meta property="article:author" content="Tigercoll">
+<meta property="article:tag" content="数据分析">
+<meta property="article:tag" content="numpy">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tigercoll.top/images/numpy%E4%BD%BF%E7%94%A8/image-20220630161950742.png">
+
+
+<link rel="canonical" href="https://tigercoll.top/post/40d74989.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/40d74989.html","path":"post/40d74989.html","title":"numpy使用"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>numpy使用 | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%89%E8%A3%85"><span class="nav-number">1.</span> <span class="nav-text">安装</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BC%E5%85%A5"><span class="nav-number">1.1.</span> <span class="nav-text">导入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E7%89%88%E6%9C%AC"><span class="nav-number">1.2.</span> <span class="nav-text">查看版本</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ndarray"><span class="nav-number">2.</span> <span class="nav-text">ndarray</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E5%88%9B%E5%BB%BA%E6%96%B9%E6%B3%95"><span class="nav-number">2.1.</span> <span class="nav-text">常用创建方法</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ndarray%E7%9A%84%E5%B1%9E%E6%80%A7"><span class="nav-number">3.</span> <span class="nav-text">ndarray的属性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ndarray%E7%9A%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C"><span class="nav-number">4.</span> <span class="nav-text">ndarray的基本操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B4%A2%E5%BC%95"><span class="nav-number">4.1.</span> <span class="nav-text">索引</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%87%E7%89%87"><span class="nav-number">4.2.</span> <span class="nav-text">切片</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%98%E5%BD%A2"><span class="nav-number">4.3.</span> <span class="nav-text">变形</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BA%A7%E8%81%94"><span class="nav-number">4.4.</span> <span class="nav-text">级联</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9E%82%E7%9B%B4%E7%BA%A7%E8%81%94"><span class="nav-number">4.4.1.</span> <span class="nav-text">垂直级联</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%B0%B4%E5%B9%B3%E7%BA%A7%E8%81%94"><span class="nav-number">4.4.2.</span> <span class="nav-text">水平级联</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%88%87%E5%88%86"><span class="nav-number">4.5.</span> <span class="nav-text">切分</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ndarray%E7%9A%84%E8%81%9A%E5%90%88%E6%93%8D%E4%BD%9C"><span class="nav-number">5.</span> <span class="nav-text">ndarray的聚合操作</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%B1%82%E5%92%8Cnp-sum"><span class="nav-number">5.1.</span> <span class="nav-text">求和np.sum</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%80%E5%A4%A7%E6%9C%80%E5%B0%8F%E5%80%BC%EF%BC%9Anp-max-x2F-np-min"><span class="nav-number">5.2.</span> <span class="nav-text">最大最小值：np.max&#x2F; np.min</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">49</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">68</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Tigercoll" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/40d74989.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="numpy使用 | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          numpy使用
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2022-06-29 16:21:51" itemprop="dateCreated datePublished" datetime="2022-06-29T16:21:51+08:00">2022-06-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/numpy/" itemprop="url" rel="index"><span itemprop="name">numpy</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>NumPy 是一个运行速度非常快的数学库，主要用于数组计算，包含：</p>
+<ul>
+<li>一个强大的N维数组对象 ndarray</li>
+<li>广播功能函数</li>
+<li>整合 C&#x2F;C++&#x2F;Fortran 代码的工具</li>
+<li>线性代数、傅里叶变换、随机数生成等功能</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h2><p>通过pip install 安装 <code>numpy</code></p>
+<p><code>pip install numpy</code></p>
+<h3 id="导入"><a href="#导入" class="headerlink" title="导入"></a>导入</h3><p><code>import numpy as np</code></p>
+<h3 id="查看版本"><a href="#查看版本" class="headerlink" title="查看版本"></a>查看版本</h3><p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220630161950742.png" alt="image-20220630161950742"></p>
+<h2 id="ndarray"><a href="#ndarray" class="headerlink" title="ndarray"></a>ndarray</h2><h3 id="常用创建方法"><a href="#常用创建方法" class="headerlink" title="常用创建方法"></a>常用创建方法</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建全是1的ndarray, 默认是float64类型</span></span><br><span class="line"><span class="comment"># np.ones(shape, dtype=None, order=&#x27;C&#x27;)</span></span><br><span class="line">np.ones(shape=(<span class="number">4</span>,<span class="number">5</span>))</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704104818993.png" alt="image-20220704104818993"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 全是0的ndarray</span></span><br><span class="line"><span class="comment"># np.zeros(shape, dtype=float, order=&#x27;C&#x27;)</span></span><br><span class="line">np.zeros(shape=(<span class="number">4</span>,<span class="number">4</span>))</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704105615223.png" alt="image-20220704105615223"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用指定的元素来填充,</span></span><br><span class="line"><span class="comment"># np.full(shape, fill_value, dtype=None, order=&#x27;C&#x27;)</span></span><br><span class="line">np.full(shape=(<span class="number">3</span>,<span class="number">3</span>), fill_value=<span class="number">8</span>, dtype=np.float64)</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704111543026.png" alt="image-20220704111543026"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 等分一个范围</span></span><br><span class="line"><span class="comment"># np.linspace(start, stop, num=50, endpoint=True, retstep=False, dtype=None)</span></span><br><span class="line">np.linspace(<span class="number">0</span>, <span class="number">100</span>, num=<span class="number">50</span>, endpoint=<span class="literal">False</span>, retstep=<span class="literal">True</span>)</span><br><span class="line"><span class="comment"># endpoint：True则包含stop；False则不包含stop</span></span><br><span class="line"><span class="comment"># retstep : 返回步长,并以元祖输出</span></span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704132615078.png" alt="image-20220704132615078"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 和python的 range一样</span></span><br><span class="line"><span class="comment"># 当step是非整数的时候,尽量使用np.linspace</span></span><br><span class="line"><span class="comment"># np.arange([start, ]stop, [step, ]dtype=None)</span></span><br><span class="line">np.arange(<span class="number">0</span>, <span class="number">100</span>,<span class="number">2</span>)</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704132758892.png" alt="image-20220704132758892"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 全是整数的ndarray 左闭右开区间.</span></span><br><span class="line"><span class="comment"># np.random.randint(low, high=None, size=None, dtype=&#x27;l&#x27;)</span></span><br><span class="line">np.random.randint(<span class="number">0</span>,  <span class="number">150</span>, size=(<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span>), )</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704133905777.png" alt="image-20220704133905777"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 标准正太分布</span></span><br><span class="line"><span class="comment"># 平均值为0, 方差 为1 的正态分布叫做标准正态分布</span></span><br><span class="line"><span class="comment"># np.random.randn(d0, d1, ..., dn)</span></span><br><span class="line">np.random.randn(<span class="number">2</span>,<span class="number">3</span>, <span class="number">2</span>,<span class="number">3</span>)</span><br><span class="line"><span class="comment"># 分为2个大矩阵,然后每个矩阵里又有3个2行3列的小矩阵,</span></span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704142321831.png" alt="image-20220704142321831"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 正态分布</span></span><br><span class="line"><span class="comment"># np.random.normal(loc=0.0, scale=1.0, size=None)</span></span><br><span class="line">np.random.normal(loc=<span class="number">10</span>, scale=<span class="number">3</span>,size=(<span class="number">3</span>,<span class="number">3</span>))</span><br><span class="line"><span class="comment"># 均值,标准差,输出维度</span></span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704144755072.png" alt="image-20220704144755072"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 生成0到1的随机数，左闭右开</span></span><br><span class="line"><span class="comment"># np.random.random(size=None)</span></span><br><span class="line">np.random.random(size=(<span class="number">3</span>,<span class="number">2</span>,<span class="number">2</span>))</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704152400609.png" alt="image-20220704152400609"></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 和np.random.random一样</span></span><br><span class="line">np.random.rand(<span class="number">2</span>,<span class="number">3</span>,<span class="number">3</span>)</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704152806987.png" alt="image-20220704152806987"></p>
+<h2 id="ndarray的属性"><a href="#ndarray的属性" class="headerlink" title="ndarray的属性"></a>ndarray的属性</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">4个必记参数：</span><br><span class="line">ndim：维度</span><br><span class="line">shape：形状（各维度的长度）</span><br><span class="line">size：总长度</span><br><span class="line">dtype：元素类型</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704154531580.png" alt="image-20220704154531580"></p>
+<h2 id="ndarray的基本操作"><a href="#ndarray的基本操作" class="headerlink" title="ndarray的基本操作"></a>ndarray的基本操作</h2><h3 id="索引"><a href="#索引" class="headerlink" title="索引"></a>索引</h3><p>一维与列表完全一致 多维时同理</p>
+<p>二维</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">n = np.random.randint(<span class="number">0</span>,<span class="number">150</span>, size=(<span class="number">4</span>,<span class="number">5</span>))</span><br><span class="line">n</span><br><span class="line">array([[ <span class="number">77</span>,  <span class="number">14</span>, <span class="number">134</span>,  <span class="number">14</span>,  <span class="number">43</span>],</span><br><span class="line">       [ <span class="number">85</span>, <span class="number">123</span>, <span class="number">124</span>,  <span class="number">91</span>, <span class="number">108</span>],</span><br><span class="line">       [ <span class="number">64</span>,  <span class="number">31</span>,  <span class="number">94</span>,  <span class="number">39</span>,  <span class="number">24</span>],</span><br><span class="line">       [ <span class="number">44</span>,  <span class="number">77</span>,  <span class="number">26</span>,  <span class="number">67</span>,  <span class="number">80</span>]])</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704161835043.png" alt="image-20220704161835043"></p>
+<p>三维</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">n = np.random.randint(<span class="number">0</span>,<span class="number">100</span>, size=(<span class="number">4</span>,<span class="number">5</span>,<span class="number">3</span>))</span><br><span class="line">n</span><br><span class="line">array([[[ <span class="number">9</span>, <span class="number">39</span>, <span class="number">23</span>],</span><br><span class="line">        [<span class="number">13</span>, <span class="number">11</span>,  <span class="number">6</span>],</span><br><span class="line">        [<span class="number">60</span>, <span class="number">62</span>, <span class="number">39</span>],</span><br><span class="line">        [<span class="number">76</span>, <span class="number">86</span>, <span class="number">68</span>],</span><br><span class="line">        [<span class="number">24</span>, <span class="number">66</span>, <span class="number">39</span>]],</span><br><span class="line"></span><br><span class="line">       [[<span class="number">42</span>, <span class="number">42</span>, <span class="number">95</span>],</span><br><span class="line">        [<span class="number">70</span>,  <span class="number">4</span>, <span class="number">87</span>],</span><br><span class="line">        [<span class="number">45</span>, <span class="number">23</span>, <span class="number">60</span>],</span><br><span class="line">        [<span class="number">46</span>, <span class="number">58</span>, <span class="number">43</span>],</span><br><span class="line">        [<span class="number">85</span>, <span class="number">92</span>, <span class="number">27</span>]],</span><br><span class="line"></span><br><span class="line">       [[<span class="number">36</span>, <span class="number">51</span>, <span class="number">87</span>],</span><br><span class="line">        [<span class="number">64</span>, <span class="number">83</span>, <span class="number">24</span>],</span><br><span class="line">        [ <span class="number">0</span>, <span class="number">30</span>, <span class="number">14</span>],</span><br><span class="line">        [<span class="number">22</span>, <span class="number">34</span>,  <span class="number">8</span>],</span><br><span class="line">        [<span class="number">80</span>, <span class="number">49</span>, <span class="number">78</span>]],</span><br><span class="line"></span><br><span class="line">       [[<span class="number">34</span>, <span class="number">44</span>, <span class="number">19</span>],</span><br><span class="line">        [<span class="number">17</span>, <span class="number">20</span>, <span class="number">45</span>],</span><br><span class="line">        [<span class="number">29</span>, <span class="number">71</span>,  <span class="number">4</span>],</span><br><span class="line">        [<span class="number">36</span>, <span class="number">85</span>, <span class="number">70</span>],</span><br><span class="line">        [<span class="number">20</span>,  <span class="number">9</span>, <span class="number">35</span>]]])</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704162631249.png" alt="image-20220704162631249"></p>
+<h3 id="切片"><a href="#切片" class="headerlink" title="切片"></a>切片</h3><p>一维与列表完全一致 多维时同理</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">n = np.random.randint(<span class="number">0</span>,<span class="number">100</span>, size=(<span class="number">4</span>,<span class="number">6</span>))</span><br><span class="line">n </span><br><span class="line">array([[<span class="number">49</span>, <span class="number">27</span>, <span class="number">77</span>, <span class="number">39</span>,  <span class="number">6</span>, <span class="number">33</span>],</span><br><span class="line">       [<span class="number">74</span>, <span class="number">48</span>, <span class="number">88</span>, <span class="number">45</span>, <span class="number">49</span>, <span class="number">96</span>],</span><br><span class="line">       [<span class="number">41</span>, <span class="number">71</span>, <span class="number">81</span>, <span class="number">50</span>, <span class="number">28</span>,  <span class="number">9</span>],</span><br><span class="line">       [<span class="number">69</span>, <span class="number">97</span>, <span class="number">81</span>, <span class="number">85</span>, <span class="number">70</span>, <span class="number">54</span>]])</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704165159077.png" alt="image-20220704165159077"></p>
+<h3 id="变形"><a href="#变形" class="headerlink" title="变形"></a>变形</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">n</span><br><span class="line">array([[<span class="number">49</span>, <span class="number">27</span>, <span class="number">77</span>, <span class="number">39</span>,  <span class="number">6</span>, <span class="number">33</span>],</span><br><span class="line">       [<span class="number">74</span>, <span class="number">48</span>, <span class="number">88</span>, <span class="number">45</span>, <span class="number">49</span>, <span class="number">96</span>],</span><br><span class="line">       [<span class="number">41</span>, <span class="number">71</span>, <span class="number">81</span>, <span class="number">50</span>, <span class="number">28</span>,  <span class="number">9</span>],</span><br><span class="line">       [<span class="number">69</span>, <span class="number">97</span>, <span class="number">81</span>, <span class="number">85</span>, <span class="number">70</span>, <span class="number">54</span>]])</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704165505336.png" alt="image-20220704165505336"></p>
+<h3 id="级联"><a href="#级联" class="headerlink" title="级联"></a>级联</h3><p><code>np.concatenate()</code> 级联需要注意的点：</p>
+<ul>
+<li>级联的参数是列表：一定要加中括号或小括号</li>
+<li>维度必须相同</li>
+<li>形状相符</li>
+<li>【重点】级联的方向默认是shape这个tuple的第一个值所代表的维度方向</li>
+<li>可通过axis参数改变级联的方向</li>
+</ul>
+<h4 id="垂直级联"><a href="#垂直级联" class="headerlink" title="垂直级联"></a>垂直级联</h4><p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704170008231.png" alt="image-20220704170008231"></p>
+<h4 id="水平级联"><a href="#水平级联" class="headerlink" title="水平级联"></a>水平级联</h4><p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704170030568.png" alt="image-20220704170030568"></p>
+<p><code>np.hstack</code>与<code>np.vstack</code> : 水平级联与垂直级联,处理自己，进行维度的变更</p>
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704170308261.png" alt="image-20220704170308261"></p>
+<p>级联的基本要求: 垂直级联的时候 ,列数一定要相同, 水平级联行数一定要相同.</p>
+<h3 id="切分"><a href="#切分" class="headerlink" title="切分"></a>切分</h3><p>与级联类似，三个函数完成切分工作：</p>
+<ul>
+<li>np.split</li>
+<li>np.vsplit</li>
+<li>np.hsplit</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">n = np.random.randint(<span class="number">0</span>,<span class="number">100</span>, size=(<span class="number">6</span>,<span class="number">6</span>))</span><br><span class="line">n</span><br><span class="line">array([[<span class="number">83</span>, <span class="number">81</span>, <span class="number">77</span>,  <span class="number">2</span>, <span class="number">20</span>, <span class="number">69</span>],</span><br><span class="line">       [<span class="number">49</span>, <span class="number">94</span>,  <span class="number">5</span>, <span class="number">91</span>, <span class="number">71</span>, <span class="number">65</span>],</span><br><span class="line">       [<span class="number">12</span>, <span class="number">10</span>, <span class="number">10</span>, <span class="number">25</span>, <span class="number">53</span>, <span class="number">90</span>],</span><br><span class="line">       [<span class="number">81</span>, <span class="number">45</span>, <span class="number">89</span>, <span class="number">64</span>, <span class="number">85</span>, <span class="number">45</span>],</span><br><span class="line">       [<span class="number">63</span>, <span class="number">35</span>, <span class="number">52</span>, <span class="number">90</span>, <span class="number">49</span>, <span class="number">82</span>],</span><br><span class="line">       [<span class="number">16</span>, <span class="number">67</span>, <span class="number">24</span>, <span class="number">86</span>, <span class="number">91</span>, <span class="number">42</span>]])</span><br></pre></td></tr></table></figure>
+
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704172931919.png" alt="image-20220704172931919"></p>
+<p><img data-src="/../images/numpy%E4%BD%BF%E7%94%A8/image-20220704173034060.png" alt="image-20220704173034060"></p>
+<h2 id="ndarray的聚合操作"><a href="#ndarray的聚合操作" class="headerlink" title="ndarray的聚合操作"></a>ndarray的聚合操作</h2><h3 id="求和np-sum"><a href="#求和np-sum" class="headerlink" title="求和np.sum"></a>求和np.sum</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line">n = np.eye(<span class="number">3</span>)</span><br><span class="line">n</span><br><span class="line">array([[<span class="number">1.</span>, <span class="number">0.</span>, <span class="number">0.</span>],</span><br><span class="line">       [<span class="number">0.</span>, <span class="number">1.</span>, <span class="number">0.</span>],</span><br><span class="line">       [<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">1.</span>]])</span><br><span class="line"></span><br><span class="line">n.<span class="built_in">sum</span>() <span class="comment"># axis=None 表示所有的维度都聚合成0维</span></span><br><span class="line"><span class="number">3.0</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># axis=0 表示对行进行聚合操作,行没了,剩下列.</span></span><br><span class="line">n.<span class="built_in">sum</span>(axis=<span class="number">0</span>)</span><br><span class="line">array([<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>])</span><br><span class="line"></span><br><span class="line"><span class="comment"># axis=1表示对列进行聚合,列没了,行还在.</span></span><br><span class="line">n.<span class="built_in">sum</span>(axis=<span class="number">1</span>)</span><br><span class="line">array([<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>])</span><br></pre></td></tr></table></figure>
+
+<h3 id="最大最小值：np-max-x2F-np-min"><a href="#最大最小值：np-max-x2F-np-min" class="headerlink" title="最大最小值：np.max&#x2F; np.min"></a>最大最小值：np.max&#x2F; np.min</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 同理</span></span><br><span class="line"></span><br><span class="line">n.<span class="built_in">max</span>(axis=<span class="number">0</span>)</span><br><span class="line">array([<span class="number">1.</span>, <span class="number">1.</span>, <span class="number">1.</span>])</span><br><span class="line"></span><br><span class="line">n.<span class="built_in">min</span>(axis=<span class="number">1</span>)</span><br><span class="line">array([<span class="number">0.</span>, <span class="number">0.</span>, <span class="number">0.</span>])</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Tigercoll 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90/" rel="tag"># 数据分析</a>
+              <a href="/tags/numpy/" rel="tag"># numpy</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/eabfeb42.html" rel="prev" title="jupyter的使用">
+                  <i class="fa fa-chevron-left"></i> jupyter的使用
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/eb37acc3.html" rel="next" title="算法回顾">
+                  算法回顾 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true,"react":{"opacity":0.7}}});</script></body>
+</html>

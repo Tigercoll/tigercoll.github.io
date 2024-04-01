@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-minimal.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="随着Internet的发展和网络应用的增多，IPv4地址枯竭已成为制约网络发展的瓶颈。尽管IPv6可以从根本上解决IPv4地址空间不足问题，但目前众多网络设备和网络应用大多是基于IPv4的，因此在IPv6广泛应用之前，一些过渡技术（如CIDR、私网地址等）的使用是解决这个问题最主要的技术手段。NAT主要用于实现内部网络（简称内网，使用私有IP地址）访问外部网络（简称外网，使用公有IP地址）的功能。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NAT地址转换">
+<meta property="og:url" content="https://tigercoll.top/post/2a46438c.html">
+<meta property="og:site_name" content="Tigercoll&#39;s Blog">
+<meta property="og:description" content="随着Internet的发展和网络应用的增多，IPv4地址枯竭已成为制约网络发展的瓶颈。尽管IPv6可以从根本上解决IPv4地址空间不足问题，但目前众多网络设备和网络应用大多是基于IPv4的，因此在IPv6广泛应用之前，一些过渡技术（如CIDR、私网地址等）的使用是解决这个问题最主要的技术手段。NAT主要用于实现内部网络（简称内网，使用私有IP地址）访问外部网络（简称外网，使用公有IP地址）的功能。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://tigercoll.top/images/NAT%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2/download.png">
+<meta property="og:image" content="https://tigercoll.top/images/NAT%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2/download-16835273286532.png">
+<meta property="og:image" content="https://tigercoll.top/images/NAT%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2/download-16835275826204.png">
+<meta property="og:image" content="https://tigercoll.top/images/NAT%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2/download.png">
+<meta property="article:published_time" content="2023-05-08T05:57:57.000Z">
+<meta property="article:modified_time" content="2023-05-08T05:57:57.000Z">
+<meta property="article:author" content="Tigercoll">
+<meta property="article:tag" content="NAT">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://tigercoll.top/images/NAT%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2/download.png">
+
+
+<link rel="canonical" href="https://tigercoll.top/post/2a46438c.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/2a46438c.html","path":"post/2a46438c.html","title":"NAT地址转换"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>NAT地址转换 | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#NAT-%E7%BD%91%E7%BB%9C%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2"><span class="nav-number">1.</span> <span class="nav-text">NAT:网络地址转换</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NAT%E7%B1%BB%E5%9E%8B"><span class="nav-number">2.</span> <span class="nav-text">NAT类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%9D%99%E6%80%81NAT"><span class="nav-number">2.1.</span> <span class="nav-text">静态NAT</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE"><span class="nav-number">2.1.1.</span> <span class="nav-text">配置</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8A%A8%E6%80%81NAT"><span class="nav-number">2.2.</span> <span class="nav-text">动态NAT</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAPT"><span class="nav-number">2.3.</span> <span class="nav-text">NAPT</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-1"><span class="nav-number">2.3.1.</span> <span class="nav-text">配置</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Easy-IP"><span class="nav-number">2.4.</span> <span class="nav-text">Easy IP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-2"><span class="nav-number">2.4.1.</span> <span class="nav-text">配置</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#NAT-Server"><span class="nav-number">2.5.</span> <span class="nav-text">NAT Server</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%85%8D%E7%BD%AE-3"><span class="nav-number">2.5.1.</span> <span class="nav-text">配置</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A3%80%E6%9F%A5%E9%85%8D%E7%BD%AE%E5%8A%A8%E6%80%81%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2%E7%BB%93%E6%9E%9C"><span class="nav-number">3.</span> <span class="nav-text">检查配置动态地址转换结果</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4"><span class="nav-number">3.0.1.</span> <span class="nav-text">操作步骤</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">49</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">37</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">68</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Tigercoll" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/2a46438c.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="NAT地址转换 | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          NAT地址转换
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2023-05-08 13:57:57" itemprop="dateCreated datePublished" datetime="2023-05-08T13:57:57+08:00">2023-05-08</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>随着Internet的发展和网络应用的增多，IPv4地址枯竭已成为制约网络发展的瓶颈。尽管IPv6可以从根本上解决IPv4地址空间不足问题，但目前众多网络设备和网络应用大多是基于IPv4的，因此在IPv6广泛应用之前，一些过渡技术（如CIDR、私网地址等）的使用是解决这个问题最主要的技术手段。NAT主要用于实现内部网络（简称内网，使用私有IP地址）访问外部网络（简称外网，使用公有IP地址）的功能。当内网的主机要访问外网时，通过NAT技术可以将其私网地址转换为公网地址，可以实现多个私网用户共用一个公网地址来访问外部网络，这样既可保证网络互通，又节省了公网地址。</p>
+<span id="more"></span>
+
+<h2 id="NAT-网络地址转换"><a href="#NAT-网络地址转换" class="headerlink" title="NAT:网络地址转换"></a>NAT:网络地址转换</h2><ul>
+<li>有效避免来自外网的攻击，可以很大程度上提高网络安全性。</li>
+<li>控制内网主机访问外网，同时也可以控制外网主机访问内网，解决了内网和外网不能互通的问题。</li>
+</ul>
+<h2 id="NAT类型"><a href="#NAT类型" class="headerlink" title="NAT类型"></a>NAT类型</h2><h3 id="静态NAT"><a href="#静态NAT" class="headerlink" title="静态NAT"></a>静态NAT</h3><p>一对一的地址转换,一个公网地址只保留一个内网地址使用</p>
+<p><img data-src="/../images/NAT%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2/download.png" alt="img"></p>
+<h4 id="配置"><a href="#配置" class="headerlink" title="配置"></a>配置</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">nat static enable   # 开启NAT 静态功能</span><br><span class="line">nat static global 公网地址 inside 私网地址   # 配置静态NAT</span><br><span class="line">display nat static  # 验证静态NAT 配置</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h3 id="动态NAT"><a href="#动态NAT" class="headerlink" title="动态NAT"></a>动态NAT</h3><p>动态NAT是指将内部网络的私有IP地址转换为公用IP地址时，IP地址对是不确定的，是随机的，所有被授权访问Internet的私有IP地址可随机转换为任何指定的合法IP地址。也就是说，只要指定哪些内部地址可以进行转换，以及用哪些合法地址作为外部地址时，就可以进行动态转换。</p>
+<h3 id="NAPT"><a href="#NAPT" class="headerlink" title="NAPT"></a>NAPT</h3><p>除了一对一的NAT转换方式外，网络地址端口转换NAPT（Network Address Port Translation）可以实现并发的地址转换。它允许多个内部地址映射到同一个公有地址上，因此也可以称为“多对一地址转换”或地址复用。</p>
+<p>NAPT方式属于多对一的地址转换，它通过使用“IP地址＋端口号”的形式进行转换，使多个私网用户可共用一个公网IP地址访问外网</p>
+<p><img data-src="/../images/NAT%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2/download-16835273286532.png" alt="img"></p>
+<h4 id="配置-1"><a href="#配置-1" class="headerlink" title="配置"></a>配置</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">nat address-group 编号 公网地址范围  # 配置NAT 地址池</span><br><span class="line">nat outbound acl 编号     # 关联ACL和NAT地址池</span><br><span class="line">address-group 编号 [no-pat] # ACL用来匹配能够转换的源地址</span><br><span class="line">no-pat                     # 只转换地址而不转换端口</span><br><span class="line">display nat address-group  # 验证NAT地址池配置信息</span><br><span class="line">display nat outbound       # 验证动态NAT 配置信息</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="Easy-IP"><a href="#Easy-IP" class="headerlink" title="Easy IP"></a>Easy IP</h3><p>Easy IP方式可以利用访问控制列表来控制哪些内部地址可以进行地址转换。</p>
+<p>Easy IP方式特别适合小型局域网访问Internet的情况。这里的小型局域网主要指中小型网吧、小型办公室等环境，一般具有以下特点：内部主机较少、出接口通过拨号方式获得临时公网IP地址以供内部主机访问Internet。对于这种情况，可以使用Easy IP方式使局域网用户都通过这个IP地址接入Internet。</p>
+<p><img data-src="/../images/NAT%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2/download-16835275826204.png" alt="img"></p>
+<h4 id="配置-2"><a href="#配置-2" class="headerlink" title="配置"></a>配置</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nat outbound acl 编号   # 配置Easy IP ,关联ACL和公网接口</span><br></pre></td></tr></table></figure>
+
+
+
+<h3 id="NAT-Server"><a href="#NAT-Server" class="headerlink" title="NAT Server"></a>NAT Server</h3><p>NAT具有“屏蔽”内部主机的作用，但有时内网需要向外网提供服务，比如提供WWW服务或者FTP服务。这种情况下需要内网的服务器不被“屏蔽”，外网用户可以随时访问内网服务器。</p>
+<p>NAT Server可以很好地解决这个问题，当外网用户访问内网服务器时，它通过事先配置好的“公网IP地址+端口号”与“私网IP地址+端口号”间的映射关系，将服务器的“公网IP地址+端口号”根据映射关系替换成对应的“私网IP地址+端口号”。</p>
+<p><img data-src="/../images/NAT%E5%9C%B0%E5%9D%80%E8%BD%AC%E6%8D%A2/download.png" alt="img"></p>
+<h4 id="配置-3"><a href="#配置-3" class="headerlink" title="配置"></a>配置</h4><figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">nat server protocol tcp/udp  global 公网地址/接口  端口  inside 私网地址 端口  <span class="comment"># 配置nat 服务器</span></span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<h2 id="检查配置动态地址转换结果"><a href="#检查配置动态地址转换结果" class="headerlink" title="检查配置动态地址转换结果"></a>检查配置动态地址转换结果</h2><h4 id="操作步骤"><a href="#操作步骤" class="headerlink" title="操作步骤"></a>操作步骤</h4><ul>
+<li>执行命令<strong>display nat address-group</strong> [ <em>group-index</em> ] [ <strong>verbose</strong> ]，查看NAT地址池的配置信息。</li>
+<li>执行命令<strong>display nat outbound</strong> [ <strong>acl</strong> <em>acl-number</em> | <strong>address-group</strong> <em>group-index</em> | <strong>interface</strong> <em>interface-type</em> <em>interface-number</em> [ <em>.subnumber</em> ] ]，查看NAT Outbound信息。</li>
+<li>执行命令<strong>display nat alg</strong>，查看NAT ALG的配置信息。</li>
+<li>执行命令<strong>display nat overlap-address</strong> { <em>map-index</em> | <strong>all</strong> | <strong>inside-vpn-instance</strong> <em>inside-vpn-instance-name</em>}，查看NAT双向地址转换的相关信息。</li>
+<li>执行命令<strong>display firewall-nat session aging-time</strong>，查看NAT表项老化时间的相关信息。</li>
+<li>执行命令<strong>display nat sip cac bandwidth information</strong> [ <strong>verbose</strong> ]，查看设备上的当前总带宽及被占用带宽。</li>
+<li>执行命令<strong>display nat filter-mode</strong>，查看当前的NAT过滤方式。</li>
+<li>执行命令<strong>display nat mapping-mode</strong>，查看NAT映射模式。</li>
+<li>执行命令<strong>display nat mapping table</strong> { <strong>all</strong> | <strong>number</strong> }或者<strong>display nat mapping table inside-address</strong> <em>ip-address</em> <strong>protocol</strong> <em>protocol-name</em> <strong>port</strong> <em>port-number</em> [ <strong>vpn-instance</strong> <em>vpn-instance-name</em> ]，查看NAT映射表所有表项信息或个数。</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Tigercoll 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/NAT/" rel="tag"># NAT</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/fb84813c.html" rel="prev" title="DHCP">
+                  <i class="fa fa-chevron-left"></i> DHCP
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/4a4c502f.html" rel="next" title="ppp协议">
+                  ppp协议 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true,"react":{"opacity":0.7}}});</script></body>
+</html>
