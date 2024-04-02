@@ -137,7 +137,7 @@
 
   <aside class="sidebar">
 
-    <div class="sidebar-inner sidebar-overview-active">
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
       <ul class="sidebar-nav">
         <li class="sidebar-nav-toc">
           文章目录
@@ -150,6 +150,7 @@
       <div class="sidebar-panel-container">
         <!--noindex-->
         <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%96%E5%80%BC%E8%8C%83%E5%9B%B4"><span class="nav-number">1.</span> <span class="nav-text">取值范围</span></a></li></ol></div>
         </div>
         <!--/noindex-->
 
@@ -277,26 +278,51 @@
 <span id="more"></span>
 
 <ol>
-<li><strong>原码（Sign-Magnitude）</strong>：<ul>
+<li><p><strong>原码（Sign-Magnitude）</strong>：</p>
+<ul>
 <li>原码是最直接的整数表示方法，其中最高位表示符号位，0表示正数，1表示负数。其余位表示数值部分。</li>
 <li>例如，+5的原码是00000101，-5的原码是10000101。</li>
 <li>原码的主要缺点是有两个零，即+0和-0，以及在进行加减运算时需要特殊处理符号位，因此并不常用于实际的计算机系统。</li>
 </ul>
 </li>
-<li><strong>反码（Ones’ Complement）</strong>：<ul>
+<li><p><strong>反码（Ones’ Complement）</strong>：</p>
+<ul>
 <li>反码解决了原码中存在两个零的问题，但仍然需要特殊处理符号位。</li>
 <li>正数的反码与原码相同，负数的反码是其原码除符号位外的各位取反。</li>
 <li>例如，+5的反码是00000101，-5的反码是11111010。</li>
 <li>反码的一个特点是，正负数的加法可以通过同样的算法进行，但是减法需要转换为加法。</li>
 </ul>
 </li>
-<li><strong>补码（Two’s Complement）</strong>：<ul>
+<li><p><strong>补码（Two’s Complement）</strong>：</p>
+<ul>
 <li>补码是最常用的整数表示方式，解决了原码和反码中的一些问题。</li>
 <li>正数的补码与原码相同，负数的补码是其原码取反后加1。</li>
 <li>例如，+5的补码是00000101，-5的补码是11111011。</li>
 <li>补码表示中只有一个零，而且加法和减法可以通过相同的算法进行，简化了计算。</li>
 <li>补码的最高位仍然表示符号位，但是不需要特殊处理，因为补码加法在溢出时会自动忽略溢出位，从而得到正确的结果。</li>
 </ul>
+<h4 id="取值范围"><a href="#取值范围" class="headerlink" title="取值范围"></a>取值范围</h4><p>原码、反码和补码是计算机中用于表示有符号整数的不同编码方式。它们的取值范围如下：</p>
+<table>
+<thead>
+<tr>
+<th>编码方式</th>
+<th>取值范围</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>原码</td>
+<td>-2^(n-1) ~ 2^(n-1)-1 (n位整数)</td>
+</tr>
+<tr>
+<td>反码</td>
+<td>-2^(n-1) ~ 2^(n-1)-1 (n位整数)</td>
+</tr>
+<tr>
+<td>补码</td>
+<td>-2^(n-1) ~ 2^(n-1)-1 (n位整数)</td>
+</tr>
+</tbody></table>
+<p>这里，n表示整数的位数，通常为8位、16位、32位或64位等。</p>
 </li>
 </ol>
 <p>总之，原码、反码和补码是用于表示有符号整数的不同编码方式，补码是最常用的一种，因为它具有简单的加法和减法规则，并且只有一个零。</p>
