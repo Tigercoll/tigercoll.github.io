@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-minimal.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="计算机网络体系结构通常指的是用于定义和组织计算机网络各层次功能的模型。这些模型帮助我们理解、设计和实现计算机网络。最著名的网络体系结构模型有两种,OSI参考模型和TCP&#x2F;IP模型（互联网模型)：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="计算机网络体系结构">
+<meta property="og:url" content="https://tigercoll.top/post/507ba1e8.html">
+<meta property="og:site_name" content="Tigercoll&#39;s Blog">
+<meta property="og:description" content="计算机网络体系结构通常指的是用于定义和组织计算机网络各层次功能的模型。这些模型帮助我们理解、设计和实现计算机网络。最著名的网络体系结构模型有两种,OSI参考模型和TCP&#x2F;IP模型（互联网模型)：">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2024-05-15T06:04:41.000Z">
+<meta property="article:modified_time" content="2024-05-15T06:04:41.000Z">
+<meta property="article:author" content="Tigercoll">
+<meta property="article:tag" content="计算机">
+<meta property="article:tag" content="软考">
+<meta property="article:tag" content="网络工程师">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://tigercoll.top/post/507ba1e8.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/507ba1e8.html","path":"post/507ba1e8.html","title":"计算机网络体系结构"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>计算机网络体系结构 | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-OSI%E5%8F%82%E8%80%83%E6%A8%A1%E5%9E%8B%EF%BC%88Open-Systems-Interconnection-Model%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">1. OSI参考模型（Open Systems Interconnection Model）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%89%A9%E7%90%86%E5%B1%82"><span class="nav-number"></span> <span class="nav-text">物理层</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E4%B8%BB%E8%A6%81%E5%8A%9F%E8%83%BD"><span class="nav-number">1.</span> <span class="nav-text">1. 主要功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%BC%A0%E8%BE%93%E4%BB%8B%E8%B4%A8"><span class="nav-number">2.</span> <span class="nav-text">2. 传输介质</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E4%BF%A1%E5%8F%B7%E4%BC%A0%E8%BE%93"><span class="nav-number">3.</span> <span class="nav-text">3. 信号传输</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%A0%87%E5%87%86%E5%92%8C%E5%8D%8F%E8%AE%AE"><span class="nav-number">4.</span> <span class="nav-text">4. 标准和协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E7%A1%AC%E4%BB%B6%E8%AE%BE%E5%A4%87"><span class="nav-number">5.</span> <span class="nav-text">5. 硬件设备</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82"><span class="nav-number"></span> <span class="nav-text">数据链路层</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%E7%9A%84%E4%B8%BB%E8%A6%81%E5%8A%9F%E8%83%BD"><span class="nav-number">1.</span> <span class="nav-text">1.数据链路层的主要功能</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%E7%9A%84%E7%BB%84%E6%88%90%E9%83%A8%E5%88%86"><span class="nav-number">2.</span> <span class="nav-text">2.数据链路层的组成部分</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%B8%B8%E8%A7%81%E7%9A%84%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%E5%8D%8F%E8%AE%AE"><span class="nav-number">3.</span> <span class="nav-text">3.常见的数据链路层协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E6%95%B0%E6%8D%AE%E9%93%BE%E8%B7%AF%E5%B1%82%E7%9A%84%E6%8C%91%E6%88%98%E5%92%8C%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">4.</span> <span class="nav-text">4.数据链路层的挑战和解决方案</span></a></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">52</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">38</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">72</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Tigercoll" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/507ba1e8.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="计算机网络体系结构 | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          计算机网络体系结构
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2024-05-15 14:04:41" itemprop="dateCreated datePublished" datetime="2024-05-15T14:04:41+08:00">2024-05-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%BD%AF%E8%80%83/" itemprop="url" rel="index"><span itemprop="name">软考</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p>计算机网络体系结构通常指的是用于定义和组织计算机网络各层次功能的模型。这些模型帮助我们理解、设计和实现计算机网络。最著名的网络体系结构模型有两种,OSI参考模型和TCP&#x2F;IP模型（互联网模型)：</p>
+<span id="more"></span>
+
+<h3 id="1-OSI参考模型（Open-Systems-Interconnection-Model）"><a href="#1-OSI参考模型（Open-Systems-Interconnection-Model）" class="headerlink" title="1. OSI参考模型（Open Systems Interconnection Model）"></a>1. OSI参考模型（Open Systems Interconnection Model）</h3><p>OSI模型由国际标准化组织（ISO）提出，是一个七层的网络体系结构模型。每一层都定义了特定的网络功能。七层模型从上到下依次为：</p>
+<ol>
+<li><strong>应用层（Application Layer）</strong>：提供网络服务和应用接口，如HTTP、FTP、SMTP等。</li>
+<li><strong>表示层（Presentation Layer）</strong>：处理数据的表示、加密和解密，如数据格式转换、数据压缩。</li>
+<li><strong>会话层（Session Layer）</strong>：管理会话和对话控制，如建立、维护和终止通信会话。</li>
+<li><strong>传输层（Transport Layer）</strong>：提供端到端的通信服务和数据流控制，如TCP、UDP。</li>
+<li><strong>网络层（Network Layer）</strong>：处理数据包的路由和转发，如IP协议。</li>
+<li><strong>数据链路层（Data Link Layer）</strong>：提供节点间的数据传输和错误检测，如以太网（Ethernet）。</li>
+<li><strong>物理层（Physical Layer）</strong>：负责物理介质上的数据传输，如比特流、信号编码。</li>
+</ol>
+<h2 id="物理层"><a href="#物理层" class="headerlink" title="物理层"></a>物理层</h2><p>计算机网络体系结构通常分为多个层次，每一层都有其特定的功能。物理层是这些层次中的最低层，负责实际的数据传输。以下是关于物理层的一些关键点：</p>
+<h3 id="1-主要功能"><a href="#1-主要功能" class="headerlink" title="1. 主要功能"></a>1. 主要功能</h3><ul>
+<li><strong>比特传输</strong>：物理层的主要功能是将数据比特流通过通信媒介从一个节点传输到另一个节点。它处理的是原始的比特，而不是任何高层数据结构。</li>
+<li><strong>信号编码</strong>：物理层将数据比特编码为适合在物理介质上传输的信号。这些信号可以是电气的（例如铜线）、光学的（例如光纤）或无线的（例如无线电波）。</li>
+<li><strong>数据速率</strong>：物理层定义了传输数据的速率，即比特率（bit rate），通常以每秒比特数（bps）为单位。</li>
+<li><strong>物理拓扑</strong>：物理层定义了网络设备的物理连接和布局，包括总线型、星型、环型和网状拓扑。</li>
+<li><strong>介质类型</strong>：物理层规定了传输介质的类型，如双绞线、电缆、光纤和无线电波等。</li>
+</ul>
+<h3 id="2-传输介质"><a href="#2-传输介质" class="headerlink" title="2. 传输介质"></a>2. 传输介质</h3><ul>
+<li><strong>双绞线</strong>：常用于局域网（LAN），如以太网。包括屏蔽双绞线（STP）和非屏蔽双绞线（UTP）。</li>
+<li><strong>同轴电缆</strong>：用于有线电视系统和早期的计算机网络。</li>
+<li><strong>光纤</strong>：通过光信号传输数据，具有高带宽和低干扰的优点。</li>
+<li><strong>无线电波</strong>：用于无线网络（Wi-Fi）、蓝牙、移动通信等。</li>
+</ul>
+<h3 id="3-信号传输"><a href="#3-信号传输" class="headerlink" title="3. 信号传输"></a>3. 信号传输</h3><ul>
+<li><strong>模拟信号和数字信号</strong>：物理层可以传输模拟信号（如声音和视频）和数字信号（如计算机数据）。</li>
+<li><strong>调制和解调</strong>：在传输模拟信号时，通常需要对信号进行调制和解调。例如，调制解调器（modem）将数字信号转换为模拟信号以通过电话线传输。</li>
+</ul>
+<h3 id="4-标准和协议"><a href="#4-标准和协议" class="headerlink" title="4. 标准和协议"></a>4. 标准和协议</h3><ul>
+<li><strong>IEEE 802.3（以太网）</strong>：定义了局域网中使用的有线连接的物理层和数据链路层。</li>
+<li><strong>IEEE 802.11（无线局域网，Wi-Fi）</strong>：定义了无线网络的物理层和数据链路层。</li>
+<li><strong>ITU-T G.703</strong>：定义了数字信号在电信网络中的物理层传输。</li>
+</ul>
+<h3 id="5-硬件设备"><a href="#5-硬件设备" class="headerlink" title="5. 硬件设备"></a>5. 硬件设备</h3><ul>
+<li><strong>网卡（NIC）</strong>：连接计算机到网络的接口，负责物理层和数据链路层的操作。</li>
+<li><strong>集线器（Hub）</strong>：一种简单的网络设备，工作在物理层，用于将多个网络设备连接在一起。</li>
+<li>**交换机（Switch）**和**路由器（Router）**：尽管主要工作在数据链路层和网络层，它们也涉及物理层的操作，尤其是在数据包的实际传输过程中。</li>
+</ul>
+<p>物理层是计算机网络的基础，其性能和可靠性直接影响整个网络系统的运行效率和稳定性。理解物理层的工作原理和技术是掌握计算机网络的第一步。</p>
+<h2 id="数据链路层"><a href="#数据链路层" class="headerlink" title="数据链路层"></a>数据链路层</h2><p>数据链路层是计算机网络体系结构中的一个重要层次，负责在相邻节点之间可靠地传输数据帧。无论是 OSI 模型中的第二层，还是 TCP&#x2F;IP 模型中的链路层部分，数据链路层都起着关键作用。以下是数据链路层的主要功能、组成部分和协议：</p>
+<h3 id="1-数据链路层的主要功能"><a href="#1-数据链路层的主要功能" class="headerlink" title="1.数据链路层的主要功能"></a>1.数据链路层的主要功能</h3><ol>
+<li><strong>帧封装</strong>：数据链路层将来自网络层的数据包封装成帧，以便在物理介质上传输。每个帧包含必要的控制信息，如源地址、目的地址和校验和（CRC）。</li>
+<li><strong>物理地址寻址</strong>：数据链路层使用物理地址（如 MAC 地址）来标识网络中的节点，确保帧能够正确传输到目标设备。</li>
+<li><strong>错误检测与校正</strong>：数据链路层通过附加到帧的校验和（如循环冗余校验 CRC）来检测传输过程中的错误。某些协议还支持错误校正。</li>
+<li><strong>流量控制</strong>：数据链路层可以控制数据传输速率，防止发送方数据传输速率超过接收方处理能力，从而避免丢包。</li>
+<li><strong>帧同步</strong>：数据链路层确保发送和接收方在帧的开始和结束处保持同步，使得数据传输可靠且有序。</li>
+<li><strong>介质访问控制</strong>：在共享传输介质（如以太网）中，数据链路层管理多个设备对介质的访问，避免冲突和碰撞。这通常通过协议如 CSMA&#x2F;CD（载波侦听多路访问&#x2F;冲突检测）实现。</li>
+</ol>
+<h3 id="2-数据链路层的组成部分"><a href="#2-数据链路层的组成部分" class="headerlink" title="2.数据链路层的组成部分"></a>2.数据链路层的组成部分</h3><p>数据链路层通常分为两个子层：</p>
+<ol>
+<li><strong>逻辑链路控制子层（LLC, Logical Link Control）</strong>：<ul>
+<li>提供接口给网络层并管理逻辑链路通信。</li>
+<li>处理帧的多路复用、流量控制和错误检测。</li>
+<li>LLC 标头包含服务访问点（SAP）来区分上层协议。</li>
+</ul>
+</li>
+<li><strong>介质访问控制子层（MAC, Media Access Control）</strong>：<ul>
+<li>负责控制对物理传输介质的访问。</li>
+<li>定义 MAC 地址用于设备标识。</li>
+<li>实现特定网络技术的介质访问控制方法，如以太网、Wi-Fi。</li>
+</ul>
+</li>
+</ol>
+<h3 id="3-常见的数据链路层协议"><a href="#3-常见的数据链路层协议" class="headerlink" title="3.常见的数据链路层协议"></a>3.常见的数据链路层协议</h3><ul>
+<li><strong>以太网（Ethernet, IEEE 802.3）</strong>：广泛使用的局域网技术，使用 MAC 地址进行设备标识和 CSMA&#x2F;CD 进行介质访问控制。</li>
+<li><strong>Wi-Fi（IEEE 802.11）</strong>：无线局域网标准，使用 CSMA&#x2F;CA（载波侦听多路访问&#x2F;冲突避免）来管理无线信道。</li>
+<li><strong>点对点协议（PPP, Point-to-Point Protocol）</strong>：用于直接连接两个节点，如拨号网络和 VPN。</li>
+<li><strong>帧中继（Frame Relay）</strong>：用于广域网连接，通过虚拟电路传输数据帧。</li>
+<li><strong>令牌环（Token Ring, IEEE 802.5）</strong>：早期局域网技术，通过令牌传递机制避免冲突。</li>
+</ul>
+<h3 id="4-数据链路层的挑战和解决方案"><a href="#4-数据链路层的挑战和解决方案" class="headerlink" title="4.数据链路层的挑战和解决方案"></a>4.数据链路层的挑战和解决方案</h3><ul>
+<li><strong>冲突和碰撞</strong>：在共享介质（如以太网）中，多个设备同时发送数据可能导致冲突。CSMA&#x2F;CD 和 CSMA&#x2F;CA 是常用的解决方案。</li>
+<li><strong>错误检测与校正</strong>：数据传输中可能出现位错误，CRC 是常用的错误检测方法，而重传机制（如 ARQ）用于错误校正。</li>
+<li><strong>流量控制</strong>：防止发送方数据溢出接收方缓冲区，常用的流量控制机制包括滑动窗口协议和速率控制协议。</li>
+</ul>
+<p>数据链路层在计算机网络中扮演着关键角色，它确保数据在相邻节点之间可靠传输，并通过错误检测、流量控制和介质访问控制等功能提高传输的可靠性和效率。数据链路层协议和技术不断演进，以适应不断变化的网络需求和环境</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Tigercoll 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA/" rel="tag"># 计算机</a>
+              <a href="/tags/%E8%BD%AF%E8%80%83/" rel="tag"># 软考</a>
+              <a href="/tags/%E7%BD%91%E7%BB%9C%E5%B7%A5%E7%A8%8B%E5%B8%88/" rel="tag"># 网络工程师</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/c8acf84f.html" rel="prev" title="网络工程师中级软考知识点">
+                  <i class="fa fa-chevron-left"></i> 网络工程师中级软考知识点
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2025</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true,"react":{"opacity":0.7}}});</script></body>
+</html>
