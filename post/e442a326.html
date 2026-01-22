@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-center-simple.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Day028：漏洞扫描与基线 - 周综合实验与测评（扫描+基线+加固） 日期：2026-01-21 周次：第4周  学习目标今天你将完成第 4 周综合实验，实现从扫描到加固的完整闭环：  整合本周所学：将漏洞扫描、基线检查、加固复验的知识串联应用 完成端到端实验：对一个目标执行完整的 安全扫描 → 基线检查 → 安全加固 → 复验验证 输出结构化周报：汇总本周所有实验结果，形成可汇报的技术文档 制">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day028：漏洞扫描与基线 - 周综合实验与测评（扫描+基线+加固）">
+<meta property="og:url" content="https://tigercoll.top/post/e442a326.html">
+<meta property="og:site_name" content="Tigercoll&#39;s Blog">
+<meta property="og:description" content="Day028：漏洞扫描与基线 - 周综合实验与测评（扫描+基线+加固） 日期：2026-01-21 周次：第4周  学习目标今天你将完成第 4 周综合实验，实现从扫描到加固的完整闭环：  整合本周所学：将漏洞扫描、基线检查、加固复验的知识串联应用 完成端到端实验：对一个目标执行完整的 安全扫描 → 基线检查 → 安全加固 → 复验验证 输出结构化周报：汇总本周所有实验结果，形成可汇报的技术文档 制">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-01-20T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-20T16:00:00.000Z">
+<meta property="article:author" content="Tigercoll">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="学习计划">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://tigercoll.top/post/e442a326.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/e442a326.html","path":"post/e442a326.html","title":"Day028：漏洞扫描与基线 - 周综合实验与测评（扫描+基线+加固）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day028：漏洞扫描与基线 - 周综合实验与测评（扫描+基线+加固） | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Day028%EF%BC%9A%E6%BC%8F%E6%B4%9E%E6%89%AB%E6%8F%8F%E4%B8%8E%E5%9F%BA%E7%BA%BF-%E5%91%A8%E7%BB%BC%E5%90%88%E5%AE%9E%E9%AA%8C%E4%B8%8E%E6%B5%8B%E8%AF%84%EF%BC%88%E6%89%AB%E6%8F%8F-%E5%9F%BA%E7%BA%BF-%E5%8A%A0%E5%9B%BA%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">Day028：漏洞扫描与基线 - 周综合实验与测评（扫描+基线+加固）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E7%9B%AE%E6%A0%87"><span class="nav-number">1.1.</span> <span class="nav-text">学习目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E5%86%85%E5%AE%B9"><span class="nav-number">1.2.</span> <span class="nav-text">学习内容</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-%E6%9C%AC%E5%91%A8%E7%9F%A5%E8%AF%86%E5%9B%9E%E9%A1%BE"><span class="nav-number">1.2.1.</span> <span class="nav-text">1️⃣ 本周知识回顾</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-%E6%BC%8F%E6%B4%9E%E6%89%AB%E6%8F%8F%E4%B8%8E%E5%9F%BA%E7%BA%BF%E6%A3%80%E6%9F%A5%E6%A8%A1%E5%9D%97%E6%A6%82%E8%A7%88"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">1.1 漏洞扫描与基线检查模块概览</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-%E5%AE%8C%E6%95%B4%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">1.2 完整工作流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-%E8%AF%AF%E6%8A%A5%E4%B8%8E%E6%BC%8F%E6%8A%A5%E5%A4%84%E7%90%86"><span class="nav-number">1.2.2.</span> <span class="nav-text">2️⃣ 误报与漏报处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-%E8%AF%AF%E6%8A%A5%EF%BC%88False-Positive%EF%BC%89%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">2.1 误报（False Positive）类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-%E6%BC%8F%E6%8A%A5%EF%BC%88False-Negative%EF%BC%89%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">2.2 漏报（False Negative）类型</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-%E8%AF%AF%E6%8A%A5-x2F-%E6%BC%8F%E6%8A%A5%E5%A4%84%E7%BD%AE%E6%B5%81%E7%A8%8B"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">2.3 误报&#x2F;漏报处置流程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%EF%B8%8F%E2%83%A3-%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95%E6%A8%A1%E6%9D%BF"><span class="nav-number">1.2.3.</span> <span class="nav-text">3️⃣ 检查清单模板</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-%E7%BB%BC%E5%90%88%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">3.1 综合检查清单</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%EF%B8%8F%E2%83%A3-%E5%91%A8%E6%8A%A5%E6%A8%A1%E6%9D%BF"><span class="nav-number">1.2.4.</span> <span class="nav-text">4️⃣ 周报模板</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-%E6%A0%87%E5%87%86%E5%91%A8%E6%8A%A5%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">4.1 标准周报格式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A1%88%E4%BE%8B-2%EF%BC%9A%E7%B3%BB%E7%BB%9F%E5%9F%BA%E7%BA%BF%E6%A3%80%E6%9F%A5"><span class="nav-number">1.2.5.</span> <span class="nav-text">案例 2：系统基线检查</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%AF%E6%8A%A5%E4%B8%8E%E6%BC%8F%E6%8A%A5%E5%A4%84%E7%90%86"><span class="nav-number">1.3.</span> <span class="nav-text">误报与漏报处理</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%AF%E6%8A%A5%E6%A1%88%E4%BE%8B"><span class="nav-number">1.3.1.</span> <span class="nav-text">误报案例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BC%8F%E6%8A%A5%E6%A1%88%E4%BE%8B"><span class="nav-number">1.3.2.</span> <span class="nav-text">漏报案例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7%E4%B8%8E%E8%84%9A%E6%9C%AC"><span class="nav-number">1.4.</span> <span class="nav-text">工具与脚本</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BD%BF%E7%94%A8%E7%9A%84%E5%B7%A5%E5%85%B7"><span class="nav-number">1.4.1.</span> <span class="nav-text">使用的工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E5%8F%91%E7%9A%84%E8%84%9A%E6%9C%AC"><span class="nav-number">1.4.2.</span> <span class="nav-text">开发的脚本</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%81%87%E5%88%B0%E7%9A%84%E9%97%AE%E9%A2%98%E4%B8%8E%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88"><span class="nav-number">1.5.</span> <span class="nav-text">遇到的问题与解决方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E5%91%A8%E6%94%B6%E8%8E%B7%E4%B8%8E%E6%84%9F%E6%82%9F"><span class="nav-number">1.6.</span> <span class="nav-text">本周收获与感悟</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8D%E8%B6%B3%E4%B8%8E%E6%94%B9%E8%BF%9B%E8%AE%A1%E5%88%92"><span class="nav-number">1.7.</span> <span class="nav-text">不足与改进计划</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%91%A8%E4%B8%8D%E8%B6%B3"><span class="nav-number">1.7.1.</span> <span class="nav-text">本周不足</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%94%B9%E8%BF%9B%E8%AE%A1%E5%88%92"><span class="nav-number">1.7.2.</span> <span class="nav-text">改进计划</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%8B%E5%91%A8%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92"><span class="nav-number">1.8.</span> <span class="nav-text">下周学习计划</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%99%84%E5%BD%95"><span class="nav-number">1.9.</span> <span class="nav-text">附录</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AF%81%E6%8D%AE%E6%96%87%E4%BB%B6%E6%B8%85%E5%8D%95"><span class="nav-number">1.9.1.</span> <span class="nav-text">证据文件清单</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-3%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89%EF%BC%9A%E5%88%B6%E5%AE%9A%E5%8A%A0%E5%9B%BA%E6%96%B9%E6%A1%88"><span class="nav-number">1.9.2.</span> <span class="nav-text">任务 3（必做）：制定加固方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-4%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89%EF%BC%9A%E6%89%A7%E8%A1%8C%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA"><span class="nav-number">1.9.3.</span> <span class="nav-text">任务 4（必做）：执行安全加固</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-5%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89%EF%BC%9A%E5%8A%A0%E5%9B%BA%E5%90%8E%E5%A4%8D%E9%AA%8C%E6%89%AB%E6%8F%8F"><span class="nav-number">1.9.4.</span> <span class="nav-text">任务 5（必做）：加固后复验扫描</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-6%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89%EF%BC%9A%E6%92%B0%E5%86%99%E5%8F%98%E6%9B%B4%E8%AE%B0%E5%BD%95"><span class="nav-number">1.9.5.</span> <span class="nav-text">任务 6（必做）：撰写变更记录</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-7%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89%EF%BC%9A%E6%92%B0%E5%86%99%E5%91%A8%E6%8A%A5"><span class="nav-number">1.9.6.</span> <span class="nav-text">任务 7（必做）：撰写周报</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A9%E5%9B%BA%E7%BB%83%E4%B9%A0%EF%BC%88%E9%A2%98%E4%B8%8E%E5%A4%8D%E7%9B%98%EF%BC%89"><span class="nav-number">1.10.</span> <span class="nav-text">巩固练习（题与复盘）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-1%EF%BC%9A%E6%9C%AC%E5%91%A8%E6%9C%80%E6%98%93%E5%BF%BD%E8%A7%86%E7%9A%84%E9%A3%8E%E9%99%A9%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">1.10.1.</span> <span class="nav-text">练习 1：本周最易忽视的风险是什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-2%EF%BC%9A%E5%AE%8C%E5%96%84%E5%8A%A0%E5%9B%BA%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95"><span class="nav-number">1.10.2.</span> <span class="nav-text">练习 2：完善加固检查清单</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-3%EF%BC%9A%E8%AE%BE%E8%AE%A1%E8%87%AA%E5%8A%A8%E5%8C%96%E5%8A%A0%E5%9B%BA%E5%B7%A5%E5%85%B7"><span class="nav-number">1.10.3.</span> <span class="nav-text">练习 3：设计自动化加固工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-4%EF%BC%9A%E8%AF%84%E4%BC%B0%E5%8A%A0%E5%9B%BA%E6%8E%AA%E6%96%BD%E7%9A%84-ROI%EF%BC%88%E6%8A%95%E8%B5%84%E5%9B%9E%E6%8A%A5%E7%8E%87%EF%BC%89"><span class="nav-number">1.10.4.</span> <span class="nav-text">练习 4：评估加固措施的 ROI（投资回报率）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E6%A0%87%E5%87%86%EF%BC%88%E8%BE%BE%E6%88%90%E5%88%A4%E5%AE%9A%EF%BC%89"><span class="nav-number">1.11.</span> <span class="nav-text">评估标准（达成判定）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E8%BE%BE%E6%88%90%E6%83%85%E5%86%B5%EF%BC%88%E7%94%B1%E5%AD%A6%E4%B9%A0%E8%80%85%E5%A1%AB%E5%86%99%EF%BC%89"><span class="nav-number">1.12.</span> <span class="nav-text">学习成果达成情况（由学习者填写）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%AA%E5%9B%BE%E4%B8%8E%E8%AF%81%E6%8D%AE"><span class="nav-number">1.12.1.</span> <span class="nav-text">截图与证据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%91%BD%E4%BB%A4%E4%B8%8E%E8%BE%93%E5%87%BA%EF%BC%88%E7%B2%98%E8%B4%B4%E5%85%B3%E9%94%AE%E7%89%87%E6%AE%B5%EF%BC%89"><span class="nav-number">1.12.2.</span> <span class="nav-text">关键命令与输出（粘贴关键片段）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E4%B8%8E%E5%8F%8D%E6%80%9D"><span class="nav-number">1.12.3.</span> <span class="nav-text">结论与反思</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E4%B8%AD%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%88%E5%90%AB%E6%80%9D%E8%B7%AF%EF%BC%89"><span class="nav-number">1.13.</span> <span class="nav-text">集中参考答案（含思路）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-1-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%9A%E6%9C%AC%E5%91%A8%E6%9C%80%E6%98%93%E5%BF%BD%E8%A7%86%E7%9A%84%E9%A3%8E%E9%99%A9%E6%98%AF%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">1.13.1.</span> <span class="nav-text">练习 1 参考答案：本周最易忽视的风险是什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-2-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%9A%E5%AE%8C%E5%96%84%E5%8A%A0%E5%9B%BA%E6%A3%80%E6%9F%A5%E6%B8%85%E5%8D%95"><span class="nav-number">1.13.2.</span> <span class="nav-text">练习 2 参考答案：完善加固检查清单</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-3-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%9A%E8%AE%BE%E8%AE%A1%E8%87%AA%E5%8A%A8%E5%8C%96%E5%8A%A0%E5%9B%BA%E5%B7%A5%E5%85%B7"><span class="nav-number">1.13.3.</span> <span class="nav-text">练习 3 参考答案：设计自动化加固工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-4-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%9A%E8%AF%84%E4%BC%B0%E5%8A%A0%E5%9B%BA%E6%8E%AA%E6%96%BD%E7%9A%84-ROI"><span class="nav-number">1.13.4.</span> <span class="nav-text">练习 4 参考答案：评估加固措施的 ROI</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E7%A4%BA%E4%BE%8B%E5%A1%AB%E5%86%99%EF%BC%88%E5%8F%AF%E7%85%A7%E6%8A%84%EF%BC%89"><span class="nav-number">1.14.</span> <span class="nav-text">学习成果示例填写（可照抄）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%AA%E5%9B%BE%E4%B8%8E%E8%AF%81%E6%8D%AE%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.14.1.</span> <span class="nav-text">截图与证据（示例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%91%BD%E4%BB%A4%E4%B8%8E%E8%BE%93%E5%87%BA%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.14.2.</span> <span class="nav-text">关键命令与输出（示例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E4%B8%8E%E5%8F%8D%E6%80%9D%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.14.3.</span> <span class="nav-text">结论与反思（示例）</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">75</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Tigercoll" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/e442a326.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day028：漏洞扫描与基线 - 周综合实验与测评（扫描+基线+加固） | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day028：漏洞扫描与基线 - 周综合实验与测评（扫描+基线+加固）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-01-21 00:00:00" itemprop="dateCreated datePublished" datetime="2026-01-21T00:00:00+08:00">2026-01-21</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Day028：漏洞扫描与基线-周综合实验与测评（扫描-基线-加固）"><a href="#Day028：漏洞扫描与基线-周综合实验与测评（扫描-基线-加固）" class="headerlink" title="Day028：漏洞扫描与基线 - 周综合实验与测评（扫描+基线+加固）"></a>Day028：漏洞扫描与基线 - 周综合实验与测评（扫描+基线+加固）</h1><ul>
+<li>日期：2026-01-21</li>
+<li>周次：第4周</li>
+</ul>
+<h2 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h2><p>今天你将完成<strong>第 4 周综合实验</strong>，实现从扫描到加固的完整闭环：</p>
+<ul>
+<li><strong>整合本周所学</strong>：将漏洞扫描、基线检查、加固复验的知识串联应用</li>
+<li><strong>完成端到端实验</strong>：对一个目标执行完整的 安全扫描 → 基线检查 → 安全加固 → 复验验证</li>
+<li><strong>输出结构化周报</strong>：汇总本周所有实验结果，形成可汇报的技术文档</li>
+<li><strong>制定改进计划</strong>：识别问题与不足，提出后续改进措施</li>
+<li><strong>建立证据链</strong>：确保每个步骤都有可追溯的记录和截图</li>
+</ul>
+<hr>
+<span id="more"></span>
+
+<h2 id="学习内容"><a href="#学习内容" class="headerlink" title="学习内容"></a>学习内容</h2><h3 id="1️⃣-本周知识回顾"><a href="#1️⃣-本周知识回顾" class="headerlink" title="1️⃣ 本周知识回顾"></a>1️⃣ 本周知识回顾</h3><h4 id="1-1-漏洞扫描与基线检查模块概览"><a href="#1-1-漏洞扫描与基线检查模块概览" class="headerlink" title="1.1 漏洞扫描与基线检查模块概览"></a>1.1 漏洞扫描与基线检查模块概览</h4><table>
+<thead>
+<tr>
+<th>天数</th>
+<th>主题</th>
+<th>核心技能</th>
+<th>工具&#x2F;技术</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Day022</strong></td>
+<td>漏洞类型与编号体系</td>
+<td>CVE&#x2F;CWE&#x2F;CVSS 体系理解</td>
+<td>NVD 数据库查询</td>
+</tr>
+<tr>
+<td><strong>Day023</strong></td>
+<td>漏洞扫描器安装与使用</td>
+<td>Nessus&#x2F;OpenVAS 扫描与报告解读</td>
+<td>Nessus Essentials</td>
+</tr>
+<tr>
+<td><strong>Day024</strong></td>
+<td>系统基线与审计</td>
+<td>口令策略、补丁管理、服务暴露检查</td>
+<td>PowerShell&#x2F;Shell 脚本</td>
+</tr>
+<tr>
+<td><strong>Day025</strong></td>
+<td>Web 中间件暴露面与加固</td>
+<td>目录列出、版本信息、安全响应头</td>
+<td>Nginx&#x2F;Apache&#x2F;IIS 配置</td>
+</tr>
+<tr>
+<td><strong>Day026</strong></td>
+<td>自动化基线检查</td>
+<td>脚本化、模块化、报告生成</td>
+<td>Python、JSON&#x2F;CSV 导出</td>
+</tr>
+<tr>
+<td><strong>Day027</strong></td>
+<td>加固复验与变更记录</td>
+<td>复验流程、变更记录、回滚方案</td>
+<td>对比脚本、Markdown 文档</td>
+</tr>
+</tbody></table>
+<hr>
+<h4 id="1-2-完整工作流程"><a href="#1-2-完整工作流程" class="headerlink" title="1.2 完整工作流程"></a>1.2 完整工作流程</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">┌──────────────────────────────────────────────────────────┐</span><br><span class="line">│                   安全加固闭环流程                        │</span><br><span class="line">└──────────────────────────────────────────────────────────┘</span><br><span class="line">                            │</span><br><span class="line">        ┌───────────────────┼───────────────────┐</span><br><span class="line">        │                   │                   │</span><br><span class="line">        ▼                   ▼                   ▼</span><br><span class="line">   ┌────────┐        ┌────────┐        ┌────────┐</span><br><span class="line">   │ 1. 扫描 │        │ 2. 基线 │        │ 3. 加固 │</span><br><span class="line">   │ 漏洞   │        │ 检查   │        │ 配置   │</span><br><span class="line">   └────────┘        └────────┘        └────────┘</span><br><span class="line">        │                   │                   │</span><br><span class="line">        └───────────────────┼───────────────────┘</span><br><span class="line">                            │</span><br><span class="line">                            ▼</span><br><span class="line">                     ┌────────────┐</span><br><span class="line">                     │ 4. 复验   │</span><br><span class="line">                     │ 有效性    │</span><br><span class="line">                     └────────────┘</span><br><span class="line">                            │</span><br><span class="line">                            ▼</span><br><span class="line">                     ┌────────────┐</span><br><span class="line">                     │ 5. 变更   │</span><br><span class="line">                     │ 记录归档   │</span><br><span class="line">                     └────────────┘</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2️⃣-误报与漏报处理"><a href="#2️⃣-误报与漏报处理" class="headerlink" title="2️⃣ 误报与漏报处理"></a>2️⃣ 误报与漏报处理</h3><h4 id="2-1-误报（False-Positive）类型"><a href="#2-1-误报（False-Positive）类型" class="headerlink" title="2.1 误报（False Positive）类型"></a>2.1 误报（False Positive）类型</h4><table>
+<thead>
+<tr>
+<th>误报类型</th>
+<th>原因</th>
+<th>处理方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Banner 误报</strong></td>
+<td>版本号已更新但 Banner 未修改</td>
+<td>手动验证实际版本</td>
+</tr>
+<tr>
+<td><strong>配置误报</strong></td>
+<td>配置存在但实际未生效</td>
+<td>重启服务后复验</td>
+</tr>
+<tr>
+<td><strong>依赖误报</strong></td>
+<td>漏洞依赖条件不满足</td>
+<td>检查环境条件</td>
+</tr>
+<tr>
+<td><strong>插件过时</strong></td>
+<td>扫描器插件版本旧</td>
+<td>更新漏洞数据库</td>
+</tr>
+</tbody></table>
+<h4 id="2-2-漏报（False-Negative）类型"><a href="#2-2-漏报（False-Negative）类型" class="headerlink" title="2.2 漏报（False Negative）类型"></a>2.2 漏报（False Negative）类型</h4><table>
+<thead>
+<tr>
+<th>漏报类型</th>
+<th>原因</th>
+<th>处理方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>未授权扫描</strong></td>
+<td>扫描器无认证权限</td>
+<td>使用认证扫描</td>
+</tr>
+<tr>
+<td><strong>端口未开放</strong></td>
+<td>服务未运行或端口关闭</td>
+<td>检查服务状态</td>
+</tr>
+<tr>
+<td><strong>防火墙拦截</strong></td>
+<td>流量被防火墙丢弃</td>
+<td>调整防火墙规则</td>
+</tr>
+<tr>
+<td><strong>自定义应用</strong></td>
+<td>针对特定应用的检测缺失</td>
+<td>使用自定义脚本</td>
+</tr>
+</tbody></table>
+<h4 id="2-3-误报-x2F-漏报处置流程"><a href="#2-3-误报-x2F-漏报处置流程" class="headerlink" title="2.3 误报&#x2F;漏报处置流程"></a>2.3 误报&#x2F;漏报处置流程</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────┐</span><br><span class="line">│ 发现异常报告                            │</span><br><span class="line">└─────────────────────────────────────────┘</span><br><span class="line">                  │</span><br><span class="line">        ┌─────────┼─────────┐</span><br><span class="line">        ▼                   ▼</span><br><span class="line">   误报?              漏报?</span><br><span class="line">        │                   │</span><br><span class="line">        ▼                   ▼</span><br><span class="line">   手动验证          深度扫描</span><br><span class="line">        │                   │</span><br><span class="line">        ▼                   ▼</span><br><span class="line">   确认误报?        发现漏洞?</span><br><span class="line">        │                   │</span><br><span class="line">   ┌───┴───┐              │</span><br><span class="line">   │       │              │</span><br><span class="line">   是       否              │</span><br><span class="line">   │       │              │</span><br><span class="line">   ▼       ▼              ▼</span><br><span class="line">忽略   重新评估        修复漏洞</span><br><span class="line">        │                   │</span><br><span class="line">        └────────┬──────────┘</span><br><span class="line">                 ▼</span><br><span class="line">            更新报告</span><br><span class="line">                 │</span><br><span class="line">                 ▼</span><br><span class="line">           归档与改进</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="3️⃣-检查清单模板"><a href="#3️⃣-检查清单模板" class="headerlink" title="3️⃣ 检查清单模板"></a>3️⃣ 检查清单模板</h3><h4 id="3-1-综合检查清单"><a href="#3-1-综合检查清单" class="headerlink" title="3.1 综合检查清单"></a>3.1 综合检查清单</h4><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">## 安全加固综合检查清单</span></span><br><span class="line"></span><br><span class="line"><span class="section">### 阶段 1：扫描前准备</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">-</span> [ ] 确认目标授权范围</span><br><span class="line"><span class="bullet">-</span> [ ] 确定维护窗口</span><br><span class="line"><span class="bullet">-</span> [ ] 备份关键配置文件</span><br><span class="line"><span class="bullet">-</span> [ ] 记录服务正常运行状态</span><br><span class="line"><span class="bullet">-</span> [ ] 准备回滚方案</span><br><span class="line"></span><br><span class="line"><span class="section">### 阶段 2：漏洞扫描</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">-</span> [ ] 执行漏洞扫描（Nessus/OpenVAS）</span><br><span class="line"><span class="bullet">-</span> [ ] 导出扫描报告（PDF/HTML/CSV）</span><br><span class="line"><span class="bullet">-</span> [ ] 识别高危漏洞（CVSS ≥ 7.0）</span><br><span class="line"><span class="bullet">-</span> [ ] 记录漏洞详情（CVE、CVSS、修复建议）</span><br><span class="line"></span><br><span class="line"><span class="section">### 阶段 3：基线检查</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">-</span> [ ] 执行自动化基线检查脚本</span><br><span class="line"><span class="bullet">-</span> [ ] 检查 Web 中间件配置（版本信息、安全响应头）</span><br><span class="line"><span class="bullet">-</span> [ ] 检查系统配置（口令策略、开放端口、补丁状态）</span><br><span class="line"><span class="bullet">-</span> [ ] 导出基线检查报告（CSV/JSON）</span><br><span class="line"></span><br><span class="line"><span class="section">### 阶段 4：安全加固</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">-</span> [ ] 根据扫描结果制定加固方案</span><br><span class="line"><span class="bullet">-</span> [ ] 修改配置文件</span><br><span class="line"><span class="bullet">-</span> [ ] 测试配置文件语法</span><br><span class="line"><span class="bullet">-</span> [ ] 重启服务</span><br><span class="line"><span class="bullet">-</span> [ ] 验证服务状态</span><br><span class="line"></span><br><span class="line"><span class="section">### 阶段 5：复验验证</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">-</span> [ ] 重新执行漏洞扫描</span><br><span class="line"><span class="bullet">-</span> [ ] 重新执行基线检查</span><br><span class="line"><span class="bullet">-</span> [ ] 对比加固前后结果</span><br><span class="line"><span class="bullet">-</span> [ ] 执行业务回归测试</span><br><span class="line"><span class="bullet">-</span> [ ] 检查日志无异常</span><br><span class="line"></span><br><span class="line"><span class="section">### 阶段 6：变更记录</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">-</span> [ ] 撰写变更记录文档</span><br><span class="line"><span class="bullet">-</span> [ ] 记录变更内容、时间、执行人</span><br><span class="line"><span class="bullet">-</span> [ ] 记录回滚方案</span><br><span class="line"><span class="bullet">-</span> [ ] 附件：配置备份、扫描报告、测试结果</span><br><span class="line"><span class="bullet">-</span> [ ] 审批签字（如需要）</span><br><span class="line"></span><br><span class="line"><span class="section">### 阶段 7：周报汇总</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">-</span> [ ] 汇总本周所有实验结果</span><br><span class="line"><span class="bullet">-</span> [ ] 统计发现的漏洞数量与风险等级</span><br><span class="line"><span class="bullet">-</span> [ ] 统计加固措施及效果</span><br><span class="line"><span class="bullet">-</span> [ ] 识别误报/漏报并说明处置方式</span><br><span class="line"><span class="bullet">-</span> [ ] 提出改进计划</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="4️⃣-周报模板"><a href="#4️⃣-周报模板" class="headerlink" title="4️⃣ 周报模板"></a>4️⃣ 周报模板</h3><h4 id="4-1-标准周报格式"><a href="#4-1-标准周报格式" class="headerlink" title="4.1 标准周报格式"></a>4.1 标准周报格式</h4><figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># 网络安全学习周报 - 第 4 周</span></span><br><span class="line"></span><br><span class="line"><span class="section">## 基本信息</span></span><br><span class="line"></span><br><span class="line">| 项目 | 内容 |</span><br><span class="line">|------|------|</span><br><span class="line">| 周次 | 第 4 周 |</span><br><span class="line">| 学习主题 | 漏洞扫描与基线 |</span><br><span class="line">| 学习周期 | 2026-01-15 至 2026-01-21 |</span><br><span class="line">| 学习者 | [你的姓名] |</span><br><span class="line">| 完成天数 | 7/7 天 |</span><br><span class="line"></span><br><span class="line"><span class="section">## 本周学习内容概览</span></span><br><span class="line"></span><br><span class="line">| 天数 | 主题 | 完成状态 | 耗时 |</span><br><span class="line">|------|------|---------|------|</span><br><span class="line">| Day022 | 漏洞类型与编号体系 | ✅ | 2 小时 |</span><br><span class="line">| Day023 | 漏洞扫描器安装与使用 | ✅ | 3 小时 |</span><br><span class="line">| Day024 | 系统基线与审计 | ✅ | 2.5 小时 |</span><br><span class="line">| Day025 | Web 中间件暴露面与加固 | ✅ | 3.5 小时 |</span><br><span class="line">| Day026 | 自动化基线检查 | ✅ | 4 小时 |</span><br><span class="line">| Day027 | 加固复验与变更记录 | ✅ | 3 小时 |</span><br><span class="line">| Day028 | 周综合实验 | ✅ | 5 小时 |</span><br><span class="line"></span><br><span class="line"><span class="strong">**本周总耗时**</span>: 约 23 小时</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line"><span class="section">## 本周实验成果汇总</span></span><br><span class="line"></span><br><span class="line"><span class="section">### 漏洞扫描统计</span></span><br><span class="line"></span><br><span class="line">| 扫描目标 | 高危漏洞 | 中危漏洞 | 低危漏洞 | 信息级 | 已修复 |</span><br><span class="line">|---------|---------|---------|---------|-------|-------|</span><br><span class="line">| 本机 Web 服务器 | 0 | 2 | 3 | 5 | 2 |</span><br><span class="line">| 测试虚拟机 | 1 | 5 | 8 | 12 | 4 |</span><br><span class="line">| <span class="strong">**总计**</span> | <span class="strong">**1**</span> | <span class="strong">**7**</span> | <span class="strong">**11**</span> | <span class="strong">**17**</span> | <span class="strong">**6**</span> |</span><br><span class="line"></span><br><span class="line"><span class="section">### 基线检查统计</span></span><br><span class="line"></span><br><span class="line">| 检查类别 | 检查项 | 通过 | 失败 | 通过率 |</span><br><span class="line">|---------|-------|------|------|--------|</span><br><span class="line">| Web 配置 | 4 | 3 | 1 | 75% |</span><br><span class="line">| 系统配置 | 6 | 4 | 2 | 67% |</span><br><span class="line">| 日志审计 | 3 | 2 | 1 | 67% |</span><br><span class="line">| <span class="strong">**总计**</span> | <span class="strong">**13**</span> | <span class="strong">**9**</span> | <span class="strong">**4**</span> | <span class="strong">**69%**</span> |</span><br><span class="line"></span><br><span class="line"><span class="section">### 加固措施统计</span></span><br><span class="line"></span><br><span class="line">| 类别 | 实施措施数 | 验证通过 | 待验证 |</span><br><span class="line">|------|-----------|---------|-------|</span><br><span class="line">| Web 中间件 | 4 | 4 | 0 |</span><br><span class="line">| 系统配置 | 3 | 3 | 0 |</span><br><span class="line">| 防火墙规则 | 2 | 1 | 1 |</span><br><span class="line">| <span class="strong">**总计**</span> | <span class="strong">**9**</span> | <span class="strong">**8**</span> | <span class="strong">**1**</span> |</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line"><span class="section">## 典型案例分析</span></span><br><span class="line"></span><br><span class="line"><span class="section">### 案例 1：Web 服务器加固</span></span><br><span class="line"></span><br><span class="line"><span class="strong">**发现问题**</span>：</span><br><span class="line"><span class="bullet">-</span> ❌ Server 头暴露版本信息（nginx/1.18.0）</span><br><span class="line"><span class="bullet">-</span> ❌ 缺少 X-Frame-Options 响应头</span><br><span class="line"><span class="bullet">-</span> ❌ 缺少 X-Content-Type-Options 响应头</span><br><span class="line"></span><br><span class="line"><span class="strong">**加固措施**</span>：</span><br><span class="line"><span class="code">```nginx</span></span><br><span class="line"><span class="code">server_tokens off;</span></span><br><span class="line"><span class="code">add_header X-Frame-Options &quot;SAMEORIGIN&quot; always;</span></span><br><span class="line"><span class="code">add_header X-Content-Type-Options &quot;nosniff&quot; always;</span></span><br><span class="line"><span class="code">add_header X-XSS-Protection &quot;1; mode=block&quot; always;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>复验结果</strong>：</p>
+<ul>
+<li>✅ Server 头已隐藏（仅显示 “nginx”）</li>
+<li>✅ 所有安全响应头已配置</li>
+<li>✅ 业务功能正常，无副作用</li>
+</ul>
+<p><strong>通过率提升</strong>: 25% → 100%</p>
+<hr>
+<h3 id="案例-2：系统基线检查"><a href="#案例-2：系统基线检查" class="headerlink" title="案例 2：系统基线检查"></a>案例 2：系统基线检查</h3><p><strong>发现问题</strong>：</p>
+<ul>
+<li>❌ SSH 允许 root 直接登录</li>
+<li>❌ 密码最小长度仅 6 位</li>
+<li>❌ 系统超过 90 天未更新补丁</li>
+</ul>
+<p><strong>加固措施</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 禁用 root SSH 登录</span></span><br><span class="line">sed -i <span class="string">&#x27;s/PermitRootLogin yes/PermitRootLogin no/&#x27;</span> /etc/ssh/sshd_config</span><br><span class="line"></span><br><span class="line"><span class="comment"># 调整密码策略</span></span><br><span class="line">sed -i <span class="string">&#x27;s/PASS_MIN_LEN 6/PASS_MIN_LEN 12/&#x27;</span> /etc/login.defs</span><br><span class="line"></span><br><span class="line"><span class="comment"># 更新系统补丁</span></span><br><span class="line">apt update &amp;&amp; apt upgrade -y</span><br></pre></td></tr></table></figure>
+
+<p><strong>复验结果</strong>：</p>
+<ul>
+<li>✅ SSH root 登录已禁用</li>
+<li>✅ 密码最小长度已调整为 12 位</li>
+<li>✅ 系统补丁已更新至最新版本</li>
+</ul>
+<hr>
+<h2 id="误报与漏报处理"><a href="#误报与漏报处理" class="headerlink" title="误报与漏报处理"></a>误报与漏报处理</h2><h3 id="误报案例"><a href="#误报案例" class="headerlink" title="误报案例"></a>误报案例</h3><table>
+<thead>
+<tr>
+<th>检查项</th>
+<th>原因</th>
+<th>处置方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CVE-2021-23017</td>
+<td>Nginx 实际版本为 1.22.1，但扫描器检测为 1.18.0</td>
+<td>手动验证，标记为误报</td>
+</tr>
+<tr>
+<td>缺少补丁 MS17-010</td>
+<td>系统已安装补丁，但注册表未更新</td>
+<td>认证扫描后确认已修复，标记为误报</td>
+</tr>
+</tbody></table>
+<h3 id="漏报案例"><a href="#漏报案例" class="headerlink" title="漏报案例"></a>漏报案例</h3><table>
+<thead>
+<tr>
+<th>检查项</th>
+<th>原因</th>
+<th>处置方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>数据库默认密码</td>
+<td>扫描器无数据库凭据，无法验证</td>
+<td>手动检查，添加到基线检查项</td>
+</tr>
+<tr>
+<td>敏感文件暴露</td>
+<td>路径不在常见扫描列表</td>
+<td>使用自定义脚本补充检查</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="工具与脚本"><a href="#工具与脚本" class="headerlink" title="工具与脚本"></a>工具与脚本</h2><h3 id="使用的工具"><a href="#使用的工具" class="headerlink" title="使用的工具"></a>使用的工具</h3><ul>
+<li>Nessus Essentials（漏洞扫描）</li>
+<li>curl（响应头检查）</li>
+<li>diff（配置对比）</li>
+<li>Python 3（自动化脚本）</li>
+</ul>
+<h3 id="开发的脚本"><a href="#开发的脚本" class="headerlink" title="开发的脚本"></a>开发的脚本</h3><ol>
+<li><strong>Web 安全基线检查脚本</strong>（Day025）</li>
+<li><strong>基线检查报告生成器</strong>（Day026）</li>
+<li><strong>加固效果对比脚本</strong>（Day027）</li>
+<li><strong>变更记录模板</strong>（Day027）</li>
+</ol>
+<hr>
+<h2 id="遇到的问题与解决方案"><a href="#遇到的问题与解决方案" class="headerlink" title="遇到的问题与解决方案"></a>遇到的问题与解决方案</h2><table>
+<thead>
+<tr>
+<th>问题</th>
+<th>原因</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>扫描结果过多，难以筛选</td>
+<td>未设置风险等级筛选</td>
+<td>只关注 CVSS ≥ 7.0 的漏洞</td>
+</tr>
+<tr>
+<td>加固后服务无法启动</td>
+<td>配置文件语法错误</td>
+<td>使用 <code>nginx -t</code> 检查语法后再重启</td>
+</tr>
+<tr>
+<td>基线检查脚本报错</td>
+<td>requests 库未安装</td>
+<td><code>pip install requests</code></td>
+</tr>
+<tr>
+<td>复验结果与加固前无变化</td>
+<td>服务未重启</td>
+<td>确保修改配置后重启服务</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="本周收获与感悟"><a href="#本周收获与感悟" class="headerlink" title="本周收获与感悟"></a>本周收获与感悟</h2><p><strong>技术收获</strong>：</p>
+<ol>
+<li>掌握了 CVE&#x2F;CWE&#x2F;CVSS 三大编号体系的应用</li>
+<li>学会了使用 Nessus 进行漏洞扫描和报告解读</li>
+<li>理解了系统基线检查的重要性和常用检查项</li>
+<li>掌握了 Web 中间件的安全加固方法</li>
+<li>学会了编写自动化基线检查脚本</li>
+<li>理解了加固复验和变更管理的重要性</li>
+</ol>
+<p><strong>思维转变</strong>：</p>
+<ul>
+<li>从”发现问题”到”解决问题”</li>
+<li>从”手动操作”到”自动化工具”</li>
+<li>从”单点加固”到”系统化加固”</li>
+<li>从”临时修复”到”标准化流程”</li>
+</ul>
+<p><strong>印象深刻的知识点</strong>：</p>
+<ul>
+<li>CVSS 评分的六个维度（AV、AC、PR、UI、S、CIA）</li>
+<li>常见安全响应头的作用和配置方法</li>
+<li>误报和漏报的识别与处理流程</li>
+<li>变更记录的标准化格式和回滚方案</li>
+</ul>
+<hr>
+<h2 id="不足与改进计划"><a href="#不足与改进计划" class="headerlink" title="不足与改进计划"></a>不足与改进计划</h2><h3 id="本周不足"><a href="#本周不足" class="headerlink" title="本周不足"></a>本周不足</h3><ol>
+<li><p><strong>深度不足</strong>：</p>
+<ul>
+<li>对部分 CVE 的原理理解不深入</li>
+<li>对某些加固措施的影响评估不够全面</li>
+</ul>
+</li>
+<li><p><strong>自动化程度有待提高</strong>：</p>
+<ul>
+<li>扫描、基线检查、加固复验仍需手动整合</li>
+<li>尚未实现完全自动化的一站式加固工具</li>
+</ul>
+</li>
+<li><p><strong>实战经验缺乏</strong>：</p>
+<ul>
+<li>仅在本地测试环境练习，缺乏真实企业环境经验</li>
+<li>对大型系统的加固策略不够熟悉</li>
+</ul>
+</li>
+</ol>
+<h3 id="改进计划"><a href="#改进计划" class="headerlink" title="改进计划"></a>改进计划</h3><table>
+<thead>
+<tr>
+<th>改进项</th>
+<th>具体措施</th>
+<th>时间规划</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>深入理解 CVE 原理</strong></td>
+<td>选择 3-5 个经典漏洞（如 Log4Shell、EternalBlue），深入分析原理和利用方式</td>
+<td>第 5 周</td>
+</tr>
+<tr>
+<td><strong>完善自动化工具</strong></td>
+<td>开发集成扫描、基线、加固、复验的一体化工具</td>
+<td>第 6 周</td>
+</tr>
+<tr>
+<td><strong>增加实战练习</strong></td>
+<td>使用 Hack The Box、VulnHub 等靶场进行实战演练</td>
+<td>持续进行</td>
+</tr>
+<tr>
+<td><strong>建立知识库</strong></td>
+<td>整理本周所学，建立个人安全知识库</td>
+<td>第 5 周</td>
+</tr>
+<tr>
+<td><strong>学习 WAF 部署</strong></td>
+<td>了解 WAF 原理，学习 ModSecurity 规则配置</td>
+<td>第 6-7 周</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="下周学习计划"><a href="#下周学习计划" class="headerlink" title="下周学习计划"></a>下周学习计划</h2><table>
+<thead>
+<tr>
+<th>天数</th>
+<th>主题</th>
+<th>预期产出</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Day029</td>
+<td>WAF 原理与安装</td>
+<td>完成 ModSecurity 安装与配置</td>
+</tr>
+<tr>
+<td>Day030</td>
+<td>常见 Web 漏洞检测</td>
+<td>理解 SQL 注入、XSS、CSRF 原理</td>
+</tr>
+<tr>
+<td>Day031</td>
+<td>WAF 规则编写</td>
+<td>编写自定义 WAF 规则</td>
+</tr>
+<tr>
+<td>Day032</td>
+<td>安全事件监控</td>
+<td>配置日志监控与告警</td>
+</tr>
+<tr>
+<td>Day033-035</td>
+<td>综合演练</td>
+<td>完成 WAF + 监控的闭环实验</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="附录"><a href="#附录" class="headerlink" title="附录"></a>附录</h2><h3 id="证据文件清单"><a href="#证据文件清单" class="headerlink" title="证据文件清单"></a>证据文件清单</h3><table>
+<thead>
+<tr>
+<th>文件名</th>
+<th>说明</th>
+<th>日期</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>day023_scan_report.pdf</code></td>
+<td>Nessus 扫描报告</td>
+<td>2026-01-16</td>
+</tr>
+<tr>
+<td><code>day024_baseline_report.csv</code></td>
+<td>系统基线检查报告</td>
+<td>2026-01-17</td>
+</tr>
+<tr>
+<td><code>day025_web_check.json</code></td>
+<td>Web 安全检查报告</td>
+<td>2026-01-18</td>
+</tr>
+<tr>
+<td><code>day026_baseline_report.json</code></td>
+<td>自动化基线检查报告</td>
+<td>2026-01-19</td>
+</tr>
+<tr>
+<td><code>day027_change_record.md</code></td>
+<td>变更记录文档</td>
+<td>2026-01-20</td>
+</tr>
+<tr>
+<td><code>day028_comparison.json</code></td>
+<td>加固效果对比报告</td>
+<td>2026-01-21</td>
+</tr>
+</tbody></table>
+<hr>
+<p><strong>周报撰写人</strong>: [你的姓名]<br><strong>周报日期</strong>: 2026-01-21<br><strong>审阅人</strong>: （如有）</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">## 实践任务（合法授权范围内）</span><br><span class="line"></span><br><span class="line">&gt; **注意**：本次综合实验请在你的测试环境、本地虚拟机或授权靶场中执行。</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">### 任务 1（必做）：选择实验目标</span><br><span class="line"></span><br><span class="line">**目标**：选择一个 Web 服务器或系统作为本次综合实验的目标。</span><br><span class="line"></span><br><span class="line">**建议选项**：</span><br><span class="line"></span><br><span class="line">1. **本地 Web 服务器**</span><br><span class="line">   - 使用 Nginx/Apache 搭建</span><br><span class="line">   - 模拟未加固状态（开启目录列出、暴露版本等）</span><br><span class="line"></span><br><span class="line">2. **虚拟机**</span><br><span class="line">   - 使用 VirtualBox/VMware 创建 Linux 虚拟机</span><br><span class="line">   - 安装常见服务（Nginx、MySQL、SSH）</span><br><span class="line"></span><br><span class="line">3. **在线靶场**</span><br><span class="line">   - Hack The Box</span><br><span class="line">   - VulnHub</span><br><span class="line">   - PortSwigger Web Security Academy</span><br><span class="line"></span><br><span class="line">**要求**：</span><br><span class="line">- 有明确的授权范围</span><br><span class="line">- 可以反复测试和回滚</span><br><span class="line">- 能够修改配置和重启服务</span><br><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">### 任务 2（必做）：加固前基线扫描</span><br><span class="line"></span><br><span class="line">**目标**：对目标系统执行加固前的完整基线扫描，建立初始状态。</span><br><span class="line"></span><br><span class="line">**步骤**：</span><br><span class="line"></span><br><span class="line">1. **记录初始状态**</span><br><span class="line"></span><br><span class="line">```bash</span><br><span class="line"># 创建基线目录</span><br><span class="line">mkdir -p ~/week4_experiment/baseline</span><br><span class="line"></span><br><span class="line"># 记录服务状态</span><br><span class="line">systemctl status nginx &gt; baseline/service_status.txt</span><br><span class="line">systemctl status ssh &gt; baseline/ssh_status.txt</span><br><span class="line"></span><br><span class="line"># 记录配置文件</span><br><span class="line">cp /etc/nginx/nginx.conf baseline/nginx.conf.before</span><br><span class="line"></span><br><span class="line"># 记录开放端口</span><br><span class="line">ss -tlnp &gt; baseline/open_ports.txt</span><br><span class="line"></span><br><span class="line"># 记录进程列表</span><br><span class="line">ps aux &gt; baseline/processes.txt</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><strong>执行 Web 安全检查</strong></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> baseline_checker</span><br><span class="line">python main.py --config config/targets.json --output ../week4_experiment/baseline</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>执行漏洞扫描（如果使用 Nessus）</strong></li>
+</ol>
+<p>启动 Nessus 扫描，导出报告到 <code>baseline/</code> 目录。</p>
+<hr>
+<h3 id="任务-3（必做）：制定加固方案"><a href="#任务-3（必做）：制定加固方案" class="headerlink" title="任务 3（必做）：制定加固方案"></a>任务 3（必做）：制定加固方案</h3><p><strong>目标</strong>：根据扫描结果，制定详细的安全加固方案。</p>
+<p><strong>步骤</strong>：</p>
+<ol>
+<li><strong>分析扫描结果</strong></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看基线检查报告</span></span><br><span class="line"><span class="built_in">cat</span> baseline/baseline_report_*.json | grep -A 5 <span class="string">&quot;status.*failed&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看漏洞扫描报告（PDF/Nessus 报告）</span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><strong>制定加固计划</strong></li>
+</ol>
+<p>创建 <code>hardening_plan.md</code>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># 安全加固计划</span></span><br><span class="line"></span><br><span class="line"><span class="section">## 目标系统</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">-</span> 系统: Ubuntu 20.04 / Windows Server 2019</span><br><span class="line"><span class="bullet">-</span> IP: 192.168.1.10</span><br><span class="line"><span class="bullet">-</span> 主要服务: Nginx, MySQL, SSH</span><br><span class="line"></span><br><span class="line"><span class="section">## 发现的问题</span></span><br><span class="line"></span><br><span class="line"><span class="section">### 高危问题</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">1.</span> <span class="strong">**问题**</span>: Server 头暴露版本信息</span><br><span class="line"><span class="bullet">   -</span> <span class="strong">**风险等级**</span>: 中</span><br><span class="line"><span class="bullet">   -</span> <span class="strong">**影响**</span>: 攻击者可精确匹配 CVE</span><br><span class="line"><span class="bullet">   -</span> <span class="strong">**修复方案**</span>: 配置 <span class="code">`server_tokens off;`</span></span><br><span class="line"><span class="bullet">   -</span> <span class="strong">**预计影响**</span>: 无</span><br><span class="line"></span><br><span class="line"><span class="bullet">2.</span> <span class="strong">**问题**</span>: 缺少安全响应头</span><br><span class="line"><span class="bullet">   -</span> <span class="strong">**风险等级**</span>: 高</span><br><span class="line"><span class="bullet">   -</span> <span class="strong">**影响**</span>: 易受点击劫持、XSS 攻击</span><br><span class="line"><span class="bullet">   -</span> <span class="strong">**修复方案**</span>: 添加 X-Frame-Options、X-Content-Type-Options 等</span><br><span class="line"><span class="bullet">   -</span> <span class="strong">**预计影响**</span>: 可能影响某些旧浏览器</span><br><span class="line"></span><br><span class="line"><span class="section">### 中危问题</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">1.</span> <span class="strong">**问题**</span>: SSH 允许 root 登录</span><br><span class="line"><span class="bullet">   -</span> <span class="strong">**风险等级**</span>: 中</span><br><span class="line"><span class="bullet">   -</span> <span class="strong">**修复方案**</span>: 禁用 PermitRootLogin</span><br><span class="line"><span class="bullet">   -</span> <span class="strong">**预计影响**</span>: 需要使用 sudo 账户</span><br><span class="line"></span><br><span class="line"><span class="section">## 加固实施计划</span></span><br><span class="line"></span><br><span class="line">| 序号 | 加固项 | 配置文件 | 预计时间 | 回滚方案 |</span><br><span class="line">|------|--------|---------|---------|---------|</span><br><span class="line">| 1 | 隐藏版本信息 | /etc/nginx/nginx.conf | 5 分钟 | 恢复配置文件 |</span><br><span class="line">| 2 | 添加安全响应头 | /etc/nginx/nginx.conf | 5 分钟 | 恢复配置文件 |</span><br><span class="line">| 3 | 禁用 SSH root 登录 | /etc/ssh/sshd<span class="emphasis">_config | 5 分钟 | 恢复配置文件 |</span></span><br><span class="line"><span class="emphasis">| 4 | 调整密码策略 | /etc/login.defs | 10 分钟 | 恢复配置文件 |</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">## 回滚预案</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">- 备份配置文件到 `baseline/`</span></span><br><span class="line"><span class="emphasis">- 每次加固前单独备份</span></span><br><span class="line"><span class="emphasis">- 如果服务无法启动，立即回滚</span></span><br><span class="line"><span class="emphasis">- 如果业务功能异常，评估是否回滚</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="任务-4（必做）：执行安全加固"><a href="#任务-4（必做）：执行安全加固" class="headerlink" title="任务 4（必做）：执行安全加固"></a>任务 4（必做）：执行安全加固</h3><p><strong>目标</strong>：按照加固计划，逐一实施加固措施。</p>
+<p><strong>步骤</strong>：</p>
+<ol>
+<li><strong>备份当前配置</strong></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 创建加固目录</span></span><br><span class="line"><span class="built_in">mkdir</span> -p ~/week4_experiment/hardening</span><br><span class="line"></span><br><span class="line"><span class="comment"># 备份配置</span></span><br><span class="line">sudo <span class="built_in">cp</span> /etc/nginx/nginx.conf hardening/nginx.conf.backup</span><br><span class="line">sudo <span class="built_in">cp</span> /etc/ssh/sshd_config hardening/sshd_config.backup</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><strong>实施加固措施</strong></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Web 中间件加固</span></span><br><span class="line">sudo nano /etc/nginx/nginx.conf</span><br><span class="line"><span class="comment"># 添加:</span></span><br><span class="line"><span class="comment"># server_tokens off;</span></span><br><span class="line"><span class="comment"># add_header X-Frame-Options &quot;SAMEORIGIN&quot; always;</span></span><br><span class="line"><span class="comment"># add_header X-Content-Type-Options &quot;nosniff&quot; always;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># SSH 加固</span></span><br><span class="line">sudo nano /etc/ssh/sshd_config</span><br><span class="line"><span class="comment"># 修改:</span></span><br><span class="line"><span class="comment"># PermitRootLogin no</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试配置</span></span><br><span class="line">sudo nginx -t</span><br><span class="line">sudo sshd -t</span><br><span class="line"></span><br><span class="line"><span class="comment"># 重启服务</span></span><br><span class="line">sudo systemctl restart nginx</span><br><span class="line">sudo systemctl restart sshd</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>验证服务状态</strong></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">systemctl status nginx</span><br><span class="line">systemctl status sshd</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试 Web 访问</span></span><br><span class="line">curl -I http://localhost/</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试 SSH 连接</span></span><br><span class="line">ssh -o PreferredAuthentications=publickey root@localhost</span><br><span class="line"><span class="comment"># 应该拒绝连接</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="任务-5（必做）：加固后复验扫描"><a href="#任务-5（必做）：加固后复验扫描" class="headerlink" title="任务 5（必做）：加固后复验扫描"></a>任务 5（必做）：加固后复验扫描</h3><p><strong>目标</strong>：执行加固后的完整基线扫描，对比加固效果。</p>
+<p><strong>步骤</strong>：</p>
+<ol>
+<li><strong>执行复验扫描</strong></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> baseline_checker</span><br><span class="line">python main.py --config config/targets.json --output ../week4_experiment/retest</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><strong>对比加固效果</strong></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">python compare_reports.py \</span><br><span class="line">    ../week4_experiment/baseline/baseline_report_*.json \</span><br><span class="line">    ../week4_experiment/retest/baseline_report_*.json</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>业务回归测试</strong></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 测试首页访问</span></span><br><span class="line">curl http://localhost/</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试静态资源</span></span><br><span class="line">curl http://localhost/style.css</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试功能（如果有）</span></span><br><span class="line">curl http://localhost/api/status</span><br><span class="line"></span><br><span class="line"><span class="comment"># 浏览器测试</span></span><br><span class="line"><span class="comment"># 打开 http://localhost 验证页面正常</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="任务-6（必做）：撰写变更记录"><a href="#任务-6（必做）：撰写变更记录" class="headerlink" title="任务 6（必做）：撰写变更记录"></a>任务 6（必做）：撰写变更记录</h3><p><strong>目标</strong>：根据实际执行情况，撰写完整的变更记录。</p>
+<p>**创建 <code>change_record_CR-2026-W4.md</code>**：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># 安全配置变更记录 - 第 4 周综合实验</span></span><br><span class="line"></span><br><span class="line"><span class="section">## 基本信息</span></span><br><span class="line"></span><br><span class="line">| 项目 | 内容 |</span><br><span class="line">|------|------|</span><br><span class="line">| 变更编号 | CR-2026-W4 |</span><br><span class="line">| 变更标题 | 综合安全加固实验 |</span><br><span class="line">| 申请人 | [你的姓名] |</span><br><span class="line">| 执行日期 | 2026-01-21 |</span><br><span class="line">| 影响系统 | 本地测试服务器 |</span><br><span class="line"></span><br><span class="line"><span class="section">## 变更内容</span></span><br><span class="line"></span><br><span class="line">| 序号 | 变更项 | 风险等级 | 状态 |</span><br><span class="line">|------|--------|---------|------|</span><br><span class="line">| 1 | 隐藏 Nginx 版本信息 | 低 | ✅ 已完成 |</span><br><span class="line">| 2 | 添加安全响应头 | 中 | ✅ 已完成 |</span><br><span class="line">| 3 | 禁用 SSH root 登录 | 中 | ✅ 已完成 |</span><br><span class="line"></span><br><span class="line"><span class="section">## 复验结果</span></span><br><span class="line"></span><br><span class="line">加固前通过率: 33.3% (1/3)</span><br><span class="line">加固后通过率: 100% (3/3)</span><br><span class="line">通过率提升: +66.7%</span><br><span class="line"></span><br><span class="line"><span class="section">## 业务回归测试</span></span><br><span class="line"></span><br><span class="line">| 测试项 | 结果 |</span><br><span class="line">|--------|------|</span><br><span class="line">| 首页访问 | ✅ 正常 |</span><br><span class="line">| SSH 登录（非 root）| ✅ 正常 |</span><br><span class="line">| SSH 登录（root） | ❌ 已禁用 |</span><br><span class="line"></span><br><span class="line"><span class="section">## 总结</span></span><br><span class="line"></span><br><span class="line">本次综合实验成功完成，加固措施全部生效，业务功能正常。</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="任务-7（必做）：撰写周报"><a href="#任务-7（必做）：撰写周报" class="headerlink" title="任务 7（必做）：撰写周报"></a>任务 7（必做）：撰写周报</h3><p><strong>目标</strong>：汇总本周所有实验成果，撰写完整周报。</p>
+<p>**创建 <code>week4_report.md</code>**，按照本节”学习内容 4.1”的模板填写。</p>
+<p><strong>必填内容</strong>：</p>
+<ol>
+<li>本周学习内容概览（填写完成状态和耗时）</li>
+<li>实验成果汇总（漏洞扫描、基线检查、加固措施统计）</li>
+<li>典型案例分析（至少 2 个案例）</li>
+<li>误报与漏报处理（如有）</li>
+<li>遇到的问题与解决方案</li>
+<li>本周收获与感悟</li>
+<li>不足与改进计划</li>
+<li>下周学习计划</li>
+</ol>
+<p><strong>附件清单</strong>：</p>
+<ul>
+<li>加固前基线报告</li>
+<li>加固后复验报告</li>
+<li>加固效果对比报告</li>
+<li>变更记录文档</li>
+<li>配置文件备份</li>
+<li>截图证据</li>
+</ul>
+<hr>
+<h2 id="巩固练习（题与复盘）"><a href="#巩固练习（题与复盘）" class="headerlink" title="巩固练习（题与复盘）"></a>巩固练习（题与复盘）</h2><hr>
+<h3 id="练习-1：本周最易忽视的风险是什么？"><a href="#练习-1：本周最易忽视的风险是什么？" class="headerlink" title="练习 1：本周最易忽视的风险是什么？"></a>练习 1：本周最易忽视的风险是什么？</h3><p><strong>思路提示</strong>：</p>
+<ul>
+<li>常见误区：只关注高危漏洞，忽视中低危问题</li>
+<li>业务影响：某些中低危问题组合可能导致严重后果</li>
+<li>防御深度：单一加固措施可能不够，需要多层防御</li>
+</ul>
+<hr>
+<h3 id="练习-2：完善加固检查清单"><a href="#练习-2：完善加固检查清单" class="headerlink" title="练习 2：完善加固检查清单"></a>练习 2：完善加固检查清单</h3><p><strong>任务</strong>：根据本周所学，完善以下检查清单。</p>
+<p><strong>示例</strong>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">## 加固前检查清单</span></span><br><span class="line"></span><br><span class="line"><span class="bullet">-</span> [ ] 确认授权范围</span><br><span class="line"><span class="bullet">-</span> [ ] 确定维护窗口</span><br><span class="line"><span class="bullet">-</span> [ ] 备份配置文件</span><br><span class="line"><span class="bullet">-</span> [ ] 记录服务状态</span><br><span class="line"><span class="bullet">-</span> [ ] 准备回滚方案</span><br><span class="line"><span class="bullet">-</span> [ ] <span class="strong">__<span class="emphasis">_（请补充）</span></span></span><br><span class="line"><span class="emphasis"><span class="strong"></span></span></span><br><span class="line"><span class="emphasis"><span class="strong">## 加固后检查清单</span></span></span><br><span class="line"><span class="emphasis"><span class="strong"></span></span></span><br><span class="line"><span class="emphasis"><span class="strong">- [ ] 配置文件语法检查</span></span></span><br><span class="line"><span class="emphasis"><span class="strong">- [ ] 服务重启成功</span></span></span><br><span class="line"><span class="emphasis"><span class="strong">- [ ] 基线检查通过</span></span></span><br><span class="line"><span class="emphasis"><span class="strong">- [ ] 业务回归测试通过</span></span></span><br><span class="line"><span class="emphasis"><span class="strong">- [ ] 日志无异常</span></span></span><br><span class="line"><span class="emphasis"><span class="strong">- [ ] _</span>__</span>（请补充）</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="练习-3：设计自动化加固工具"><a href="#练习-3：设计自动化加固工具" class="headerlink" title="练习 3：设计自动化加固工具"></a>练习 3：设计自动化加固工具</h3><p><strong>任务</strong>：设计一个工具，自动执行扫描 → 基线 → 加固 → 复验的流程。</p>
+<p><strong>思路提示</strong>：</p>
+<ul>
+<li>模块化设计：扫描模块、基线模块、加固模块、复验模块</li>
+<li>配置化：加固策略可配置</li>
+<li>可回滚：自动备份配置，失败时自动回滚</li>
+<li>报告生成：自动生成加固前后对比报告</li>
+</ul>
+<hr>
+<h3 id="练习-4：评估加固措施的-ROI（投资回报率）"><a href="#练习-4：评估加固措施的-ROI（投资回报率）" class="headerlink" title="练习 4：评估加固措施的 ROI（投资回报率）"></a>练习 4：评估加固措施的 ROI（投资回报率）</h3><p><strong>任务</strong>：对本周实施的加固措施进行 ROI 评估。</p>
+<p><strong>评估框架</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>加固项</th>
+<th>实施成本</th>
+<th>风险降低</th>
+<th>业务影响</th>
+<th>ROI 评分</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>隐藏版本信息</td>
+<td>5 分钟</td>
+<td>低</td>
+<td>无</td>
+<td>高</td>
+</tr>
+<tr>
+<td>添加安全响应头</td>
+<td>5 分钟</td>
+<td>中</td>
+<td>低</td>
+<td>高</td>
+</tr>
+<tr>
+<td>禁用 SSH root</td>
+<td>5 分钟</td>
+<td>中</td>
+<td>低</td>
+<td>高</td>
+</tr>
+</tbody></table>
+<p><strong>ROI 计算公式</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ROI = (风险降低 × 影响范围) / (实施成本 + 业务影响)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="评估标准（达成判定）"><a href="#评估标准（达成判定）" class="headerlink" title="评估标准（达成判定）"></a>评估标准（达成判定）</h2><ul>
+<li>✅ 完成了加固前的基线扫描</li>
+<li>✅ 制定并执行了完整的加固方案</li>
+<li>✅ 完成了加固后的复验扫描</li>
+<li>✅ 生成了加固效果对比报告</li>
+<li>✅ 完成了业务回归测试</li>
+<li>✅ 撰写了变更记录文档</li>
+<li>✅ 撰写了完整的周报</li>
+<li>✅ 周报逻辑清晰、证据充分</li>
+<li>✅ 提出了可执行的改进计划</li>
+</ul>
+<hr>
+<h2 id="学习成果达成情况（由学习者填写）"><a href="#学习成果达成情况（由学习者填写）" class="headerlink" title="学习成果达成情况（由学习者填写）"></a>学习成果达成情况（由学习者填写）</h2><hr>
+<h3 id="截图与证据"><a href="#截图与证据" class="headerlink" title="截图与证据"></a>截图与证据</h3><ul>
+<li><input disabled="" type="checkbox"> 实验目标系统截图</li>
+<li><input disabled="" type="checkbox"> 加固前基线扫描输出</li>
+<li><input disabled="" type="checkbox"> 加固方案文档（hardening_plan.md）</li>
+<li><input disabled="" type="checkbox"> 加固后复验扫描输出</li>
+<li><input disabled="" type="checkbox"> 加固效果对比报告</li>
+<li><input disabled="" type="checkbox"> 业务回归测试截图</li>
+<li><input disabled="" type="checkbox"> 变更记录文档（change_record_CR-2026-W4.md）</li>
+<li><input disabled="" type="checkbox"> 周报文档（week4_report.md）</li>
+<li><input disabled="" type="checkbox"> 配置文件备份</li>
+</ul>
+<hr>
+<h3 id="关键命令与输出（粘贴关键片段）"><a href="#关键命令与输出（粘贴关键片段）" class="headerlink" title="关键命令与输出（粘贴关键片段）"></a>关键命令与输出（粘贴关键片段）</h3><p><strong>加固前扫描</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ python main.py --config config/targets.json --output baseline</span><br><span class="line">============================================================</span><br><span class="line">扫描目标: 本机测试 (web)</span><br><span class="line">============================================================</span><br><span class="line">  ❌ [版本信息泄露] 发现版本信息泄露</span><br><span class="line">  ❌ [安全响应头检查] 缺少 3 个安全响应头</span><br><span class="line">  ✅ [目录列出检查] 未发现目录列出</span><br><span class="line"></span><br><span class="line">通过率: 33.3% (1/3)</span><br></pre></td></tr></table></figure>
+
+<p><strong>加固配置</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ sudo nano /etc/nginx/nginx.conf</span><br><span class="line"></span><br><span class="line"><span class="comment"># 添加的配置:</span></span><br><span class="line">server_tokens off;</span><br><span class="line">add_header X-Frame-Options <span class="string">&quot;SAMEORIGIN&quot;</span> always;</span><br><span class="line">add_header X-Content-Type-Options <span class="string">&quot;nosniff&quot;</span> always;</span><br><span class="line">add_header X-XSS-Protection <span class="string">&quot;1; mode=block&quot;</span> always;</span><br></pre></td></tr></table></figure>
+
+<p><strong>加固后扫描</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">$ python main.py --config config/targets.json --output retest</span><br><span class="line">============================================================</span><br><span class="line">扫描目标: 本机测试 (web)</span><br><span class="line">============================================================</span><br><span class="line">  ✅ [版本信息泄露] 未发现版本信息泄露</span><br><span class="line">  ✅ [安全响应头检查] 所有安全响应头已配置</span><br><span class="line">  ✅ [目录列出检查] 未发现目录列出</span><br><span class="line"></span><br><span class="line">通过率: 100% (3/3)</span><br></pre></td></tr></table></figure>
+
+<p><strong>加固效果对比</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">$ python compare_reports.py before.json after.json</span><br><span class="line">============================================================</span><br><span class="line">加固效果对比报告</span><br><span class="line">============================================================</span><br><span class="line"></span><br><span class="line">✅ 已修复 (2 个)</span><br><span class="line">  + 版本信息泄露</span><br><span class="line">  + 安全响应头检查</span><br><span class="line"></span><br><span class="line">通过率提升: 33.3% → 100.0% (+66.7%)</span><br><span class="line">============================================================</span><br></pre></td></tr></table></figure>
+
+<p><strong>业务回归测试</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ curl -I http://localhost/</span><br><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: nginx</span><br><span class="line">Date: Wed, 21 Jan 2026 14:00:00 GMT</span><br><span class="line">X-Frame-Options: SAMEORIGIN</span><br><span class="line">X-Content-Type-Options: nosniff</span><br><span class="line">X-XSS-Protection: 1; mode=block</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="结论与反思"><a href="#结论与反思" class="headerlink" title="结论与反思"></a>结论与反思</h3><p><strong>本周学习总结</strong>：</p>
+<ul>
+<li>掌握了完整的漏洞扫描、基线检查、安全加固、复验验证的闭环流程</li>
+<li>理解了 CVE&#x2F;CWE&#x2F;CVSS 三大编号体系的实际应用</li>
+<li>学会了使用 Nessus 进行漏洞扫描和报告解读</li>
+<li>掌握了系统基线检查和 Web 中间件加固的方法</li>
+<li>学会了编写自动化基线检查脚本</li>
+<li>理解了加固复验和变更记录的重要性</li>
+</ul>
+<p><strong>技术收获</strong>：</p>
+<ol>
+<li>Nginx 安全响应头配置</li>
+<li>SSH 安全加固（禁用 root 登录）</li>
+<li>自动化基线检查脚本开发</li>
+<li>加固效果对比分析</li>
+<li>变更记录文档撰写</li>
+</ol>
+<p><strong>思维转变</strong>：</p>
+<ul>
+<li>从”单点加固”到”系统化加固”</li>
+<li>从”手动操作”到”自动化工具”</li>
+<li>从”临时修复”到”标准化流程”</li>
+<li>从”发现问题”到”解决问题”</li>
+</ul>
+<p><strong>遇到的问题与解决</strong>：</p>
+<ol>
+<li>扫描结果过多 → 只关注高危问题（CVSS ≥ 7.0）</li>
+<li>加固后服务无法启动 → 使用 <code>nginx -t</code> 检查语法</li>
+<li>复验结果无变化 → 确认服务已重启</li>
+<li>脚本报错 → 检查依赖库是否安装</li>
+</ol>
+<p><strong>本周不足</strong>：</p>
+<ul>
+<li>对部分 CVE 的原理理解不够深入</li>
+<li>自动化工具集成程度有待提高</li>
+<li>缺乏真实企业环境的实战经验</li>
+</ul>
+<p><strong>下周改进计划</strong>：</p>
+<ol>
+<li>选择 3-5 个经典漏洞深入分析</li>
+<li>开发一站式自动化加固工具</li>
+<li>使用 Hack The Box 进行实战练习</li>
+<li>学习 WAF 原理与部署</li>
+</ol>
+<p><strong>本次实验耗时</strong>：约 5 小时（包含周报撰写）</p>
+<p><strong>掌握程度自评</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 😕 理解了基本概念，但实践不熟练</li>
+<li><input disabled="" type="checkbox"> 🙂 完成了基础任务</li>
+<li><input disabled="" type="checkbox"> 😃 完成了所有任务并理解原理</li>
+<li><input disabled="" type="checkbox"> 🤩 额外开发了自动化工具或深入研究了某个方向</li>
+</ul>
+<hr>
+<h2 id="集中参考答案（含思路）"><a href="#集中参考答案（含思路）" class="headerlink" title="集中参考答案（含思路）"></a>集中参考答案（含思路）</h2><hr>
+<h3 id="练习-1-参考答案：本周最易忽视的风险是什么？"><a href="#练习-1-参考答案：本周最易忽视的风险是什么？" class="headerlink" title="练习 1 参考答案：本周最易忽视的风险是什么？"></a>练习 1 参考答案：本周最易忽视的风险是什么？</h3><p><strong>易忽视的风险类型</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>风险类型</th>
+<th>为什么易忽视</th>
+<th>潜在危害</th>
+<th>防御措施</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>信息级风险</strong></td>
+<td>认为不是漏洞，不需要修复</td>
+<td>帮助攻击者制定攻击策略</td>
+<td>隐藏 Banner、敏感文件</td>
+</tr>
+<tr>
+<td><strong>组合风险</strong></td>
+<td>单独看风险不大</td>
+<td>组合利用可造成严重后果</td>
+<td>多层防御、减少攻击面</td>
+</tr>
+<tr>
+<td><strong>配置风险</strong></td>
+<td>不是代码漏洞</td>
+<td>默认配置可能引入安全漏洞</td>
+<td>强化配置、遵循最佳实践</td>
+</tr>
+<tr>
+<td><strong>依赖风险</strong></td>
+<td>依赖第三方组件</td>
+<td>第三方组件漏洞影响整体安全</td>
+<td>定期更新、依赖扫描</td>
+</tr>
+<tr>
+<td><strong>人为风险</strong></td>
+<td>技术问题容易引起注意</td>
+<td>社会工程、钓鱼攻击不易发现</td>
+<td>安全培训、权限最小化</td>
+</tr>
+</tbody></table>
+<p><strong>示例：组合风险的危害</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">风险 A: 目录列出（低危）</span><br><span class="line">风险 B: 备份文件包含数据库密码（高危）</span><br><span class="line">风险 C: SSH 弱密码（中危）</span><br><span class="line"></span><br><span class="line">单独看:</span><br><span class="line">- 风险 A: 低危</span><br><span class="line">- 风险 B: 高危</span><br><span class="line">- 风险 C: 中危</span><br><span class="line"></span><br><span class="line">组合利用:</span><br><span class="line">1. 通过风险 A 发现备份文件</span><br><span class="line">2. 下载备份文件，获取数据库密码</span><br><span class="line">3. 使用风险 C 登录服务器</span><br><span class="line">4. 结果: 服务器被完全控制</span><br></pre></td></tr></table></figure>
+
+<p><strong>结论</strong>：</p>
+<ol>
+<li><p><strong>信息级风险不容忽视</strong>：Banner 泄露、敏感文件暴露等信息虽然单独不算高危，但可能成为攻击链的重要一环。</p>
+</li>
+<li><p><strong>组合攻击更危险</strong>：多个低&#x2F;中危漏洞组合利用，可能达到高危甚至严重后果。</p>
+</li>
+<li><p><strong>防御需要深度</strong>：单一防护措施容易被绕过，需要多层防御（Defense in Depth）。</p>
+</li>
+<li><p><strong>定期全面检查</strong>：不能只关注高危漏洞，中低危问题也需要定期评估和修复。</p>
+</li>
+</ol>
+<hr>
+<h3 id="练习-2-参考答案：完善加固检查清单"><a href="#练习-2-参考答案：完善加固检查清单" class="headerlink" title="练习 2 参考答案：完善加固检查清单"></a>练习 2 参考答案：完善加固检查清单</h3><p><strong>加固前检查清单（完整版）</strong>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">## 加固前检查清单</span></span><br><span class="line"></span><br><span class="line"><span class="section">### 授权与准备</span></span><br><span class="line"><span class="bullet">-</span> [ ] 确认目标在授权范围内</span><br><span class="line"><span class="bullet">-</span> [ ] 确认维护窗口并获得相关方同意</span><br><span class="line"><span class="bullet">-</span> [ ] 备份所有配置文件</span><br><span class="line"><span class="bullet">-</span> [ ] 记录服务正常运行状态</span><br><span class="line"><span class="bullet">-</span> [ ] 准备回滚方案和回滚命令</span><br><span class="line"><span class="bullet">-</span> [ ] 通知相关用户维护窗口</span><br><span class="line"></span><br><span class="line"><span class="section">### 基线扫描</span></span><br><span class="line"><span class="bullet">-</span> [ ] 执行漏洞扫描（Nessus/OpenVAS）</span><br><span class="line"><span class="bullet">-</span> [ ] 执行基线检查（系统/中间件）</span><br><span class="line"><span class="bullet">-</span> [ ] 导出扫描报告（PDF/CSV/JSON）</span><br><span class="line"><span class="bullet">-</span> [ ] 记录高危漏洞（CVSS ≥ 7.0）</span><br><span class="line"><span class="bullet">-</span> [ ] 记录基线检查失败项</span><br><span class="line"><span class="bullet">-</span> [ ] 分析误报和漏报</span><br><span class="line"></span><br><span class="line"><span class="section">### 风险评估</span></span><br><span class="line"><span class="bullet">-</span> [ ] 评估加固措施的业务影响</span><br><span class="line"><span class="bullet">-</span> [ ] 评估加固失败的风险</span><br><span class="line"><span class="bullet">-</span> [ ] 制定优先级（高危优先）</span><br><span class="line"><span class="bullet">-</span> [ ] 准备测试环境验证（如需要）</span><br><span class="line"><span class="bullet">-</span> [ ] 制定应急响应预案</span><br></pre></td></tr></table></figure>
+
+<p><strong>加固后检查清单（完整版）</strong>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">## 加固后检查清单</span></span><br><span class="line"></span><br><span class="line"><span class="section">### 配置验证</span></span><br><span class="line"><span class="bullet">-</span> [ ] 配置文件语法检查（nginx -t, sshd -t）</span><br><span class="line"><span class="bullet">-</span> [ ] 服务重启成功</span><br><span class="line"><span class="bullet">-</span> [ ] 服务状态正常（systemctl status）</span><br><span class="line"><span class="bullet">-</span> [ ] 端口监听正常（ss -tlnp）</span><br><span class="line"></span><br><span class="line"><span class="section">### 功能验证</span></span><br><span class="line"><span class="bullet">-</span> [ ] 首页访问正常</span><br><span class="line"><span class="bullet">-</span> [ ] 核心功能正常</span><br><span class="line"><span class="bullet">-</span> [ ] API 端点正常（如有）</span><br><span class="line"><span class="bullet">-</span> [ ] 静态资源加载正常</span><br><span class="line"><span class="bullet">-</span> [ ] 数据库连接正常（如有）</span><br><span class="line"></span><br><span class="line"><span class="section">### 安全复验</span></span><br><span class="line"><span class="bullet">-</span> [ ] 重新执行漏洞扫描</span><br><span class="line"><span class="bullet">-</span> [ ] 重新执行基线检查</span><br><span class="line"><span class="bullet">-</span> [ ] 对比加固前后结果</span><br><span class="line"><span class="bullet">-</span> [ ] 确认高危问题已修复</span><br><span class="line"><span class="bullet">-</span> [ ] 检查是否引入新问题</span><br><span class="line"></span><br><span class="line"><span class="section">### 业务回归测试</span></span><br><span class="line"><span class="bullet">-</span> [ ] 用户登录功能正常</span><br><span class="line"><span class="bullet">-</span> [ ] 数据提交功能正常</span><br><span class="line"><span class="bullet">-</span> [ ] 文件上传功能正常（如有）</span><br><span class="line"><span class="bullet">-</span> [ ] 跨域请求正常（如有）</span><br><span class="line"><span class="bullet">-</span> [ ] 浏览器兼容性测试（Chrome/Firefox/Safari）</span><br><span class="line"></span><br><span class="line"><span class="section">### 监控与日志</span></span><br><span class="line"><span class="bullet">-</span> [ ] 检查错误日志无异常增加</span><br><span class="line"><span class="bullet">-</span> [ ] 检查访问日志流量正常</span><br><span class="line"><span class="bullet">-</span> [ ] 检查性能指标（响应时间、CPU/内存）</span><br><span class="line"><span class="bullet">-</span> [ ] 配置监控告警（如需要）</span><br><span class="line"><span class="bullet">-</span> [ ] 观察 24 小时（生产环境）</span><br><span class="line"></span><br><span class="line"><span class="section">### 文档与归档</span></span><br><span class="line"><span class="bullet">-</span> [ ] 撰写变更记录文档</span><br><span class="line"><span class="bullet">-</span> [ ] 保存配置文件备份</span><br><span class="line"><span class="bullet">-</span> [ ] 保存扫描报告</span><br><span class="line"><span class="bullet">-</span> [ ] 保存测试结果和截图</span><br><span class="line"><span class="bullet">-</span> [ ] 更新资产管理台账</span><br><span class="line"><span class="bullet">-</span> [ ] 归档到知识库</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="练习-3-参考答案：设计自动化加固工具"><a href="#练习-3-参考答案：设计自动化加固工具" class="headerlink" title="练习 3 参考答案：设计自动化加固工具"></a>练习 3 参考答案：设计自动化加固工具</h3><p><strong>工具架构设计</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">自动化安全加固工具 (Auto-Harden)</span><br><span class="line">│</span><br><span class="line">├─ 配置层</span><br><span class="line">│  ├─ targets.yaml       # 目标列表</span><br><span class="line">│  ├─ rules.yaml         # 加固规则</span><br><span class="line">│  └─ thresholds.yaml    # 风险阈值</span><br><span class="line">│</span><br><span class="line">├─ 扫描层</span><br><span class="line">│  ├─ vulnerability_scanner.py  # 漏洞扫描模块</span><br><span class="line">│  ├─ baseline_checker.py       # 基线检查模块</span><br><span class="line">│  └─ port_scanner.py          # 端口扫描模块</span><br><span class="line">│</span><br><span class="line">├─ 加固层</span><br><span class="line">│  ├─ hardening_engine.py      # 加固引擎</span><br><span class="line">│  ├─ rule_processor.py       # 规则处理器</span><br><span class="line">│  └─ backup_manager.py       # 备份管理</span><br><span class="line">│</span><br><span class="line">├─ 验证层</span><br><span class="line">│  ├─ verification.py       # 验证模块</span><br><span class="line">│  ├─ regression_test.py    # 回归测试</span><br><span class="line">│  └─ diff_generator.py    # 差异分析</span><br><span class="line">│</span><br><span class="line">├─ 报告层</span><br><span class="line">│  ├─ report_generator.py   # 报告生成</span><br><span class="line">│  └─ exporter.py         # 导出器（CSV/JSON/PDF）</span><br><span class="line">│</span><br><span class="line">└─ CLI (命令行接口)</span><br><span class="line">   └─ main.py</span><br></pre></td></tr></table></figure>
+
+<p><strong>核心代码示例</strong>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">自动化安全加固工具</span></span><br><span class="line"><span class="string">用法: python auto_harden.py --target config/targets.yaml</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="keyword">import</span> argparse</span><br><span class="line"><span class="keyword">import</span> shutil</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime</span><br><span class="line"></span><br><span class="line"><span class="keyword">from</span> modules.scanner <span class="keyword">import</span> VulnerabilityScanner, BaselineChecker</span><br><span class="line"><span class="keyword">from</span> modules.hardening <span class="keyword">import</span> HardeningEngine, BackupManager</span><br><span class="line"><span class="keyword">from</span> modules.verification <span class="keyword">import</span> VerificationEngine</span><br><span class="line"><span class="keyword">from</span> modules.report <span class="keyword">import</span> ReportGenerator</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    parser = argparse.ArgumentParser(description=<span class="string">&quot;自动化安全加固工具&quot;</span>)</span><br><span class="line">    parser.add_argument(<span class="string">&quot;--target&quot;</span>, <span class="string">&quot;-t&quot;</span>, required=<span class="literal">True</span>, <span class="built_in">help</span>=<span class="string">&quot;目标配置文件&quot;</span>)</span><br><span class="line">    parser.add_argument(<span class="string">&quot;--backup-dir&quot;</span>, <span class="string">&quot;-b&quot;</span>, default=<span class="string">&quot;backups&quot;</span>, <span class="built_in">help</span>=<span class="string">&quot;备份目录&quot;</span>)</span><br><span class="line">    parser.add_argument(<span class="string">&quot;--output&quot;</span>, <span class="string">&quot;-o&quot;</span>, default=<span class="string">&quot;reports&quot;</span>, <span class="built_in">help</span>=<span class="string">&quot;报告输出目录&quot;</span>)</span><br><span class="line">    parser.add_argument(<span class="string">&quot;--dry-run&quot;</span>, <span class="string">&quot;-d&quot;</span>, action=<span class="string">&quot;store_true&quot;</span>, <span class="built_in">help</span>=<span class="string">&quot;仅模拟执行，不实际修改&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    args = parser.parse_args()</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 初始化各模块</span></span><br><span class="line">    backup_mgr = BackupManager(args.backup_dir)</span><br><span class="line">    vuln_scanner = VulnerabilityScanner()</span><br><span class="line">    baseline_checker = BaselineChecker()</span><br><span class="line">    hardening_engine = HardeningEngine(backup_mgr, dry_run=args.dry_run)</span><br><span class="line">    verifier = VerificationEngine()</span><br><span class="line">    report_gen = ReportGenerator(args.output)</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;=&quot;</span> * <span class="number">60</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;自动化安全加固工具&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;=&quot;</span> * <span class="number">60</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;目标配置: <span class="subst">&#123;args.target&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;备份目录: <span class="subst">&#123;args.backup_dir&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;输出目录: <span class="subst">&#123;args.output&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;模拟执行: <span class="subst">&#123;args.dry_run&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;=&quot;</span> * <span class="number">60</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 阶段 1: 扫描</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;\n[阶段 1/5] 执行扫描...&quot;</span>)</span><br><span class="line">    vuln_results = vuln_scanner.scan(args.target)</span><br><span class="line">    baseline_results = baseline_checker.check(args.target)</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;  发现漏洞: <span class="subst">&#123;<span class="built_in">len</span>(vuln_results)&#125;</span> 个&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;  基线检查: <span class="subst">&#123;<span class="built_in">len</span>([r <span class="keyword">for</span> r <span class="keyword">in</span> baseline_results <span class="keyword">if</span> <span class="keyword">not</span> r.passed])&#125;</span> 个失败&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 阶段 2: 分析</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;\n[阶段 2/5] 分析结果...&quot;</span>)</span><br><span class="line">    hardening_plan = hardening_engine.analyze(vuln_results, baseline_results)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;  生成加固计划: <span class="subst">&#123;<span class="built_in">len</span>(hardening_plan.rules)&#125;</span> 条规则&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 阶段 3: 加固</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;\n[阶段 3/5] 执行加固...&quot;</span>)</span><br><span class="line">    backup_id = backup_mgr.create_backup()</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;  备份 ID: <span class="subst">&#123;backup_id&#125;</span>&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    hardening_results = []</span><br><span class="line">    <span class="keyword">for</span> rule <span class="keyword">in</span> hardening_plan.rules:</span><br><span class="line">        result = hardening_engine.apply(rule)</span><br><span class="line">        hardening_results.append(result)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;  [<span class="subst">&#123;result.status&#125;</span>] <span class="subst">&#123;rule.description&#125;</span>&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 阶段 4: 验证</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;\n[阶段 4/5] 验证加固...&quot;</span>)</span><br><span class="line">    verification_results = verifier.verify(args.target)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;  验证通过: <span class="subst">&#123;<span class="built_in">len</span>([r <span class="keyword">for</span> r <span class="keyword">in</span> verification_results <span class="keyword">if</span> r.passed])&#125;</span>/<span class="subst">&#123;<span class="built_in">len</span>(verification_results)&#125;</span>&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 阶段 5: 回归测试</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;\n[阶段 5/5] 回归测试...&quot;</span>)</span><br><span class="line">    regression_results = verifier.regression_test(args.target)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;  回归测试: <span class="subst">&#123;<span class="built_in">len</span>([r <span class="keyword">for</span> r <span class="keyword">in</span> regression_results <span class="keyword">if</span> r.passed])&#125;</span>/<span class="subst">&#123;<span class="built_in">len</span>(regression_results)&#125;</span>&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 生成报告</span></span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;\n生成报告...&quot;</span>)</span><br><span class="line">    report = report_gen.generate(</span><br><span class="line">        scan_results=(vuln_results, baseline_results),</span><br><span class="line">        hardening_results=hardening_results,</span><br><span class="line">        verification_results=verification_results,</span><br><span class="line">        regression_results=regression_results,</span><br><span class="line">        backup_id=backup_id</span><br><span class="line">    )</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;\n报告已生成: <span class="subst">&#123;report&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;=&quot;</span> * <span class="number">60</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;加固流程完成！&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;=&quot;</span> * <span class="number">60</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<p><strong>规则配置示例（rules.yaml）</strong>：</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">rules:</span></span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">&quot;隐藏 Nginx 版本信息&quot;</span></span><br><span class="line">    <span class="attr">severity:</span> <span class="string">&quot;low&quot;</span></span><br><span class="line">    <span class="attr">target_type:</span> <span class="string">&quot;web&quot;</span></span><br><span class="line">    <span class="attr">action:</span> <span class="string">&quot;config_modify&quot;</span></span><br><span class="line">    <span class="attr">config_file:</span> <span class="string">&quot;/etc/nginx/nginx.conf&quot;</span></span><br><span class="line">    <span class="attr">config_path:</span> <span class="string">&quot;http.server_tokens&quot;</span></span><br><span class="line">    <span class="attr">value:</span> <span class="string">&quot;off&quot;</span></span><br><span class="line">    </span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">&quot;添加 X-Frame-Options 响应头&quot;</span></span><br><span class="line">    <span class="attr">severity:</span> <span class="string">&quot;medium&quot;</span></span><br><span class="line">    <span class="attr">target_type:</span> <span class="string">&quot;web&quot;</span></span><br><span class="line">    <span class="attr">action:</span> <span class="string">&quot;config_add&quot;</span></span><br><span class="line">    <span class="attr">config_file:</span> <span class="string">&quot;/etc/nginx/nginx.conf&quot;</span></span><br><span class="line">    <span class="attr">config_path:</span> <span class="string">&quot;http.add_header&quot;</span></span><br><span class="line">    <span class="attr">value:</span> <span class="string">&quot;X-Frame-Options \&quot;SAMEORIGIN\&quot; always&quot;</span></span><br><span class="line">    </span><br><span class="line">  <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">&quot;禁用 SSH root 登录&quot;</span></span><br><span class="line">    <span class="attr">severity:</span> <span class="string">&quot;medium&quot;</span></span><br><span class="line">    <span class="attr">target_type:</span> <span class="string">&quot;ssh&quot;</span></span><br><span class="line">    <span class="attr">action:</span> <span class="string">&quot;config_modify&quot;</span></span><br><span class="line">    <span class="attr">config_file:</span> <span class="string">&quot;/etc/ssh/sshd_config&quot;</span></span><br><span class="line">    <span class="attr">config_path:</span> <span class="string">&quot;PermitRootLogin&quot;</span></span><br><span class="line">    <span class="attr">value:</span> <span class="string">&quot;no&quot;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="练习-4-参考答案：评估加固措施的-ROI"><a href="#练习-4-参考答案：评估加固措施的-ROI" class="headerlink" title="练习 4 参考答案：评估加固措施的 ROI"></a>练习 4 参考答案：评估加固措施的 ROI</h3><p><strong>ROI 评估表</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>加固项</th>
+<th>实施成本</th>
+<th>风险降低</th>
+<th>业务影响</th>
+<th>影响范围</th>
+<th>ROI 评分</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>隐藏版本信息</td>
+<td>5 分钟</td>
+<td>低（减少信息泄露）</td>
+<td>无</td>
+<td>全局</td>
+<td>⭐⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>添加安全响应头</td>
+<td>5 分钟</td>
+<td>中（防御 XSS&#x2F;点击劫持）</td>
+<td>低</td>
+<td>全局</td>
+<td>⭐⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>禁用 SSH root</td>
+<td>5 分钟</td>
+<td>中（减少暴力破解）</td>
+<td>低</td>
+<td>全局</td>
+<td>⭐⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>调整密码策略</td>
+<td>10 分钟</td>
+<td>中（提高账户安全）</td>
+<td>中（可能影响用户）</td>
+<td>全局</td>
+<td>⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>更新系统补丁</td>
+<td>30 分钟</td>
+<td>高（修复已知漏洞）</td>
+<td>高（可能需要重启）</td>
+<td>全局</td>
+<td>⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>配置防火墙规则</td>
+<td>15 分钟</td>
+<td>高（限制攻击面）</td>
+<td>中（可能阻断合法流量）</td>
+<td>全局</td>
+<td>⭐⭐⭐⭐</td>
+</tr>
+<tr>
+<td>关闭不必要端口</td>
+<td>5 分钟</td>
+<td>中（减少攻击面）</td>
+<td>低（影响小众功能）</td>
+<td>特定服务</td>
+<td>⭐⭐⭐</td>
+</tr>
+<tr>
+<td>启用 SELinux</td>
+<td>20 分钟</td>
+<td>高（强制访问控制）</td>
+<td>高（配置复杂）</td>
+<td>全局</td>
+<td>⭐⭐⭐</td>
+</tr>
+<tr>
+<td>配置日志审计</td>
+<td>15 分钟</td>
+<td>中（便于事后溯源）</td>
+<td>低</td>
+<td>全局</td>
+<td>⭐⭐⭐⭐</td>
+</tr>
+</tbody></table>
+<p><strong>ROI 评分标准</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ROI = (风险降低 × 影响范围 × 影响权重) / (实施成本 + 业务影响)</span><br><span class="line"></span><br><span class="line">评分:</span><br><span class="line">⭐⭐⭐⭐⭐  极高 ROI (低成本、高收益、低风险)</span><br><span class="line">⭐⭐⭐⭐    高 ROI</span><br><span class="line">⭐⭐⭐      中等 ROI</span><br><span class="line">⭐⭐        低 ROI</span><br><span class="line">⭐         负 ROI (成本过高或影响过大)</span><br></pre></td></tr></table></figure>
+
+<p><strong>优先级建议</strong>：</p>
+<ol>
+<li><p><strong>P0（立即实施）</strong>：⭐⭐⭐⭐⭐</p>
+<ul>
+<li>隐藏版本信息</li>
+<li>添加安全响应头</li>
+<li>禁用 SSH root 登录</li>
+</ul>
+</li>
+<li><p><strong>P1（一周内）</strong>：⭐⭐⭐⭐</p>
+<ul>
+<li>调整密码策略</li>
+<li>更新系统补丁</li>
+<li>配置日志审计</li>
+</ul>
+</li>
+<li><p><strong>P2（一个月内）</strong>：⭐⭐⭐</p>
+<ul>
+<li>配置防火墙规则</li>
+<li>关闭不必要端口</li>
+</ul>
+</li>
+<li><p><strong>P3（计划中）</strong>：⭐⭐</p>
+<ul>
+<li>启用 SELinux（需要充分测试）</li>
+</ul>
+</li>
+</ol>
+<p><strong>结论</strong>：</p>
+<ol>
+<li><p><strong>优先实施低成本高收益的措施</strong>：隐藏版本信息、添加安全响应头等措施只需几分钟，但能显著降低信息泄露风险。</p>
+</li>
+<li><p><strong>评估业务影响</strong>：某些措施（如启用 SELinux）虽然安全性高，但配置复杂、可能影响业务，需要充分测试。</p>
+</li>
+<li><p><strong>持续优化 ROI</strong>：随着技术进步，某些措施的 ROI 可能变化，需要定期评估和调整优先级。</p>
+</li>
+</ol>
+<hr>
+<h2 id="学习成果示例填写（可照抄）"><a href="#学习成果示例填写（可照抄）" class="headerlink" title="学习成果示例填写（可照抄）"></a>学习成果示例填写（可照抄）</h2><blockquote>
+<p>可将”示例”内容替换为你自己的时间与截图文件名。</p>
+</blockquote>
+<hr>
+<h3 id="截图与证据（示例）"><a href="#截图与证据（示例）" class="headerlink" title="截图与证据（示例）"></a>截图与证据（示例）</h3><ul>
+<li>实验目标：<code>images/day028_target_system.png</code></li>
+<li>加固前扫描：<code>images/day028_before_scan.png</code></li>
+<li>加固后扫描：<code>images/day028_after_scan.png</code></li>
+<li>加固效果对比：<code>images/day028_comparison.png</code></li>
+<li>业务回归测试：<code>images/day028_regression_test.png</code></li>
+<li>变更记录：<code>change_record_CR-2026-W4.md</code></li>
+<li>周报：<code>week4_report.md</code></li>
+</ul>
+<hr>
+<h3 id="关键命令与输出（示例）"><a href="#关键命令与输出（示例）" class="headerlink" title="关键命令与输出（示例）"></a>关键命令与输出（示例）</h3><p><strong>加固前扫描</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ python main.py --config config/targets.json --output baseline</span><br><span class="line">============================================================</span><br><span class="line">扫描目标: 本机测试 (web)</span><br><span class="line">============================================================</span><br><span class="line">  ❌ [版本信息泄露] 发现版本信息泄露</span><br><span class="line">  ❌ [安全响应头检查] 缺少 3 个安全响应头</span><br><span class="line"></span><br><span class="line">通过率: 33.3% (1/3)</span><br></pre></td></tr></table></figure>
+
+<p><strong>加固后扫描</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ python main.py --config config/targets.json --output retest</span><br><span class="line">============================================================</span><br><span class="line">扫描目标: 本机测试 (web)</span><br><span class="line">============================================================</span><br><span class="line">  ✅ [版本信息泄露] 未发现版本信息泄露</span><br><span class="line">  ✅ [安全响应头检查] 所有安全响应头已配置</span><br><span class="line"></span><br><span class="line">通过率: 100% (3/3)</span><br></pre></td></tr></table></figure>
+
+<p><strong>加固效果对比</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ python compare_reports.py before.json after.json</span><br><span class="line">通过率提升: 33.3% → 100.0% (+66.7%)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="结论与反思（示例）"><a href="#结论与反思（示例）" class="headerlink" title="结论与反思（示例）"></a>结论与反思（示例）</h3><p><strong>本周学习总结</strong>：</p>
+<ul>
+<li>完成了从漏洞扫描、基线检查、安全加固到复验验证的完整闭环</li>
+<li>掌握了 CVE&#x2F;CWE&#x2F;CVSS 体系的实际应用</li>
+<li>学会了使用 Nessus 进行漏洞扫描</li>
+<li>掌握了系统基线和 Web 中间件加固方法</li>
+<li>开发了自动化基线检查脚本</li>
+<li>理解了加固复验和变更记录的重要性</li>
+</ul>
+<p><strong>技术收获</strong>：</p>
+<ol>
+<li>Nginx 安全响应头配置</li>
+<li>SSH 安全加固</li>
+<li>自动化脚本开发</li>
+<li>报告生成和对比分析</li>
+</ol>
+<p><strong>思维转变</strong>：</p>
+<ul>
+<li>从”单点加固”到”系统化加固”</li>
+<li>从”手动操作”到”自动化工具”</li>
+<li>从”临时修复”到”标准化流程”</li>
+</ul>
+<p><strong>不足与改进</strong>：</p>
+<ul>
+<li>深入研究 3-5 个经典漏洞原理</li>
+<li>开发一站式自动化加固工具</li>
+<li>使用 Hack The Box 进行实战练习</li>
+</ul>
+<p><strong>本次实验耗时</strong>：约 5 小时</p>
+<p><strong>掌握程度自评</strong>：</p>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 😃 完成了所有任务并理解原理</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Tigercoll 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+              <a href="/tags/%E5%AE%89%E5%85%A8/" rel="tag"># 安全</a>
+              <a href="/tags/%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" rel="tag"># 学习计划</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/cd46dc34.html" rel="prev" title="Day027：漏洞扫描与基线 - 加固复验与变更记录">
+                  <i class="fa fa-chevron-left"></i> Day027：漏洞扫描与基线 - 加固复验与变更记录
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/8abede0b.html" rel="next" title="Day029：日志与可观测性 - 日志类型与字段规范">
+                  Day029：日志与可观测性 - 日志类型与字段规范 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true,"react":{"opacity":0.7}}});</script></body>
+</html>

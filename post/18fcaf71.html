@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-center-simple.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Day023:漏洞扫描器(合规用途)安装与配置,报告解读 日期:2026-01-16 周次:第 4 周  学习目标今天是第 4 周的第一天,你应该能做到:  理解漏洞扫描的合法边界:能清楚说明授权范围、扫描窗口、合规要求 完成 OpenVAS&#x2F;Nessus Essentials 安装:能在 Windows 或 Linux 环境下完成部署 执行一次标准扫描:针对授权目标(本机&#x2F;V">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day023:漏洞扫描器(合规用途)安装与配置,报告解读">
+<meta property="og:url" content="https://tigercoll.top/post/18fcaf71.html">
+<meta property="og:site_name" content="Tigercoll&#39;s Blog">
+<meta property="og:description" content="Day023:漏洞扫描器(合规用途)安装与配置,报告解读 日期:2026-01-16 周次:第 4 周  学习目标今天是第 4 周的第一天,你应该能做到:  理解漏洞扫描的合法边界:能清楚说明授权范围、扫描窗口、合规要求 完成 OpenVAS&#x2F;Nessus Essentials 安装:能在 Windows 或 Linux 环境下完成部署 执行一次标准扫描:针对授权目标(本机&#x2F;V">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-01-15T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-15T16:00:00.000Z">
+<meta property="article:author" content="Tigercoll">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="学习计划">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://tigercoll.top/post/18fcaf71.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/18fcaf71.html","path":"post/18fcaf71.html","title":"Day023:漏洞扫描器(合规用途)安装与配置,报告解读"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day023:漏洞扫描器(合规用途)安装与配置,报告解读 | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Day023-%E6%BC%8F%E6%B4%9E%E6%89%AB%E6%8F%8F%E5%99%A8-%E5%90%88%E8%A7%84%E7%94%A8%E9%80%94-%E5%AE%89%E8%A3%85%E4%B8%8E%E9%85%8D%E7%BD%AE-%E6%8A%A5%E5%91%8A%E8%A7%A3%E8%AF%BB"><span class="nav-number">1.</span> <span class="nav-text">Day023:漏洞扫描器(合规用途)安装与配置,报告解读</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E7%9B%AE%E6%A0%87"><span class="nav-number">1.1.</span> <span class="nav-text">学习目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E5%86%85%E5%AE%B9"><span class="nav-number">1.2.</span> <span class="nav-text">学习内容</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-%E6%BC%8F%E6%B4%9E%E6%89%AB%E6%8F%8F%E7%9A%84%E5%90%88%E6%B3%95%E6%8E%88%E6%9D%83%E6%A1%86%E6%9E%B6"><span class="nav-number">1.2.1.</span> <span class="nav-text">1️⃣ 漏洞扫描的合法授权框架</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%83%85%E5%86%B5%E4%B8%8B%E5%8F%AF%E4%BB%A5%E4%BD%BF%E7%94%A8%E6%BC%8F%E6%B4%9E%E6%89%AB%E6%8F%8F%E5%99%A8"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">什么情况下可以使用漏洞扫描器?</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BC%81%E4%B8%9A%E7%BA%A7%E6%8E%88%E6%9D%83%E6%B5%81%E7%A8%8B-%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">企业级授权流程(示例)</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-%E6%BC%8F%E6%B4%9E%E6%89%AB%E6%8F%8F%E5%99%A8%E5%AF%B9%E6%AF%94-OpenVAS-vs-Nessus"><span class="nav-number">1.2.2.</span> <span class="nav-text">2️⃣ 漏洞扫描器对比:OpenVAS vs Nessus</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%EF%B8%8F%E2%83%A3-CVSS-%E8%AF%84%E5%88%86%E4%BD%93%E7%B3%BB%E9%80%9F%E8%A7%88"><span class="nav-number">1.2.3.</span> <span class="nav-text">3️⃣ CVSS 评分体系速览</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%AF%84%E5%88%86%E7%AD%89%E7%BA%A7"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">评分等级</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CVSS-v3-%E8%AE%A1%E7%AE%97%E8%A6%81%E7%B4%A0"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">CVSS v3 计算要素</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%EF%B8%8F%E2%83%A3-Nessus-%E6%9E%B6%E6%9E%84%E4%B8%8E%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">1.2.4.</span> <span class="nav-text">4️⃣ Nessus 架构与工作原理</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E8%B7%B5%E4%BB%BB%E5%8A%A1-%E5%90%88%E6%B3%95%E6%8E%88%E6%9D%83%E8%8C%83%E5%9B%B4%E5%86%85"><span class="nav-number">1.3.</span> <span class="nav-text">实践任务(合法授权范围内)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-1-%E5%BF%85%E5%81%9A-%E5%AE%89%E8%A3%85-Nessus-Essentials"><span class="nav-number">1.3.1.</span> <span class="nav-text">任务 1(必做):安装 Nessus Essentials</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Windows-%E5%AE%89%E8%A3%85%E6%AD%A5%E9%AA%A4"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">Windows 安装步骤</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-2-%E5%BF%85%E5%81%9A-%E6%89%A7%E8%A1%8C%E7%AC%AC%E4%B8%80%E6%AC%A1%E6%89%AB%E6%8F%8F-%E6%9C%AC%E6%9C%BA"><span class="nav-number">1.3.2.</span> <span class="nav-text">任务 2(必做):执行第一次扫描(本机)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-3-%E5%BF%85%E5%81%9A-%E8%A7%A3%E8%AF%BB%E6%89%AB%E6%8F%8F%E6%8A%A5%E5%91%8A"><span class="nav-number">1.3.3.</span> <span class="nav-text">任务 3(必做):解读扫描报告</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-4-%E8%BF%9B%E9%98%B6-%E4%BD%BF%E7%94%A8-PowerShell-%E6%8F%90%E5%8F%96%E5%85%B3%E9%94%AE%E4%BF%A1%E6%81%AF"><span class="nav-number">1.3.4.</span> <span class="nav-text">任务 4(进阶):使用 PowerShell 提取关键信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-5-%E5%8F%AF%E9%80%89-%E6%89%AB%E6%8F%8F%E8%99%9A%E6%8B%9F%E6%9C%BA"><span class="nav-number">1.3.5.</span> <span class="nav-text">任务 5(可选):扫描虚拟机</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A9%E5%9B%BA%E7%BB%83%E4%B9%A0"><span class="nav-number">1.4.</span> <span class="nav-text">巩固练习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-1-CVSS-%E5%88%86%E6%95%B0-8-1-%E7%9A%84%E6%BC%8F%E6%B4%9E%E5%BA%94%E8%AF%A5%E4%BC%98%E5%85%88%E4%BF%AE%E5%A4%8D%E5%90%97"><span class="nav-number">1.4.1.</span> <span class="nav-text">题 1:CVSS 分数 8.1 的漏洞应该优先修复吗?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-2-%E4%B8%BA%E4%BB%80%E4%B9%88-Nessus-%E6%89%AB%E6%8F%8F%E7%BB%93%E6%9E%9C%E4%B8%AD%E4%BC%9A%E6%9C%89%E2%80%9DFalse-Positive%E2%80%9D-%E8%AF%AF%E6%8A%A5"><span class="nav-number">1.4.2.</span> <span class="nav-text">题 2:为什么 Nessus 扫描结果中会有”False Positive”(误报)?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-3-%E6%9C%AA%E7%BB%8F%E6%8E%88%E6%9D%83%E6%89%AB%E6%8F%8F%E5%85%AC%E7%BD%91-IP-%E6%9C%89%E4%BB%80%E4%B9%88%E6%B3%95%E5%BE%8B%E5%90%8E%E6%9E%9C"><span class="nav-number">1.4.3.</span> <span class="nav-text">题 3:未经授权扫描公网 IP 有什么法律后果?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-4-%E8%AE%A4%E8%AF%81%E6%89%AB%E6%8F%8F%E5%92%8C%E9%9D%9E%E8%AE%A4%E8%AF%81%E6%89%AB%E6%8F%8F%E7%9A%84%E4%B8%BB%E8%A6%81%E5%8C%BA%E5%88%AB%E6%98%AF%E4%BB%80%E4%B9%88"><span class="nav-number">1.4.4.</span> <span class="nav-text">题 4:认证扫描和非认证扫描的主要区别是什么?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-5-%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E4%B8%80%E4%B8%AA%E6%BC%8F%E6%B4%9E%E6%98%AF%E5%90%A6%E9%9C%80%E8%A6%81%E7%AB%8B%E5%8D%B3%E4%BF%AE%E5%A4%8D"><span class="nav-number">1.4.5.</span> <span class="nav-text">题 5:如何判断一个漏洞是否需要立即修复?</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E6%A0%87%E5%87%86"><span class="nav-number">1.5.</span> <span class="nav-text">评估标准</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E8%BE%BE%E6%88%90%E6%83%85%E5%86%B5-%E7%94%B1%E5%AD%A6%E4%B9%A0%E8%80%85%E5%A1%AB%E5%86%99"><span class="nav-number">1.6.</span> <span class="nav-text">学习成果达成情况(由学习者填写)</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%AA%E5%9B%BE%E4%B8%8E%E8%AF%81%E6%8D%AE"><span class="nav-number">1.6.1.</span> <span class="nav-text">截图与证据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%91%BD%E4%BB%A4%E4%B8%8E%E8%BE%93%E5%87%BA"><span class="nav-number">1.6.2.</span> <span class="nav-text">关键命令与输出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E4%B8%8E%E5%8F%8D%E6%80%9D"><span class="nav-number">1.6.3.</span> <span class="nav-text">结论与反思</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E4%B8%AD%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88"><span class="nav-number">1.7.</span> <span class="nav-text">集中参考答案</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-1-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88"><span class="nav-number">1.7.1.</span> <span class="nav-text">题 1 参考答案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-2-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88"><span class="nav-number">1.7.2.</span> <span class="nav-text">题 2 参考答案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-3-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88"><span class="nav-number">1.7.3.</span> <span class="nav-text">题 3 参考答案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-4-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88"><span class="nav-number">1.7.4.</span> <span class="nav-text">题 4 参考答案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-5-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88"><span class="nav-number">1.7.5.</span> <span class="nav-text">题 5 参考答案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E7%A4%BA%E4%BE%8B%E5%A1%AB%E5%86%99"><span class="nav-number">1.8.</span> <span class="nav-text">学习成果示例填写</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%AA%E5%9B%BE%E4%B8%8E%E8%AF%81%E6%8D%AE-%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.8.1.</span> <span class="nav-text">截图与证据(示例)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%91%BD%E4%BB%A4%E4%B8%8E%E8%BE%93%E5%87%BA-%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.8.2.</span> <span class="nav-text">关键命令与输出(示例)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E4%B8%8E%E5%8F%8D%E6%80%9D-%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.8.3.</span> <span class="nav-text">结论与反思(示例)</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">75</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Tigercoll" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/18fcaf71.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day023:漏洞扫描器(合规用途)安装与配置,报告解读 | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day023:漏洞扫描器(合规用途)安装与配置,报告解读
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-01-16 00:00:00" itemprop="dateCreated datePublished" datetime="2026-01-16T00:00:00+08:00">2026-01-16</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Day023-漏洞扫描器-合规用途-安装与配置-报告解读"><a href="#Day023-漏洞扫描器-合规用途-安装与配置-报告解读" class="headerlink" title="Day023:漏洞扫描器(合规用途)安装与配置,报告解读"></a>Day023:漏洞扫描器(合规用途)安装与配置,报告解读</h1><ul>
+<li>日期:2026-01-16</li>
+<li>周次:第 4 周</li>
+</ul>
+<h2 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h2><p>今天是第 4 周的第一天,你应该能做到:</p>
+<ul>
+<li><strong>理解漏洞扫描的合法边界</strong>:能清楚说明授权范围、扫描窗口、合规要求</li>
+<li><strong>完成 OpenVAS&#x2F;Nessus Essentials 安装</strong>:能在 Windows 或 Linux 环境下完成部署</li>
+<li><strong>执行一次标准扫描</strong>:针对授权目标(本机&#x2F;VM)执行基础漏洞扫描</li>
+<li><strong>解读扫描报告</strong>:能识别高&#x2F;中&#x2F;低危漏洞,理解 CVSS 评分体系</li>
+<li><strong>形成可复用流程</strong>:记录扫描 SOP,为后续基线检查打基础</li>
+</ul>
+<blockquote>
+<p><strong>核心原则</strong>:漏洞扫描器是强大的工具,必须在合法授权范围内使用。未经授权扫描他人系统属于违法行为。</p>
+</blockquote>
+<hr>
+<span id="more"></span>
+
+<h2 id="学习内容"><a href="#学习内容" class="headerlink" title="学习内容"></a>学习内容</h2><h3 id="1️⃣-漏洞扫描的合法授权框架"><a href="#1️⃣-漏洞扫描的合法授权框架" class="headerlink" title="1️⃣ 漏洞扫描的合法授权框架"></a>1️⃣ 漏洞扫描的合法授权框架</h3><h4 id="什么情况下可以使用漏洞扫描器"><a href="#什么情况下可以使用漏洞扫描器" class="headerlink" title="什么情况下可以使用漏洞扫描器?"></a>什么情况下可以使用漏洞扫描器?</h4><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>合法性</th>
+<th>前置条件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>扫描自己的设备(个人电脑&#x2F;虚拟机)</td>
+<td>✅ 合法</td>
+<td>无需额外授权</td>
+</tr>
+<tr>
+<td>扫描公司内部系统(受雇于该公司)</td>
+<td>✅ 合法</td>
+<td>需书面授权+扫描窗口+范围界定</td>
+</tr>
+<tr>
+<td>扫描客户系统(安全测试&#x2F;渗透测试)</td>
+<td>✅ 合法</td>
+<td>需签订合同+明确范围+责任免责条款</td>
+</tr>
+<tr>
+<td>扫描实验室靶场(如 Hack The Box)</td>
+<td>✅ 合法</td>
+<td>平台 ToS 已授权,限平台内部</td>
+</tr>
+<tr>
+<td>扫描公网随机 IP</td>
+<td>🚨 违法</td>
+<td>无授权,可能触发刑法</td>
+</tr>
+<tr>
+<td>扫描学校&#x2F;邻居网络(即使出于好意)</td>
+<td>🚨 违法</td>
+<td>无授权,可能被起诉</td>
+</tr>
+</tbody></table>
+<h4 id="企业级授权流程-示例"><a href="#企业级授权流程-示例" class="headerlink" title="企业级授权流程(示例)"></a>企业级授权流程(示例)</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────┐</span><br><span class="line">│ 1. 提交扫描申请                                     │</span><br><span class="line">│    - 扫描目的(合规检查/安全评估/渗透测试前置)      │</span><br><span class="line">│    - 目标范围(IP 段/域名/主机列表)                  │</span><br><span class="line">│    - 扫描窗口(开始时间/结束时间)                    │</span><br><span class="line">│    - 预期影响(是否会影响业务)                       │</span><br><span class="line">└─────────────────────────────────────────────────────┘</span><br><span class="line">                        ↓</span><br><span class="line">┌─────────────────────────────────────────────────────┐</span><br><span class="line">│ 2. 审批环节                                         │</span><br><span class="line">│    - 资产负责人签字                                 │</span><br><span class="line">│    - 信息安全部门审批                               │</span><br><span class="line">│    - 如涉及生产环境,需业务部门确认                  │</span><br><span class="line">└─────────────────────────────────────────────────────┘</span><br><span class="line">                        ↓</span><br><span class="line">┌─────────────────────────────────────────────────────┐</span><br><span class="line">│ 3. 执行扫描                                         │</span><br><span class="line">│    - 记录扫描开始/结束时间                          │</span><br><span class="line">│    - 监控扫描过程(是否触发告警/影响业务)            │</span><br><span class="line">│    - 保存原始日志                                   │</span><br><span class="line">└─────────────────────────────────────────────────────┘</span><br><span class="line">                        ↓</span><br><span class="line">┌─────────────────────────────────────────────────────┐</span><br><span class="line">│ 4. 报告与归档                                       │</span><br><span class="line">│    - 导出扫描报告(PDF/HTML/CSV)                     │</span><br><span class="line">│    - 脱敏处理(隐藏真实 IP/账号)                     │</span><br><span class="line">│    - 提交给相关方并归档                             │</span><br><span class="line">└─────────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2️⃣-漏洞扫描器对比-OpenVAS-vs-Nessus"><a href="#2️⃣-漏洞扫描器对比-OpenVAS-vs-Nessus" class="headerlink" title="2️⃣ 漏洞扫描器对比:OpenVAS vs Nessus"></a>2️⃣ 漏洞扫描器对比:OpenVAS vs Nessus</h3><table>
+<thead>
+<tr>
+<th>特性</th>
+<th>OpenVAS</th>
+<th>Nessus Essentials</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>许可证</strong></td>
+<td>GPL(开源)</td>
+<td>免费版(限 16 IP)</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>企业内部&#x2F;学习</td>
+<td>个人学习&#x2F;小规模测试</td>
+</tr>
+<tr>
+<td><strong>漏洞库更新</strong></td>
+<td>社区维护,更新较慢</td>
+<td>Tenable 官方,更新快</td>
+</tr>
+<tr>
+<td><strong>支持平台</strong></td>
+<td>Linux(推荐 Kali&#x2F;Ubuntu)</td>
+<td>Windows&#x2F;Linux&#x2F;macOS</td>
+</tr>
+<tr>
+<td><strong>安装难度</strong></td>
+<td>中等(需配置 PostgreSQL)</td>
+<td>简单(一键安装)</td>
+</tr>
+<tr>
+<td><strong>Web 界面</strong></td>
+<td>Greenbone Security Assistant</td>
+<td>Nessus Web UI</td>
+</tr>
+<tr>
+<td><strong>报告格式</strong></td>
+<td>PDF&#x2F;HTML&#x2F;XML&#x2F;CSV</td>
+<td>PDF&#x2F;HTML&#x2F;CSV&#x2F;Nessus</td>
+</tr>
+<tr>
+<td><strong>推荐用途</strong></td>
+<td>学习 + 企业预算有限</td>
+<td>学习 + 快速上手</td>
+</tr>
+</tbody></table>
+<p><strong>本课程选型</strong>:优先使用 <strong>Nessus Essentials</strong>(安装简单,适合 Windows 学习者)。如有 Linux 环境可选 OpenVAS。</p>
+<hr>
+<h3 id="3️⃣-CVSS-评分体系速览"><a href="#3️⃣-CVSS-评分体系速览" class="headerlink" title="3️⃣ CVSS 评分体系速览"></a>3️⃣ CVSS 评分体系速览</h3><p><strong>CVSS(Common Vulnerability Scoring System)</strong> 是通用漏洞评分系统,范围 0-10。</p>
+<h4 id="评分等级"><a href="#评分等级" class="headerlink" title="评分等级"></a>评分等级</h4><table>
+<thead>
+<tr>
+<th>CVSS 分数</th>
+<th>严重等级</th>
+<th>图标</th>
+<th>典型示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>9.0-10.0</td>
+<td>🔴 严重(Critical)</td>
+<td>🚨</td>
+<td>远程代码执行(RCE)、未授权访问数据库</td>
+</tr>
+<tr>
+<td>7.0-8.9</td>
+<td>🟠 高危(High)</td>
+<td>⚠️</td>
+<td>SQL 注入、权限提升、敏感信息泄露</td>
+</tr>
+<tr>
+<td>4.0-6.9</td>
+<td>🟡 中危(Medium)</td>
+<td>ℹ️</td>
+<td>弱口令、过时的组件版本、信息泄露</td>
+</tr>
+<tr>
+<td>0.1-3.9</td>
+<td>🟢 低危(Low)</td>
+<td>✓</td>
+<td>Banner 泄露、不安全的配置建议</td>
+</tr>
+<tr>
+<td>0.0</td>
+<td>⚪ 信息(Info)</td>
+<td>📋</td>
+<td>开放端口、服务版本信息</td>
+</tr>
+</tbody></table>
+<h4 id="CVSS-v3-计算要素"><a href="#CVSS-v3-计算要素" class="headerlink" title="CVSS v3 计算要素"></a>CVSS v3 计算要素</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">CVSS v3 = f(攻击向量, 攻击复杂度, 权限要求, 用户交互, 机密性影响, 完整性影响, 可用性影响)</span><br><span class="line"></span><br><span class="line">示例:CVE-2021-44228(Log4Shell)</span><br><span class="line">- 攻击向量(AV): Network(可远程利用)</span><br><span class="line">- 攻击复杂度(AC): Low(易于利用)</span><br><span class="line">- 权限要求(PR): None(无需权限)</span><br><span class="line">- 用户交互(UI): None(无需用户操作)</span><br><span class="line">- 机密性(C): High(可读取敏感数据)</span><br><span class="line">- 完整性(I): High(可修改数据)</span><br><span class="line">- 可用性(A): High(可造成服务中断)</span><br><span class="line">→ CVSS 3.1 分数: 10.0(严重)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="4️⃣-Nessus-架构与工作原理"><a href="#4️⃣-Nessus-架构与工作原理" class="headerlink" title="4️⃣ Nessus 架构与工作原理"></a>4️⃣ Nessus 架构与工作原理</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">┌───────────────────────────────────────────────────────┐</span><br><span class="line">│                    Nessus 扫描器                      │</span><br><span class="line">│                                                       │</span><br><span class="line">│  ┌─────────────┐       ┌─────────────┐              │</span><br><span class="line">│  │  Web UI     │◄─────►│  扫描引擎   │              │</span><br><span class="line">│  │ (8834 端口) │       │  (nessusd)  │              │</span><br><span class="line">│  └─────────────┘       └─────────────┘              │</span><br><span class="line">│         │                     │                      │</span><br><span class="line">│         ▼                     ▼                      │</span><br><span class="line">│  ┌─────────────────────────────────────┐            │</span><br><span class="line">│  │         漏洞插件库(Plugins)         │            │</span><br><span class="line">│  │  - 网络服务漏洞                     │            │</span><br><span class="line">│  │  - Web 应用漏洞                     │            │</span><br><span class="line">│  │  - 操作系统漏洞                     │            │</span><br><span class="line">│  │  - 配置审计(CIS Benchmark)          │            │</span><br><span class="line">│  └─────────────────────────────────────┘            │</span><br><span class="line">└───────────────────────────────────────────────────────┘</span><br><span class="line">                    │</span><br><span class="line">                    ▼</span><br><span class="line">          ┌──────────────────┐</span><br><span class="line">          │   目标主机       │</span><br><span class="line">          │   (被扫描对象)   │</span><br><span class="line">          └──────────────────┘</span><br></pre></td></tr></table></figure>
+
+<p><strong>扫描流程</strong>:</p>
+<ol>
+<li><strong>端口探测</strong>:识别开放端口(类似 Nmap)</li>
+<li><strong>服务识别</strong>:确定运行的服务与版本</li>
+<li><strong>漏洞匹配</strong>:根据插件库匹配已知漏洞</li>
+<li><strong>深度检测</strong>:发送 Payload 验证漏洞是否真实存在</li>
+<li><strong>生成报告</strong>:汇总漏洞信息、修复建议、参考链接</li>
+</ol>
+<hr>
+<h2 id="实践任务-合法授权范围内"><a href="#实践任务-合法授权范围内" class="headerlink" title="实践任务(合法授权范围内)"></a>实践任务(合法授权范围内)</h2><blockquote>
+<p><strong>今天仅扫描自己的设备或虚拟机,严禁扫描未授权目标。</strong></p>
+</blockquote>
+<h3 id="任务-1-必做-安装-Nessus-Essentials"><a href="#任务-1-必做-安装-Nessus-Essentials" class="headerlink" title="任务 1(必做):安装 Nessus Essentials"></a>任务 1(必做):安装 Nessus Essentials</h3><h4 id="Windows-安装步骤"><a href="#Windows-安装步骤" class="headerlink" title="Windows 安装步骤"></a>Windows 安装步骤</h4><p><strong>步骤 1:注册并下载</strong></p>
+<ol>
+<li>访问 <a target="_blank" rel="noopener" href="https://www.tenable.com/products/nessus/nessus-essentials">Tenable 官网</a></li>
+<li>注册账号,获取激活码(Activation Code)</li>
+<li>下载 Windows 安装包(约 80MB)</li>
+</ol>
+<p><strong>步骤 2:安装</strong></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 运行安装程序(双击 .msi 文件)</span></span><br><span class="line"><span class="comment"># 安装路径默认:C:\Program Files\Tenable\Nessus</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装完成后,Nessus 服务会自动启动</span></span><br><span class="line"><span class="built_in">Get-Service</span> <span class="literal">-Name</span> <span class="string">&quot;Tenable Nessus&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 3:初始化配置</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1. 打开浏览器访问:https://localhost:8834</span><br><span class="line">2. 信任自签名证书(点击&quot;高级&quot; → &quot;继续访问&quot;)</span><br><span class="line">3. 选择 &quot;Nessus Essentials&quot;</span><br><span class="line">4. 输入激活码</span><br><span class="line">5. 创建管理员账号(用户名/密码,务必记录)</span><br><span class="line">6. 等待插件下载(约 30-60 分钟,取决于网络)</span><br></pre></td></tr></table></figure>
+
+<p><strong>验证安装</strong>:</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 检查 Nessus 服务状态</span></span><br><span class="line"><span class="built_in">Get-Service</span> <span class="literal">-Name</span> <span class="string">&quot;Tenable Nessus&quot;</span> | <span class="built_in">Select-Object</span> Name, Status, StartType</span><br><span class="line"></span><br><span class="line"><span class="comment"># 检查监听端口</span></span><br><span class="line"><span class="built_in">Get-NetTCPConnection</span> <span class="literal">-LocalPort</span> <span class="number">8834</span> | <span class="built_in">Select-Object</span> LocalAddress, LocalPort, State</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="任务-2-必做-执行第一次扫描-本机"><a href="#任务-2-必做-执行第一次扫描-本机" class="headerlink" title="任务 2(必做):执行第一次扫描(本机)"></a>任务 2(必做):执行第一次扫描(本机)</h3><p><strong>步骤 1:创建扫描任务</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">1. 登录 Nessus Web UI(https://localhost:8834)</span><br><span class="line">2. 点击 &quot;New Scan&quot;</span><br><span class="line">3. 选择模板 &quot;Basic Network Scan&quot;</span><br><span class="line">4. 配置扫描参数:</span><br><span class="line">   - Name: Day023_LocalScan</span><br><span class="line">   - Targets: 127.0.0.1(本机)</span><br><span class="line">   - Schedule: 立即运行</span><br><span class="line">5. 点击 &quot;Save&quot; 保存</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 2:启动扫描</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 在 &quot;My Scans&quot; 中找到 Day023_LocalScan</span><br><span class="line">2. 点击 &quot;Launch&quot; 启动</span><br><span class="line">3. 观察扫描进度(状态栏会显示进度百分比)</span><br></pre></td></tr></table></figure>
+
+<p><strong>扫描时长预估</strong>:</p>
+<ul>
+<li>本机扫描:5-15 分钟</li>
+<li>虚拟机扫描:10-30 分钟(取决于开放端口数量)</li>
+</ul>
+<hr>
+<h3 id="任务-3-必做-解读扫描报告"><a href="#任务-3-必做-解读扫描报告" class="headerlink" title="任务 3(必做):解读扫描报告"></a>任务 3(必做):解读扫描报告</h3><p><strong>步骤 1:导出报告</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1. 扫描完成后,点击扫描任务名称</span><br><span class="line">2. 点击右上角 &quot;Export&quot; → &quot;PDF&quot;</span><br><span class="line">3. 保存为:Day023_Report.pdf</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 2:分析报告结构</strong></p>
+<p>报告通常包含以下部分:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">1. Executive Summary(执行摘要)</span><br><span class="line">   - 漏洞总数</span><br><span class="line">   - 严重等级分布(Critical/High/Medium/Low/Info)</span><br><span class="line">   - 风险评分</span><br><span class="line"></span><br><span class="line">2. Vulnerability Details(漏洞详情)</span><br><span class="line">   - 漏洞名称</span><br><span class="line">   - CVE 编号(如果有)</span><br><span class="line">   - CVSS 分数</span><br><span class="line">   - 受影响的端口/服务</span><br><span class="line">   - 描述</span><br><span class="line">   - 解决方案</span><br><span class="line">   - 参考链接</span><br><span class="line"></span><br><span class="line">3. Remediations(修复建议)</span><br><span class="line">   - 按优先级排序的修复措施</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 3:填写漏洞清单</strong></p>
+<table>
+<thead>
+<tr>
+<th>CVE 编号</th>
+<th>漏洞名称</th>
+<th>CVSS</th>
+<th>等级</th>
+<th>受影响端口</th>
+<th>修复建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CVE-XXXX-XXXX</td>
+<td>[示例] SMBv1 启用</td>
+<td>7.5</td>
+<td>🟠 高危</td>
+<td>445&#x2F;tcp</td>
+<td>禁用 SMBv1</td>
+</tr>
+<tr>
+<td>N&#x2F;A</td>
+<td>[示例] TLS 1.0 启用</td>
+<td>5.3</td>
+<td>🟡 中危</td>
+<td>443&#x2F;tcp</td>
+<td>禁用 TLS 1.0&#x2F;1.1</td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="任务-4-进阶-使用-PowerShell-提取关键信息"><a href="#任务-4-进阶-使用-PowerShell-提取关键信息" class="headerlink" title="任务 4(进阶):使用 PowerShell 提取关键信息"></a>任务 4(进阶):使用 PowerShell 提取关键信息</h3><p>虽然 Nessus 提供了 Web 界面,但我们可以用 PowerShell 解析导出的 CSV 报告。</p>
+<p><strong>步骤 1:导出 CSV 格式报告</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. Export → CSV</span><br><span class="line">2. 保存为:Day023_Report.csv</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 2:用 PowerShell 分析</strong></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 读取 CSV</span></span><br><span class="line"><span class="variable">$vulns</span> = <span class="built_in">Import-Csv</span> <span class="literal">-Path</span> <span class="string">&quot;.\Day023_Report.csv&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 统计各等级漏洞数量</span></span><br><span class="line"><span class="variable">$vulns</span> | <span class="built_in">Group-Object</span> Risk | <span class="built_in">Sort-Object</span> Name | <span class="built_in">Select-Object</span> Name, Count</span><br><span class="line"></span><br><span class="line"><span class="comment"># 提取高危及以上漏洞</span></span><br><span class="line"><span class="variable">$critical</span> = <span class="variable">$vulns</span> | <span class="built_in">Where-Object</span> &#123; <span class="variable">$_</span>.Risk <span class="operator">-in</span> <span class="selector-tag">@</span>(<span class="string">&quot;Critical&quot;</span>, <span class="string">&quot;High&quot;</span>) &#125;</span><br><span class="line"><span class="variable">$critical</span> | <span class="built_in">Select-Object</span> Risk, Name, Host, Port | <span class="built_in">Format-Table</span> <span class="literal">-AutoSize</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 导出高危漏洞清单</span></span><br><span class="line"><span class="variable">$critical</span> | <span class="built_in">Export-Csv</span> <span class="literal">-Path</span> <span class="string">&quot;.\Day023_Critical.csv&quot;</span> <span class="literal">-NoTypeInformation</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">Write-Host</span> <span class="string">&quot;✅ 已导出 <span class="variable">$</span>(<span class="variable">$critical</span>.Count) 个高危及以上漏洞&quot;</span> <span class="literal">-ForegroundColor</span> Green</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="任务-5-可选-扫描虚拟机"><a href="#任务-5-可选-扫描虚拟机" class="headerlink" title="任务 5(可选):扫描虚拟机"></a>任务 5(可选):扫描虚拟机</h3><p>如果你有虚拟机(如 Windows Server&#x2F;Ubuntu),可以进行跨主机扫描。</p>
+<p><strong>前置条件</strong>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1. 虚拟机网络模式:桥接模式或 NAT(确保主机能 ping 通虚拟机)</span><br><span class="line">2. 虚拟机防火墙:暂时允许 ICMP 和常见端口(扫描后恢复)</span><br></pre></td></tr></table></figure>
+
+<p><strong>扫描配置</strong>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">1. 创建新扫描任务</span><br><span class="line">2. Targets: 192.168.x.x(虚拟机 IP)</span><br><span class="line">3. Credentials: 如果提供凭据,可以执行&quot;认证扫描&quot;(更准确)</span><br><span class="line">   - Windows: 本地管理员账号</span><br><span class="line">   - Linux: root 或 sudo 用户</span><br><span class="line">4. 启动扫描</span><br></pre></td></tr></table></figure>
+
+<p><strong>认证扫描 vs 非认证扫描</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>非认证扫描</td>
+<td>无需账号,快速</td>
+<td>只能检测外部可见漏洞</td>
+</tr>
+<tr>
+<td>认证扫描</td>
+<td>可检测补丁缺失、配置错误</td>
+<td>需要管理员权限,速度较慢</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="巩固练习"><a href="#巩固练习" class="headerlink" title="巩固练习"></a>巩固练习</h2><h3 id="题-1-CVSS-分数-8-1-的漏洞应该优先修复吗"><a href="#题-1-CVSS-分数-8-1-的漏洞应该优先修复吗" class="headerlink" title="题 1:CVSS 分数 8.1 的漏洞应该优先修复吗?"></a>题 1:CVSS 分数 8.1 的漏洞应该优先修复吗?</h3><p><strong>思路提示</strong>:</p>
+<ul>
+<li>CVSS 8.1 属于”高危”等级</li>
+<li>但修复优先级还需考虑:<ul>
+<li>是否可远程利用?</li>
+<li>是否已有公开 Exploit?</li>
+<li>资产重要性(核心业务系统 vs 测试环境)</li>
+<li>修复成本与业务影响</li>
+</ul>
+</li>
+</ul>
+<h3 id="题-2-为什么-Nessus-扫描结果中会有”False-Positive”-误报"><a href="#题-2-为什么-Nessus-扫描结果中会有”False-Positive”-误报" class="headerlink" title="题 2:为什么 Nessus 扫描结果中会有”False Positive”(误报)?"></a>题 2:为什么 Nessus 扫描结果中会有”False Positive”(误报)?</h3><p><strong>思路提示</strong>:</p>
+<ul>
+<li>漏洞扫描器基于”特征匹配”,可能误判</li>
+<li>常见误报原因:<ul>
+<li>Banner 伪装(服务器故意修改版本号)</li>
+<li>补丁已打但 Banner 未更新</li>
+<li>扫描器插件过时</li>
+</ul>
+</li>
+</ul>
+<h3 id="题-3-未经授权扫描公网-IP-有什么法律后果"><a href="#题-3-未经授权扫描公网-IP-有什么法律后果" class="headerlink" title="题 3:未经授权扫描公网 IP 有什么法律后果?"></a>题 3:未经授权扫描公网 IP 有什么法律后果?</h3><p><strong>思路提示</strong>:</p>
+<ul>
+<li>涉及法律:《网络安全法》、《刑法》第 285 条、第 286 条</li>
+<li>即使”没有恶意”也可能构成犯罪</li>
+</ul>
+<h3 id="题-4-认证扫描和非认证扫描的主要区别是什么"><a href="#题-4-认证扫描和非认证扫描的主要区别是什么" class="headerlink" title="题 4:认证扫描和非认证扫描的主要区别是什么?"></a>题 4:认证扫描和非认证扫描的主要区别是什么?</h3><p><strong>思路提示</strong>:</p>
+<ul>
+<li>认证扫描:提供系统凭据,可以登录系统检查内部配置</li>
+<li>非认证扫描:仅从外部探测,无法检测需要登录才能发现的问题</li>
+<li>准确性、覆盖范围、所需权限的差异</li>
+</ul>
+<h3 id="题-5-如何判断一个漏洞是否需要立即修复"><a href="#题-5-如何判断一个漏洞是否需要立即修复" class="headerlink" title="题 5:如何判断一个漏洞是否需要立即修复?"></a>题 5:如何判断一个漏洞是否需要立即修复?</h3><p><strong>思路提示</strong>:</p>
+<ul>
+<li>CVSS 分数只是参考,不是唯一标准</li>
+<li>需要考虑:可利用性、资产重要性、业务影响、是否有补偿控制措施</li>
+</ul>
+<hr>
+<h2 id="评估标准"><a href="#评估标准" class="headerlink" title="评估标准"></a>评估标准</h2><ul>
+<li>✅ 你能清楚说明漏洞扫描的合法授权边界</li>
+<li>✅ 你能在 Windows 上完成 Nessus Essentials 安装并启动服务</li>
+<li>✅ 你能对本机或虚拟机执行一次完整扫描</li>
+<li>✅ 你能解读扫描报告,识别高危漏洞并提取修复建议</li>
+<li>✅ 你能用 PowerShell 提取扫描报告中的关键信息</li>
+<li>✅ 你能解释 CVSS 评分体系与修复优先级判断</li>
+</ul>
+<hr>
+<h2 id="学习成果达成情况-由学习者填写"><a href="#学习成果达成情况-由学习者填写" class="headerlink" title="学习成果达成情况(由学习者填写)"></a>学习成果达成情况(由学习者填写)</h2><h3 id="截图与证据"><a href="#截图与证据" class="headerlink" title="截图与证据"></a>截图与证据</h3><ul>
+<li><input disabled="" type="checkbox"> Nessus 服务运行截图(<code>Get-Service</code> 输出)</li>
+<li><input disabled="" type="checkbox"> Nessus Web UI 登录截图</li>
+<li><input disabled="" type="checkbox"> 扫描任务配置截图</li>
+<li><input disabled="" type="checkbox"> 扫描完成后的结果总览截图</li>
+<li><input disabled="" type="checkbox"> 导出的 PDF 报告(Day023_Report.pdf)</li>
+<li><input disabled="" type="checkbox"> PowerShell 提取的高危漏洞清单(Day023_Critical.csv)</li>
+</ul>
+<h3 id="关键命令与输出"><a href="#关键命令与输出" class="headerlink" title="关键命令与输出"></a>关键命令与输出</h3><p><strong>Nessus 服务状态</strong>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Name            Status   StartType</span><br><span class="line">----            ------   ---------</span><br><span class="line">Tenable Nessus  Running  Automatic</span><br></pre></td></tr></table></figure>
+
+<p><strong>扫描结果统计</strong>:</p>
+<ul>
+<li>Critical: ___ 个</li>
+<li>High: ___ 个</li>
+<li>Medium: ___ 个</li>
+<li>Low: ___ 个</li>
+<li>Info: ___ 个</li>
+</ul>
+<p><strong>高危漏洞示例</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>CVE</th>
+<th>漏洞名称</th>
+<th>CVSS</th>
+<th>受影响端口</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody></table>
+<h3 id="结论与反思"><a href="#结论与反思" class="headerlink" title="结论与反思"></a>结论与反思</h3><p><strong>我今天搞清楚了</strong>:</p>
+<ul>
+<li>(例如:漏洞扫描必须在授权范围内,CVSS 评分不是唯一的修复依据)</li>
+</ul>
+<p><strong>我差点搞混的是</strong>:</p>
+<ul>
+<li>(例如:误以为”低危”漏洞可以不管,实际上组合利用也可能造成严重后果)</li>
+</ul>
+<p><strong>明天我要继续补的是</strong>:</p>
+<ul>
+<li>(例如:学习如何配置认证扫描,提高漏洞检测准确率)</li>
+</ul>
+<p><strong>本次学习耗时</strong>:约 ___ 小时</p>
+<p><strong>掌握程度自评</strong>:</p>
+<ul>
+<li><input disabled="" type="checkbox"> 😕 看懂了但没动手</li>
+<li><input disabled="" type="checkbox"> 🙂 完成了 Nessus 安装和基础扫描</li>
+<li><input disabled="" type="checkbox"> 😃 完成了所有任务并理解报告结构</li>
+<li><input disabled="" type="checkbox"> 🤩 额外做了认证扫描或虚拟机扫描</li>
+</ul>
+<hr>
+<h2 id="集中参考答案"><a href="#集中参考答案" class="headerlink" title="集中参考答案"></a>集中参考答案</h2><h3 id="题-1-参考答案"><a href="#题-1-参考答案" class="headerlink" title="题 1 参考答案"></a>题 1 参考答案</h3><p>CVSS 8.1 属于高危,但修复优先级需综合考虑:</p>
+<ul>
+<li>可利用性(是否有公开 Exploit)</li>
+<li>资产重要性(生产环境 vs 测试环境)</li>
+<li>暴露面(外网可访问 vs 仅内网)</li>
+<li>修复成本(是否需要停机)</li>
+</ul>
+<p><strong>决策矩阵</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>条件</th>
+<th>优先级</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>远程可利用 + 有 Exploit + 生产环境</td>
+<td>🔴 立即修复</td>
+</tr>
+<tr>
+<td>远程可利用 + 无 Exploit + 生产环境</td>
+<td>🟠 7 天内修复</td>
+</tr>
+<tr>
+<td>仅本地可利用 + 测试环境</td>
+<td>🟡 下次维护窗口修复</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="题-2-参考答案"><a href="#题-2-参考答案" class="headerlink" title="题 2 参考答案"></a>题 2 参考答案</h3><p>误报原因:</p>
+<ol>
+<li><strong>Banner 匹配不准确</strong>:版本号未更新但已打补丁</li>
+<li><strong>插件检测逻辑不严谨</strong>:未实际验证漏洞</li>
+<li><strong>环境差异</strong>:某些漏洞仅特定配置可利用</li>
+</ol>
+<p><strong>降低误报的方法</strong>:</p>
+<ul>
+<li>启用认证扫描(可检查实际补丁状态)</li>
+<li>手动验证高危漏洞</li>
+<li>使用多个扫描器交叉验证</li>
+</ul>
+<hr>
+<h3 id="题-3-参考答案"><a href="#题-3-参考答案" class="headerlink" title="题 3 参考答案"></a>题 3 参考答案</h3><p>未授权扫描可能触犯:</p>
+<ul>
+<li>《刑法》第 285 条(非法侵入计算机信息系统罪):3 年以下有期徒刑或拘役</li>
+<li>《刑法》第 286 条(破坏计算机信息系统罪):5 年以下有期徒刑或拘役</li>
+</ul>
+<p><strong>真实案例</strong>:</p>
+<ul>
+<li>2018 年某大学生”练手”扫描学校服务器,被判缓刑</li>
+<li>2020 年某安全从业者扫描客户系统但未签合同,被起诉索赔</li>
+</ul>
+<p><strong>合法途径</strong>:</p>
+<ul>
+<li>扫描自己的设备</li>
+<li>获得书面授权后扫描企业内部系统</li>
+<li>参与合法的 SRC&#x2F;漏洞赏金计划</li>
+<li>使用官方靶场练习</li>
+</ul>
+<hr>
+<h3 id="题-4-参考答案"><a href="#题-4-参考答案" class="headerlink" title="题 4 参考答案"></a>题 4 参考答案</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>认证扫描</th>
+<th>非认证扫描</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>需要凭据</strong></td>
+<td>是(管理员账号)</td>
+<td>否</td>
+</tr>
+<tr>
+<td><strong>检测深度</strong></td>
+<td>深(可检查补丁、配置、本地漏洞)</td>
+<td>浅(仅外部可见漏洞)</td>
+</tr>
+<tr>
+<td><strong>准确性</strong></td>
+<td>高(误报率低)</td>
+<td>中(依赖 Banner)</td>
+</tr>
+<tr>
+<td><strong>速度</strong></td>
+<td>慢</td>
+<td>快</td>
+</tr>
+<tr>
+<td><strong>典型用途</strong></td>
+<td>合规审计、内部评估</td>
+<td>外部渗透测试前期侦查</td>
+</tr>
+</tbody></table>
+<p><strong>推荐做法</strong>:</p>
+<ul>
+<li>内部系统:优先使用认证扫描</li>
+<li>外部系统:先非认证扫描,发现问题后再申请认证扫描</li>
+</ul>
+<hr>
+<h3 id="题-5-参考答案"><a href="#题-5-参考答案" class="headerlink" title="题 5 参考答案"></a>题 5 参考答案</h3><p><strong>修复优先级判断矩阵</strong>:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">优先级 = f(CVSS 分数, 可利用性, 资产重要性, 暴露面, 补偿控制)</span><br><span class="line"></span><br><span class="line">示例:</span><br><span class="line">- 漏洞 A: CVSS 9.8, 已有公开 Exploit, 影响外网 Web 服务器</span><br><span class="line">  → 🔴 P0: 立即修复(24 小时内)</span><br><span class="line"></span><br><span class="line">- 漏洞 B: CVSS 8.1, 无公开 Exploit, 影响内网测试环境</span><br><span class="line">  → 🟡 P2: 下次维护窗口修复(30 天内)</span><br><span class="line"></span><br><span class="line">- 漏洞 C: CVSS 7.5, 已有防火墙限制访问, 仅内网可达</span><br><span class="line">  → 🟢 P3: 计划修复(90 天内)</span><br></pre></td></tr></table></figure>
+
+<p><strong>补偿控制措施</strong>:</p>
+<ul>
+<li>防火墙规则限制访问</li>
+<li>WAF&#x2F;IPS 规则拦截已知攻击</li>
+<li>网络隔离(VLAN 分段)</li>
+<li>监控告警(检测异常访问)</li>
+</ul>
+<hr>
+<h2 id="学习成果示例填写"><a href="#学习成果示例填写" class="headerlink" title="学习成果示例填写"></a>学习成果示例填写</h2><h3 id="截图与证据-示例"><a href="#截图与证据-示例" class="headerlink" title="截图与证据(示例)"></a>截图与证据(示例)</h3><ul>
+<li>Nessus 服务运行截图:<code>images/day023_nessus_service.png</code></li>
+<li>扫描结果总览:<code>images/day023_scan_summary.png</code></li>
+<li>高危漏洞清单:<code>Day023_Critical.csv</code>(3 个高危漏洞)</li>
+</ul>
+<h3 id="关键命令与输出-示例"><a href="#关键命令与输出-示例" class="headerlink" title="关键命令与输出(示例)"></a>关键命令与输出(示例)</h3><p><strong>扫描结果统计</strong>:</p>
+<ul>
+<li>Critical: 0 个</li>
+<li>High: 3 个</li>
+<li>Medium: 12 个</li>
+<li>Low: 8 个</li>
+<li>Info: 25 个</li>
+</ul>
+<p><strong>高危漏洞示例</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>CVE</th>
+<th>漏洞名称</th>
+<th>CVSS</th>
+<th>受影响端口</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CVE-2017-0143</td>
+<td>MS17-010 (EternalBlue)</td>
+<td>8.1</td>
+<td>445&#x2F;tcp</td>
+</tr>
+<tr>
+<td>N&#x2F;A</td>
+<td>TLS 1.0 Enabled</td>
+<td>7.5</td>
+<td>443&#x2F;tcp</td>
+</tr>
+<tr>
+<td>CVE-2019-0708</td>
+<td>BlueKeep (RDP RCE)</td>
+<td>9.8</td>
+<td>3389&#x2F;tcp</td>
+</tr>
+</tbody></table>
+<h3 id="结论与反思-示例"><a href="#结论与反思-示例" class="headerlink" title="结论与反思(示例)"></a>结论与反思(示例)</h3><p><strong>我今天搞清楚了</strong>:</p>
+<ul>
+<li>漏洞扫描必须在合法授权范围内,否则可能触犯刑法</li>
+<li>CVSS 分数是参考,不是唯一的修复依据</li>
+<li>认证扫描比非认证扫描更准确,但需要管理员权限</li>
+<li>误报是常见现象,需要手动验证</li>
+</ul>
+<p><strong>我差点搞混的是</strong>:</p>
+<ul>
+<li>以为”信息级”漏洞可以忽略,实际上 Banner 泄露可能帮助攻击者制定攻击策略</li>
+<li>以为 CVSS 10.0 就一定要立即修复,但还要看是否真实可利用和资产重要性</li>
+</ul>
+<p><strong>明天我要继续补的是</strong>:</p>
+<ul>
+<li>学习如何配置 Windows 认证扫描(提供凭据)</li>
+<li>研究如何手动验证漏洞(避免误报)</li>
+<li>建立漏洞修复跟踪流程</li>
+<li>学习系统基线检查项</li>
+</ul>
+<p><strong>本次学习耗时</strong>:约 3 小时(含 Nessus 插件下载时间)</p>
+<p><strong>掌握程度自评</strong>:</p>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 😃 完成了所有任务并理解报告结构</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Tigercoll 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+              <a href="/tags/%E5%AE%89%E5%85%A8/" rel="tag"># 安全</a>
+              <a href="/tags/%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" rel="tag"># 学习计划</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/6de128c9.html" rel="prev" title="Day022：漏洞扫描与基线 - 漏洞类型与编号体系">
+                  <i class="fa fa-chevron-left"></i> Day022：漏洞扫描与基线 - 漏洞类型与编号体系
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/87578fee.html" rel="next" title="Day024：漏洞扫描与基线 - 系统基线与审计">
+                  Day024：漏洞扫描与基线 - 系统基线与审计 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true,"react":{"opacity":0.7}}});</script></body>
+</html>

@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-center-simple.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Day021：操作系统与脚本 - 第 3 周综合实验与测评（OS+枚举+脚本，傻瓜版能照做） 日期：2026-01-14 周次：第 3 周  学习目标今天把第 3 周收口，你应该能做到：  主机侧：能给出 Windows&#x2F;Linux 各 5 条加固项（并有证据） 网络侧：能对”授权目标”做一次端口&#x2F;服务枚举并导出结果 脚本侧：能把输出整理成结构化文件（CSV&#x2F;JSON">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day021：操作系统与脚本 - 第 3 周综合实验与测评（OS+枚举+脚本，傻瓜版能照做）">
+<meta property="og:url" content="https://tigercoll.top/post/96499f8c.html">
+<meta property="og:site_name" content="Tigercoll&#39;s Blog">
+<meta property="og:description" content="Day021：操作系统与脚本 - 第 3 周综合实验与测评（OS+枚举+脚本，傻瓜版能照做） 日期：2026-01-14 周次：第 3 周  学习目标今天把第 3 周收口，你应该能做到：  主机侧：能给出 Windows&#x2F;Linux 各 5 条加固项（并有证据） 网络侧：能对”授权目标”做一次端口&#x2F;服务枚举并导出结果 脚本侧：能把输出整理成结构化文件（CSV&#x2F;JSON">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-01-13T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-13T16:00:00.000Z">
+<meta property="article:author" content="Tigercoll">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="学习计划">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://tigercoll.top/post/96499f8c.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/96499f8c.html","path":"post/96499f8c.html","title":"Day021：操作系统与脚本 - 第 3 周综合实验与测评（OS+枚举+脚本，傻瓜版能照做）"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day021：操作系统与脚本 - 第 3 周综合实验与测评（OS+枚举+脚本，傻瓜版能照做） | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Day021%EF%BC%9A%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B8%8E%E8%84%9A%E6%9C%AC-%E7%AC%AC-3-%E5%91%A8%E7%BB%BC%E5%90%88%E5%AE%9E%E9%AA%8C%E4%B8%8E%E6%B5%8B%E8%AF%84%EF%BC%88OS-%E6%9E%9A%E4%B8%BE-%E8%84%9A%E6%9C%AC%EF%BC%8C%E5%82%BB%E7%93%9C%E7%89%88%E8%83%BD%E7%85%A7%E5%81%9A%EF%BC%89"><span class="nav-number">1.</span> <span class="nav-text">Day021：操作系统与脚本 - 第 3 周综合实验与测评（OS+枚举+脚本，傻瓜版能照做）</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E7%9B%AE%E6%A0%87"><span class="nav-number">1.1.</span> <span class="nav-text">学习目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E7%AC%AC-3-%E5%91%A8%E7%9F%A5%E8%AF%86%E5%9C%B0%E5%9B%BE"><span class="nav-number">1.2.</span> <span class="nav-text">一、第 3 周知识地图</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%8110-%E4%B8%AA%E6%98%93%E9%94%99%E7%82%B9%E5%AF%B9%E7%85%A7%E8%A1%A8"><span class="nav-number">1.3.</span> <span class="nav-text">二、10 个易错点对照表</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E7%BB%BC%E5%90%88%E5%AE%9E%E9%AA%8C%E4%BB%BB%E5%8A%A1"><span class="nav-number">1.4.</span> <span class="nav-text">三、综合实验任务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-1%EF%BC%9AWindows-%E8%87%AA%E6%9F%A5%E8%AF%81%E6%8D%AE%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89"><span class="nav-number">1.4.1.</span> <span class="nav-text">任务 1：Windows 自查证据（必做）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A%E5%AE%A1%E8%AE%A1%E7%AE%A1%E7%90%86%E5%91%98%E7%BB%84%E6%88%90%E5%91%98"><span class="nav-number">1.4.1.1.</span> <span class="nav-text">步骤 1：审计管理员组成员</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-2%EF%BC%9A%E5%AF%BC%E5%87%BA%E6%9C%80%E8%BF%91-24-%E5%B0%8F%E6%97%B6%E7%99%BB%E5%BD%95%E4%BA%8B%E4%BB%B6"><span class="nav-number">1.4.1.2.</span> <span class="nav-text">步骤 2：导出最近 24 小时登录事件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-3%EF%BC%9A%E6%A3%80%E6%9F%A5%E9%98%B2%E7%81%AB%E5%A2%99%E5%85%A5%E7%AB%99%E8%A7%84%E5%88%99"><span class="nav-number">1.4.1.3.</span> <span class="nav-text">步骤 3：检查防火墙入站规则</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-4%EF%BC%9A%E7%9B%98%E7%82%B9%E7%9B%91%E5%90%AC%E7%AB%AF%E5%8F%A3"><span class="nav-number">1.4.1.4.</span> <span class="nav-text">步骤 4：盘点监听端口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-5%EF%BC%9A%E6%95%B4%E7%90%86-Windows-%E9%A3%8E%E9%99%A9%E6%B8%85%E5%8D%95"><span class="nav-number">1.4.1.5.</span> <span class="nav-text">步骤 5：整理 Windows 风险清单</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-2%EF%BC%9ALinux-%E8%87%AA%E6%9F%A5%E8%AF%81%E6%8D%AE%EF%BC%88%E5%8F%AF%E9%80%89%EF%BC%8C%E9%9C%80%E8%87%AA%E5%BB%BA-VM%EF%BC%89"><span class="nav-number">1.4.2.</span> <span class="nav-text">任务 2：Linux 自查证据（可选，需自建 VM）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A%E6%A3%80%E6%9F%A5%E5%85%B3%E9%94%AE%E6%96%87%E4%BB%B6%E6%9D%83%E9%99%90"><span class="nav-number">1.4.2.1.</span> <span class="nav-text">步骤 1：检查关键文件权限</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-2%EF%BC%9A%E5%AE%A1%E8%AE%A1-sudo-%E6%9D%83%E9%99%90"><span class="nav-number">1.4.2.2.</span> <span class="nav-text">步骤 2：审计 sudo 权限</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-3%EF%BC%9A%E7%9B%98%E7%82%B9%E7%9B%91%E5%90%AC%E7%AB%AF%E5%8F%A3"><span class="nav-number">1.4.2.3.</span> <span class="nav-text">步骤 3：盘点监听端口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-4%EF%BC%9A%E6%9F%A5%E7%9C%8B%E6%9C%80%E8%BF%91%E7%99%BB%E5%BD%95%E8%AE%B0%E5%BD%95"><span class="nav-number">1.4.2.4.</span> <span class="nav-text">步骤 4：查看最近登录记录</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-5%EF%BC%9A%E6%95%B4%E7%90%86-Linux-%E9%A3%8E%E9%99%A9%E6%B8%85%E5%8D%95"><span class="nav-number">1.4.2.5.</span> <span class="nav-text">步骤 5：整理 Linux 风险清单</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-3%EF%BC%9A%E6%8E%88%E6%9D%83%E7%9B%AE%E6%A0%87%E6%9E%9A%E4%B8%BE%E8%AF%81%E6%8D%AE%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89"><span class="nav-number">1.4.3.</span> <span class="nav-text">任务 3：授权目标枚举证据（必做）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A%E8%AE%B0%E5%BD%95%E6%8E%88%E6%9D%83%E4%BF%A1%E6%81%AF"><span class="nav-number">1.4.3.1.</span> <span class="nav-text">步骤 1：记录授权信息</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-2%EF%BC%9A%E6%89%A7%E8%A1%8C%E6%89%AB%E6%8F%8F"><span class="nav-number">1.4.3.2.</span> <span class="nav-text">步骤 2：执行扫描</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-3%EF%BC%9A%E7%94%A8-Python-%E8%84%9A%E6%9C%AC%E8%A7%A3%E6%9E%90%E7%BB%93%E6%9E%9C"><span class="nav-number">1.4.3.3.</span> <span class="nav-text">步骤 3：用 Python 脚本解析结果</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-4%EF%BC%9A%E6%95%B4%E7%90%86%E6%9C%8D%E5%8A%A1%E6%B8%85%E5%8D%95"><span class="nav-number">1.4.3.4.</span> <span class="nav-text">步骤 4：整理服务清单</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-4%EF%BC%9A%E8%84%9A%E6%9C%AC%E4%BE%A7%E5%AE%9E%E6%88%98%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89"><span class="nav-number">1.4.4.</span> <span class="nav-text">任务 4：脚本侧实战（必做）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%9C%80%E6%B1%82"><span class="nav-number">1.4.4.1.</span> <span class="nav-text">需求</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8F%82%E8%80%83%E5%AE%9E%E7%8E%B0%EF%BC%88Python%EF%BC%89"><span class="nav-number">1.4.4.2.</span> <span class="nav-text">参考实现（Python）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E7%AC%AC-3-%E5%91%A8%E5%91%A8%E6%8A%A5%E6%A8%A1%E6%9D%BF"><span class="nav-number">1.5.</span> <span class="nav-text">四、第 3 周周报模板</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%A8%E6%8A%A5%E6%A0%87%E9%A2%98"><span class="nav-number">1.5.1.</span> <span class="nav-text">周报标题</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E5%AD%A6%E4%B9%A0%E6%A6%82%E8%A7%88"><span class="nav-number">1.5.2.</span> <span class="nav-text">一、学习概览</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%85%B3%E9%94%AE%E5%8F%91%E7%8E%B0%E4%B8%8E%E8%AF%81%E6%8D%AE"><span class="nav-number">1.5.3.</span> <span class="nav-text">二、关键发现与证据</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Windows-%E4%B8%BB%E6%9C%BA%E8%87%AA%E6%9F%A5"><span class="nav-number">1.5.3.1.</span> <span class="nav-text">Windows 主机自查</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Linux-%E4%B8%BB%E6%9C%BA%E8%87%AA%E6%9F%A5%EF%BC%88%E5%A6%82%E6%9C%89%EF%BC%89"><span class="nav-number">1.5.3.2.</span> <span class="nav-text">Linux 主机自查（如有）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F%E4%B8%8E%E6%9C%8D%E5%8A%A1%E6%9E%9A%E4%B8%BE"><span class="nav-number">1.5.3.3.</span> <span class="nav-text">端口扫描与服务枚举</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%B7%B2%E5%AE%8C%E6%88%90%E7%9A%84%E5%8A%A0%E5%9B%BA%E6%8E%AA%E6%96%BD"><span class="nav-number">1.5.4.</span> <span class="nav-text">三、已完成的加固措施</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E8%84%9A%E6%9C%AC%E5%B7%A5%E5%85%B7%E8%BE%93%E5%87%BA"><span class="nav-number">1.5.5.</span> <span class="nav-text">四、脚本工具输出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E7%9F%A5%E8%AF%86%E7%9B%B2%E5%8C%BA%E4%B8%8E%E6%94%B9%E8%BF%9B%E8%AE%A1%E5%88%92"><span class="nav-number">1.5.6.</span> <span class="nav-text">五、知识盲区与改进计划</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%9C%AC%E5%91%A8%E9%81%87%E5%88%B0%E7%9A%84%E5%9B%B0%E9%9A%BE"><span class="nav-number">1.5.6.1.</span> <span class="nav-text">本周遇到的困难</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%B8%8B%E5%91%A8%E6%94%B9%E8%BF%9B%E8%AE%A1%E5%88%92"><span class="nav-number">1.5.6.2.</span> <span class="nav-text">下周改进计划</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E8%AF%84%E4%BC%B0%E6%A0%87%E5%87%86%E8%BE%BE%E6%88%90%E6%83%85%E5%86%B5"><span class="nav-number">1.5.7.</span> <span class="nav-text">六、评估标准达成情况</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E9%99%84%E4%BB%B6%E6%B8%85%E5%8D%95"><span class="nav-number">1.5.8.</span> <span class="nav-text">七、附件清单</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%B7%A9%E5%9B%BA%E7%BB%83%E4%B9%A0"><span class="nav-number">1.6.</span> <span class="nav-text">五、巩固练习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-1%EF%BC%9A%E8%AE%BE%E8%AE%A1%E4%B8%80%E5%A5%97-Windows-%E5%8A%A0%E5%9B%BA%E6%96%B9%E6%A1%88"><span class="nav-number">1.6.1.</span> <span class="nav-text">练习 1：设计一套 Windows 加固方案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-2%EF%BC%9A%E8%AE%BE%E8%AE%A1%E4%B8%80%E5%A5%97-Linux-%E5%8A%A0%E5%9B%BA%E6%96%B9%E6%A1%88"><span class="nav-number">1.6.2.</span> <span class="nav-text">练习 2：设计一套 Linux 加固方案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E8%AF%84%E4%BC%B0%E6%A0%87%E5%87%86"><span class="nav-number">1.7.</span> <span class="nav-text">六、评估标准</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">1.8.</span> <span class="nav-text">七、参考资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E8%BE%BE%E6%88%90%E6%83%85%E5%86%B5%EF%BC%88%E7%94%B1%E5%AD%A6%E4%B9%A0%E8%80%85%E5%A1%AB%E5%86%99%EF%BC%89"><span class="nav-number">1.9.</span> <span class="nav-text">八、学习成果达成情况（由学习者填写）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Windows-%E8%87%AA%E6%9F%A5%E8%AF%81%E6%8D%AE"><span class="nav-number">1.9.1.</span> <span class="nav-text">Windows 自查证据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux-%E8%87%AA%E6%9F%A5%E8%AF%81%E6%8D%AE%EF%BC%88%E5%A6%82%E6%9C%89%EF%BC%89"><span class="nav-number">1.9.2.</span> <span class="nav-text">Linux 自查证据（如有）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F%E8%AF%81%E6%8D%AE"><span class="nav-number">1.9.3.</span> <span class="nav-text">端口扫描证据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%84%9A%E6%9C%AC%E5%B7%A5%E5%85%B7"><span class="nav-number">1.9.4.</span> <span class="nav-text">脚本工具</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%91%A8%E6%8A%A5"><span class="nav-number">1.9.5.</span> <span class="nav-text">周报</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">75</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Tigercoll" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/96499f8c.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day021：操作系统与脚本 - 第 3 周综合实验与测评（OS+枚举+脚本，傻瓜版能照做） | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day021：操作系统与脚本 - 第 3 周综合实验与测评（OS+枚举+脚本，傻瓜版能照做）
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-01-14 00:00:00" itemprop="dateCreated datePublished" datetime="2026-01-14T00:00:00+08:00">2026-01-14</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Day021：操作系统与脚本-第-3-周综合实验与测评（OS-枚举-脚本，傻瓜版能照做）"><a href="#Day021：操作系统与脚本-第-3-周综合实验与测评（OS-枚举-脚本，傻瓜版能照做）" class="headerlink" title="Day021：操作系统与脚本 - 第 3 周综合实验与测评（OS+枚举+脚本，傻瓜版能照做）"></a>Day021：操作系统与脚本 - 第 3 周综合实验与测评（OS+枚举+脚本，傻瓜版能照做）</h1><ul>
+<li>日期：2026-01-14</li>
+<li>周次：第 3 周</li>
+</ul>
+<h2 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h2><p>今天把第 3 周收口，你应该能做到：</p>
+<ul>
+<li><strong>主机侧</strong>：能给出 Windows&#x2F;Linux 各 5 条加固项（并有证据）</li>
+<li><strong>网络侧</strong>：能对”授权目标”做一次端口&#x2F;服务枚举并导出结果</li>
+<li><strong>脚本侧</strong>：能把输出整理成结构化文件（CSV&#x2F;JSON），形成可复用”小工具”</li>
+<li><strong>报告侧</strong>：输出一份完整的第 3 周周报（含证据链、风险评估、改进建议）</li>
+</ul>
+<hr>
+<span id="more"></span>
+
+<h2 id="一、第-3-周知识地图"><a href="#一、第-3-周知识地图" class="headerlink" title="一、第 3 周知识地图"></a>一、第 3 周知识地图</h2><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">第 3 周：操作系统与脚本</span><br><span class="line">├─ Day015：Linux 安全基础</span><br><span class="line">│   ├─ 权限管理（rwx/SUID/SGID）</span><br><span class="line">│   ├─ 用户与组（useradd/sudo/sudoers）</span><br><span class="line">│   ├─ 服务管理（systemd/监听端口）</span><br><span class="line">│   ├─ 日志审计（journalctl/auth.log）</span><br><span class="line">│   └─ 防火墙（ufw/iptables/firewalld）</span><br><span class="line">│</span><br><span class="line">├─ Day016：Windows 安全基础</span><br><span class="line">│   ├─ UAC 原理（4个安全级别）</span><br><span class="line">│   ├─ 用户与组（管理员组审计）</span><br><span class="line">│   ├─ 事件日志（4624/4625/4672/4688）</span><br><span class="line">│   ├─ 防火墙（入站规则审计）</span><br><span class="line">│   └─ 本地安全策略（密码/锁定策略）</span><br><span class="line">│</span><br><span class="line">├─ Day017：PowerShell 脚本</span><br><span class="line">│   ├─ 对象管道与 Select-Object/Where-Object</span><br><span class="line">│   ├─ 变量、循环、条件、函数</span><br><span class="line">│   ├─ 错误处理（try/catch/finally）</span><br><span class="line">│   ├─ 日志解析与批量处理</span><br><span class="line">│   └─ CSV 导出与数据统计</span><br><span class="line">│</span><br><span class="line">├─ Day018：Python 脚本</span><br><span class="line">│   ├─ 文件操作（open/pathlib）</span><br><span class="line">│   ├─ 正则表达式（re.match/findall）</span><br><span class="line">│   ├─ JSON/CSV 处理</span><br><span class="line">│   ├─ HTTP 请求（urllib.request）</span><br><span class="line">│   └─ 错误处理（try/except）</span><br><span class="line">│</span><br><span class="line">├─ Day019：Nmap 端口扫描</span><br><span class="line">│   ├─ 合法授权原则</span><br><span class="line">│   ├─ 扫描类型（-sS/-sT/-sU）</span><br><span class="line">│   ├─ 端口状态（open/closed/filtered）</span><br><span class="line">│   ├─ 服务版本探测（-sV）</span><br><span class="line">│   └─ 结果导出（-oN/-oX/-oG）</span><br><span class="line">│</span><br><span class="line">└─ Day020：服务枚举与指纹识别</span><br><span class="line">    ├─ HTTP 枚举（curl/浏览器）</span><br><span class="line">    ├─ SSH Banner 获取（nc/telnet）</span><br><span class="line">    ├─ 数据库枚举（mysql-info）</span><br><span class="line">    ├─ RDP/SMB 探测（Nmap NSE）</span><br><span class="line">    └─ 结果解析（Python/PowerShell）</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="二、10-个易错点对照表"><a href="#二、10-个易错点对照表" class="headerlink" title="二、10 个易错点对照表"></a>二、10 个易错点对照表</h2><table>
+<thead>
+<tr>
+<th>易错点</th>
+<th>错误做法</th>
+<th>正确做法</th>
+<th>后果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1. 未记录授权</strong></td>
+<td>直接扫描内网主机</td>
+<td>先获取书面授权，记录扫描窗口</td>
+<td>可能违反公司政策&#x2F;触发 IDS</td>
+</tr>
+<tr>
+<td><strong>2. sudo 配置错误</strong></td>
+<td><code>user ALL=(ALL) NOPASSWD: ALL</code></td>
+<td>仅授权必要命令，且需要密码</td>
+<td>普通账号可无密码提权</td>
+</tr>
+<tr>
+<td><strong>3. 防火墙全开</strong></td>
+<td>关闭 Windows 防火墙</td>
+<td>保持开启，按需放通</td>
+<td>所有端口暴露</td>
+</tr>
+<tr>
+<td><strong>4. RDP 对公网开放</strong></td>
+<td>3389 端口允许 Any</td>
+<td>仅允许 VPN&#x2F;堡垒机 IP</td>
+<td>成为暴力破解目标</td>
+</tr>
+<tr>
+<td><strong>5. 密码策略太弱</strong></td>
+<td>无复杂性要求，无锁定策略</td>
+<td>12 位+复杂性+5 次锁定</td>
+<td>容易被暴力破解</td>
+</tr>
+<tr>
+<td><strong>6. 日志未启用</strong></td>
+<td>未开启进程创建审计（4688）</td>
+<td><code>auditpol /set /category:*</code></td>
+<td>无法溯源攻击行为</td>
+</tr>
+<tr>
+<td><strong>7. Banner 直接信任</strong></td>
+<td>看到 Apache 就认为是 Apache</td>
+<td>交叉验证（curl+Nmap）</td>
+<td>可能被伪装 Banner 误导</td>
+</tr>
+<tr>
+<td><strong>8. 异常处理缺失</strong></td>
+<td><code>except: pass</code>（吞掉错误）</td>
+<td>输出错误信息+解决建议</td>
+<td>脚本出错无法排查</td>
+</tr>
+<tr>
+<td><strong>9. 全端口扫描无节制</strong></td>
+<td>直接 <code>-p-</code> 扫描生产环境</td>
+<td>先 <code>--top-ports 100</code> 测试</td>
+<td>可能触发限流&#x2F;DoS</td>
+</tr>
+<tr>
+<td><strong>10. 结果未脱敏</strong></td>
+<td>日志中包含真实 IP&#x2F;账号</td>
+<td>导出前替换为 <code>192.168.1.X</code>&#x2F;<code>user_A</code></td>
+<td>泄露敏感信息</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="三、综合实验任务"><a href="#三、综合实验任务" class="headerlink" title="三、综合实验任务"></a>三、综合实验任务</h2><h3 id="任务-1：Windows-自查证据（必做）"><a href="#任务-1：Windows-自查证据（必做）" class="headerlink" title="任务 1：Windows 自查证据（必做）"></a>任务 1：Windows 自查证据（必做）</h3><p><strong>目标</strong>：用 PowerShell 收集 Windows 安全证据，识别 3 个以上风险点。</p>
+<h4 id="步骤-1：审计管理员组成员"><a href="#步骤-1：审计管理员组成员" class="headerlink" title="步骤 1：审计管理员组成员"></a>步骤 1：审计管理员组成员</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Get-LocalGroupMember</span> <span class="literal">-Group</span> <span class="string">&quot;Administrators&quot;</span> | </span><br><span class="line"><span class="built_in">Select-Object</span> Name, PrincipalSource, ObjectClass | </span><br><span class="line"><span class="built_in">Format-Table</span> <span class="literal">-AutoSize</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>检查清单</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 是否有离职员工残留账号</li>
+<li><input disabled="" type="checkbox"> 是否有非 IT 人员在管理员组</li>
+<li><input disabled="" type="checkbox"> 是否有命名异常的账号（如 <code>temp_admin</code>）</li>
+</ul>
+<h4 id="步骤-2：导出最近-24-小时登录事件"><a href="#步骤-2：导出最近-24-小时登录事件" class="headerlink" title="步骤 2：导出最近 24 小时登录事件"></a>步骤 2：导出最近 24 小时登录事件</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 登录成功（4624）</span></span><br><span class="line"><span class="built_in">Get-WinEvent</span> <span class="literal">-FilterHashtable</span> <span class="selector-tag">@</span>&#123;</span><br><span class="line">    LogName=<span class="string">&#x27;Security&#x27;</span></span><br><span class="line">    ID=<span class="number">4624</span></span><br><span class="line">    StartTime=(<span class="built_in">Get-Date</span>).AddDays(<span class="literal">-1</span>)</span><br><span class="line">&#125; | <span class="built_in">Select-Object</span> TimeCreated, </span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;User&quot;</span>;Expression=&#123;<span class="variable">$_</span>.Properties[<span class="number">5</span>].Value&#125;&#125;,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;LogonType&quot;</span>;Expression=&#123;<span class="variable">$_</span>.Properties[<span class="number">8</span>].Value&#125;&#125;,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;SourceIP&quot;</span>;Expression=&#123;<span class="variable">$_</span>.Properties[<span class="number">18</span>].Value&#125;&#125; | </span><br><span class="line"><span class="built_in">Export-Csv</span> <span class="literal">-Path</span> <span class="string">&quot;.\win_logins.csv&quot;</span> <span class="literal">-NoTypeInformation</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 登录失败（4625）</span></span><br><span class="line"><span class="built_in">Get-WinEvent</span> <span class="literal">-FilterHashtable</span> <span class="selector-tag">@</span>&#123;</span><br><span class="line">    LogName=<span class="string">&#x27;Security&#x27;</span></span><br><span class="line">    ID=<span class="number">4625</span></span><br><span class="line">    StartTime=(<span class="built_in">Get-Date</span>).AddDays(<span class="literal">-1</span>)</span><br><span class="line">&#125; | <span class="built_in">Select-Object</span> TimeCreated, </span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;User&quot;</span>;Expression=&#123;<span class="variable">$_</span>.Properties[<span class="number">5</span>].Value&#125;&#125; | </span><br><span class="line"><span class="built_in">Group-Object</span> User | <span class="built_in">Sort-Object</span> Count <span class="literal">-Descending</span> | </span><br><span class="line"><span class="built_in">Select-Object</span> <span class="literal">-First</span> <span class="number">5</span> Name, Count</span><br></pre></td></tr></table></figure>
+
+<p><strong>检查清单</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 是否有非预期的 RDP 登录（登录类型 10）</li>
+<li><input disabled="" type="checkbox"> 是否有大量失败登录（可能是暴力破解）</li>
+<li><input disabled="" type="checkbox"> 是否有非工作时间的登录</li>
+</ul>
+<h4 id="步骤-3：检查防火墙入站规则"><a href="#步骤-3：检查防火墙入站规则" class="headerlink" title="步骤 3：检查防火墙入站规则"></a>步骤 3：检查防火墙入站规则</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Get-NetFirewallRule</span> <span class="literal">-Direction</span> Inbound <span class="literal">-Enabled</span> True <span class="literal">-Action</span> Allow | </span><br><span class="line"><span class="built_in">Select-Object</span> DisplayName, Profile, </span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;LocalPort&quot;</span>;Expression=&#123;(<span class="built_in">Get-NetFirewallPortFilter</span> <span class="literal">-AssociatedNetFirewallRule</span> <span class="variable">$_</span>).LocalPort&#125;&#125;,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;RemoteAddress&quot;</span>;Expression=&#123;(<span class="built_in">Get-NetFirewallAddressFilter</span> <span class="literal">-AssociatedNetFirewallRule</span> <span class="variable">$_</span>).RemoteAddress&#125;&#125; | </span><br><span class="line"><span class="built_in">Where-Object</span> &#123;<span class="variable">$_</span>.LocalPort <span class="operator">-ne</span> <span class="variable">$null</span>&#125; | </span><br><span class="line"><span class="built_in">Export-Csv</span> <span class="literal">-Path</span> <span class="string">&quot;.\win_firewall.csv&quot;</span> <span class="literal">-NoTypeInformation</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>检查清单</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> RDP（3389）是否限制 IP</li>
+<li><input disabled="" type="checkbox"> SMB（445）是否对公网开放</li>
+<li><input disabled="" type="checkbox"> 是否有”Any”远程地址的高危端口</li>
+</ul>
+<h4 id="步骤-4：盘点监听端口"><a href="#步骤-4：盘点监听端口" class="headerlink" title="步骤 4：盘点监听端口"></a>步骤 4：盘点监听端口</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Get-NetTCPConnection</span> <span class="literal">-State</span> Listen | </span><br><span class="line"><span class="built_in">Select-Object</span> LocalAddress, LocalPort, State,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;ProcessName&quot;</span>;Expression=&#123;(<span class="built_in">Get-Process</span> <span class="literal">-Id</span> <span class="variable">$_</span>.OwningProcess <span class="literal">-ErrorAction</span> SilentlyContinue).ProcessName&#125;&#125;,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;ProcessPath&quot;</span>;Expression=&#123;(<span class="built_in">Get-Process</span> <span class="literal">-Id</span> <span class="variable">$_</span>.OwningProcess <span class="literal">-ErrorAction</span> SilentlyContinue).Path&#125;&#125; | </span><br><span class="line"><span class="built_in">Export-Csv</span> <span class="literal">-Path</span> <span class="string">&quot;.\win_ports.csv&quot;</span> <span class="literal">-NoTypeInformation</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>检查清单</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 是否有意外的高端口监听（如 4444&#x2F;5555）</li>
+<li><input disabled="" type="checkbox"> 进程路径是否在 <code>AppData</code>&#x2F;<code>Temp</code></li>
+<li><input disabled="" type="checkbox"> 进程名是否伪装成系统进程</li>
+</ul>
+<h4 id="步骤-5：整理-Windows-风险清单"><a href="#步骤-5：整理-Windows-风险清单" class="headerlink" title="步骤 5：整理 Windows 风险清单"></a>步骤 5：整理 Windows 风险清单</h4><table>
+<thead>
+<tr>
+<th>风险项</th>
+<th>发现证据</th>
+<th>风险等级</th>
+<th>改进建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>管理员组成员过多</td>
+<td>有 3 个非 IT 账号</td>
+<td>⚠️ 中</td>
+<td>移除非必要账号</td>
+</tr>
+<tr>
+<td>RDP 对所有 IP 开放</td>
+<td>防火墙规则 RemoteAddress&#x3D;Any</td>
+<td>🚨 高</td>
+<td>限制为 VPN IP 段</td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="任务-2：Linux-自查证据（可选，需自建-VM）"><a href="#任务-2：Linux-自查证据（可选，需自建-VM）" class="headerlink" title="任务 2：Linux 自查证据（可选，需自建 VM）"></a>任务 2：Linux 自查证据（可选，需自建 VM）</h3><p><strong>目标</strong>：用命令行收集 Linux 安全证据。</p>
+<h4 id="步骤-1：检查关键文件权限"><a href="#步骤-1：检查关键文件权限" class="headerlink" title="步骤 1：检查关键文件权限"></a>步骤 1：检查关键文件权限</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ls</span> -l /etc/shadow /etc/passwd /etc/sudoers</span><br></pre></td></tr></table></figure>
+
+<p><strong>检查清单</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> <code>/etc/shadow</code> 权限是否为 600 或 000</li>
+<li><input disabled="" type="checkbox"> <code>/etc/passwd</code> 是否可被所有人读取（644）</li>
+<li><input disabled="" type="checkbox"> <code>/etc/sudoers</code> 权限是否为 440 或 400</li>
+</ul>
+<h4 id="步骤-2：审计-sudo-权限"><a href="#步骤-2：审计-sudo-权限" class="headerlink" title="步骤 2：审计 sudo 权限"></a>步骤 2：审计 sudo 权限</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">sudo grep -v <span class="string">&#x27;^#&#x27;</span> /etc/sudoers | grep -v <span class="string">&#x27;^$&#x27;</span></span><br><span class="line">sudo <span class="built_in">ls</span> -la /etc/sudoers.d/</span><br></pre></td></tr></table></figure>
+
+<p><strong>检查清单</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 是否有 <code>NOPASSWD: ALL</code>（极不安全）</li>
+<li><input disabled="" type="checkbox"> 是否有非 IT 人员拥有 sudo 权限</li>
+</ul>
+<h4 id="步骤-3：盘点监听端口"><a href="#步骤-3：盘点监听端口" class="headerlink" title="步骤 3：盘点监听端口"></a>步骤 3：盘点监听端口</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo ss -lntup</span><br></pre></td></tr></table></figure>
+
+<p><strong>检查清单</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 是否有意外的高端口监听</li>
+<li><input disabled="" type="checkbox"> SSH（22）是否监听在 <code>0.0.0.0</code>（所有网卡）</li>
+<li><input disabled="" type="checkbox"> 数据库端口（3306&#x2F;5432）是否对外暴露</li>
+</ul>
+<h4 id="步骤-4：查看最近登录记录"><a href="#步骤-4：查看最近登录记录" class="headerlink" title="步骤 4：查看最近登录记录"></a>步骤 4：查看最近登录记录</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">last -n 20</span><br><span class="line">lastb -n 20  <span class="comment"># 失败登录</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>检查清单</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 是否有非预期的 IP 登录</li>
+<li><input disabled="" type="checkbox"> 是否有大量失败登录</li>
+</ul>
+<h4 id="步骤-5：整理-Linux-风险清单"><a href="#步骤-5：整理-Linux-风险清单" class="headerlink" title="步骤 5：整理 Linux 风险清单"></a>步骤 5：整理 Linux 风险清单</h4><table>
+<thead>
+<tr>
+<th>风险项</th>
+<th>发现证据</th>
+<th>风险等级</th>
+<th>改进建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>&#x2F;etc&#x2F;shadow 权限 644</td>
+<td><code>ls -l</code> 输出</td>
+<td>🚨 极高</td>
+<td><code>chmod 600 /etc/shadow</code></td>
+</tr>
+<tr>
+<td>MySQL 监听 0.0.0.0:3306</td>
+<td><code>ss -lntup</code></td>
+<td>🚨 高</td>
+<td>改为 127.0.0.1 或限制 IP</td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="任务-3：授权目标枚举证据（必做）"><a href="#任务-3：授权目标枚举证据（必做）" class="headerlink" title="任务 3：授权目标枚举证据（必做）"></a>任务 3：授权目标枚举证据（必做）</h3><p><strong>目标</strong>：对一个合法目标（本机&#x2F;VM）做端口扫描+服务枚举。</p>
+<h4 id="步骤-1：记录授权信息"><a href="#步骤-1：记录授权信息" class="headerlink" title="步骤 1：记录授权信息"></a>步骤 1：记录授权信息</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">目标：127.0.0.1（本机）</span><br><span class="line">授权类型：自建环境</span><br><span class="line">扫描窗口：2026-01-14 14:00 - 14:30</span><br><span class="line">目的：第 3 周综合实验，学习端口扫描与服务枚举</span><br></pre></td></tr></table></figure>
+
+<h4 id="步骤-2：执行扫描"><a href="#步骤-2：执行扫描" class="headerlink" title="步骤 2：执行扫描"></a>步骤 2：执行扫描</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -sT -sV --top-ports 1000 -oX scan.xml 127.0.0.1</span><br></pre></td></tr></table></figure>
+
+<h4 id="步骤-3：用-Python-脚本解析结果"><a href="#步骤-3：用-Python-脚本解析结果" class="headerlink" title="步骤 3：用 Python 脚本解析结果"></a>步骤 3：用 Python 脚本解析结果</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> xml.etree.ElementTree <span class="keyword">as</span> ET</span><br><span class="line"><span class="keyword">import</span> csv</span><br><span class="line"></span><br><span class="line">tree = ET.parse(<span class="string">&quot;scan.xml&quot;</span>)</span><br><span class="line">root = tree.getroot()</span><br><span class="line"></span><br><span class="line">results = []</span><br><span class="line"><span class="keyword">for</span> host <span class="keyword">in</span> root.findall(<span class="string">&quot;host&quot;</span>):</span><br><span class="line">    ip = host.find(<span class="string">&quot;address&quot;</span>).get(<span class="string">&quot;addr&quot;</span>)</span><br><span class="line">    ports_elem = host.find(<span class="string">&quot;ports&quot;</span>)</span><br><span class="line">    <span class="keyword">if</span> ports_elem <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        <span class="keyword">continue</span></span><br><span class="line">    <span class="keyword">for</span> port <span class="keyword">in</span> ports_elem.findall(<span class="string">&quot;port&quot;</span>):</span><br><span class="line">        portid = port.get(<span class="string">&quot;portid&quot;</span>)</span><br><span class="line">        state = port.find(<span class="string">&quot;state&quot;</span>).get(<span class="string">&quot;state&quot;</span>)</span><br><span class="line">        service = port.find(<span class="string">&quot;service&quot;</span>)</span><br><span class="line">        service_name = service.get(<span class="string">&quot;name&quot;</span>, <span class="string">&quot;unknown&quot;</span>) <span class="keyword">if</span> service <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">else</span> <span class="string">&quot;unknown&quot;</span></span><br><span class="line">        version = service.get(<span class="string">&quot;product&quot;</span>, <span class="string">&quot;&quot;</span>) <span class="keyword">if</span> service <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">else</span> <span class="string">&quot;&quot;</span></span><br><span class="line">        results.append([ip, portid, state, service_name, version])</span><br><span class="line"></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;scan_results.csv&quot;</span>, <span class="string">&quot;w&quot;</span>, newline=<span class="string">&quot;&quot;</span>, encoding=<span class="string">&quot;utf-8&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    writer = csv.writer(f)</span><br><span class="line">    writer.writerow([<span class="string">&quot;IP&quot;</span>, <span class="string">&quot;Port&quot;</span>, <span class="string">&quot;State&quot;</span>, <span class="string">&quot;Service&quot;</span>, <span class="string">&quot;Version&quot;</span>])</span><br><span class="line">    writer.writerows(results)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;✅ 已导出 <span class="subst">&#123;<span class="built_in">len</span>(results)&#125;</span> 条结果&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<h4 id="步骤-4：整理服务清单"><a href="#步骤-4：整理服务清单" class="headerlink" title="步骤 4：整理服务清单"></a>步骤 4：整理服务清单</h4><table>
+<thead>
+<tr>
+<th>IP</th>
+<th>Port</th>
+<th>State</th>
+<th>Service</th>
+<th>Version</th>
+<th>风险等级</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>127.0.0.1</td>
+<td>135</td>
+<td>open</td>
+<td>msrpc</td>
+<td>-</td>
+<td>⚠️ 中</td>
+</tr>
+<tr>
+<td>127.0.0.1</td>
+<td>445</td>
+<td>open</td>
+<td>microsoft-ds</td>
+<td>-</td>
+<td>🚨 高</td>
+</tr>
+<tr>
+<td>127.0.0.1</td>
+<td>3389</td>
+<td>open</td>
+<td>ms-wbt-server</td>
+<td>-</td>
+<td>🚨 高</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="任务-4：脚本侧实战（必做）"><a href="#任务-4：脚本侧实战（必做）" class="headerlink" title="任务 4：脚本侧实战（必做）"></a>任务 4：脚本侧实战（必做）</h3><p><strong>目标</strong>：写一个”日志统计工具”，能重复使用。</p>
+<h4 id="需求"><a href="#需求" class="headerlink" title="需求"></a>需求</h4><ol>
+<li>读取 <code>demo.log</code>（格式：<code>时间, 用户, 操作</code>）</li>
+<li>统计每个用户的操作次数</li>
+<li>导出为 CSV</li>
+<li>用 try&#x2F;except 处理文件不存在的情况</li>
+</ol>
+<h4 id="参考实现（Python）"><a href="#参考实现（Python）" class="headerlink" title="参考实现（Python）"></a>参考实现（Python）</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> csv</span><br><span class="line"><span class="keyword">from</span> collections <span class="keyword">import</span> defaultdict</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">analyze_log</span>(<span class="params">log_file, output_file</span>):</span><br><span class="line">    <span class="keyword">try</span>:</span><br><span class="line">        stats = defaultdict(<span class="built_in">int</span>)</span><br><span class="line">        <span class="keyword">with</span> <span class="built_in">open</span>(log_file, <span class="string">&quot;r&quot;</span>, encoding=<span class="string">&quot;utf-8&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">            <span class="keyword">for</span> line <span class="keyword">in</span> f:</span><br><span class="line">                parts = line.strip().split(<span class="string">&quot;, &quot;</span>)</span><br><span class="line">                <span class="keyword">if</span> <span class="built_in">len</span>(parts) &gt;= <span class="number">2</span>:</span><br><span class="line">                    user = parts[<span class="number">1</span>]</span><br><span class="line">                    stats[user] += <span class="number">1</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 导出 CSV</span></span><br><span class="line">        <span class="keyword">with</span> <span class="built_in">open</span>(output_file, <span class="string">&quot;w&quot;</span>, newline=<span class="string">&quot;&quot;</span>, encoding=<span class="string">&quot;utf-8&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">            writer = csv.writer(f)</span><br><span class="line">            writer.writerow([<span class="string">&quot;User&quot;</span>, <span class="string">&quot;Count&quot;</span>])</span><br><span class="line">            <span class="keyword">for</span> user, count <span class="keyword">in</span> <span class="built_in">sorted</span>(stats.items(), key=<span class="keyword">lambda</span> x: x[<span class="number">1</span>], reverse=<span class="literal">True</span>):</span><br><span class="line">                writer.writerow([user, count])</span><br><span class="line">        </span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;✅ 已导出 <span class="subst">&#123;<span class="built_in">len</span>(stats)&#125;</span> 个用户的统计结果到 <span class="subst">&#123;output_file&#125;</span>&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">except</span> FileNotFoundError:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;❌ 错误：文件 <span class="subst">&#123;log_file&#125;</span> 不存在&quot;</span>)</span><br><span class="line">    <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;❌ 未知错误：<span class="subst">&#123;e&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 使用</span></span><br><span class="line">analyze_log(<span class="string">&quot;demo.log&quot;</span>, <span class="string">&quot;user_stats.csv&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、第-3-周周报模板"><a href="#四、第-3-周周报模板" class="headerlink" title="四、第 3 周周报模板"></a>四、第 3 周周报模板</h2><h3 id="周报标题"><a href="#周报标题" class="headerlink" title="周报标题"></a>周报标题</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">第 3 周学习周报：操作系统与脚本</span><br><span class="line">学习者：[你的姓名]</span><br><span class="line">日期：2026-01-14</span><br></pre></td></tr></table></figure>
+
+<h3 id="一、学习概览"><a href="#一、学习概览" class="headerlink" title="一、学习概览"></a>一、学习概览</h3><p><strong>本周学习主题</strong>：</p>
+<ul>
+<li>Day015：Linux 安全基础（权限&#x2F;用户&#x2F;服务&#x2F;日志&#x2F;防火墙）</li>
+<li>Day016：Windows 安全基础（UAC&#x2F;事件日志&#x2F;防火墙&#x2F;策略）</li>
+<li>Day017：PowerShell 脚本（管道&#x2F;循环&#x2F;函数&#x2F;错误处理）</li>
+<li>Day018：Python 脚本（文件&#x2F;正则&#x2F;JSON&#x2F;HTTP）</li>
+<li>Day019：Nmap 端口扫描（-sS&#x2F;-sT&#x2F;端口状态&#x2F;导出）</li>
+<li>Day020：服务枚举（HTTP&#x2F;SSH&#x2F;MySQL&#x2F;Banner 交叉验证）</li>
+<li>Day021：综合实验（本周知识整合）</li>
+</ul>
+<p><strong>总学习时长</strong>：约 14 小时<br><strong>完成任务数</strong>：7 天 × 5 个任务 &#x3D; 35 个任务</p>
+<hr>
+<h3 id="二、关键发现与证据"><a href="#二、关键发现与证据" class="headerlink" title="二、关键发现与证据"></a>二、关键发现与证据</h3><h4 id="Windows-主机自查"><a href="#Windows-主机自查" class="headerlink" title="Windows 主机自查"></a>Windows 主机自查</h4><table>
+<thead>
+<tr>
+<th>风险项</th>
+<th>发现证据</th>
+<th>风险等级</th>
+<th>改进建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>[示例] 管理员组成员过多</td>
+<td>有 3 个非 IT 账号</td>
+<td>⚠️ 中</td>
+<td>移除非必要账号</td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody></table>
+<h4 id="Linux-主机自查（如有）"><a href="#Linux-主机自查（如有）" class="headerlink" title="Linux 主机自查（如有）"></a>Linux 主机自查（如有）</h4><table>
+<thead>
+<tr>
+<th>风险项</th>
+<th>发现证据</th>
+<th>风险等级</th>
+<th>改进建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>[示例] &#x2F;etc&#x2F;shadow 权限 644</td>
+<td><code>ls -l</code> 输出</td>
+<td>🚨 极高</td>
+<td><code>chmod 600 /etc/shadow</code></td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody></table>
+<h4 id="端口扫描与服务枚举"><a href="#端口扫描与服务枚举" class="headerlink" title="端口扫描与服务枚举"></a>端口扫描与服务枚举</h4><table>
+<thead>
+<tr>
+<th>IP</th>
+<th>Port</th>
+<th>Service</th>
+<th>Version</th>
+<th>风险等级</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>127.0.0.1</td>
+<td>3389</td>
+<td>ms-wbt-server</td>
+<td>-</td>
+<td>🚨 高</td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="三、已完成的加固措施"><a href="#三、已完成的加固措施" class="headerlink" title="三、已完成的加固措施"></a>三、已完成的加固措施</h3><ol>
+<li>✅ [示例] 移除了管理员组中的离职员工账号 <code>bob</code></li>
+<li>✅ [示例] 配置了账户锁定策略（5 次失败锁定 30 分钟）</li>
+<li>✅ [示例] 限制 RDP（3389）仅允许内网 IP 段访问</li>
+<li>…</li>
+</ol>
+<hr>
+<h3 id="四、脚本工具输出"><a href="#四、脚本工具输出" class="headerlink" title="四、脚本工具输出"></a>四、脚本工具输出</h3><p><strong>工具 1</strong>：日志统计工具（Python）</p>
+<ul>
+<li>功能：统计每个用户的操作次数</li>
+<li>输入：demo.log</li>
+<li>输出：user_stats.csv</li>
+<li>代码行数：约 30 行</li>
+<li>可复用性：✅ 高（可用于 Day019&#x2F;Day020 的日志分析）</li>
+</ul>
+<p><strong>工具 2</strong>：Nmap 结果解析器（PowerShell）</p>
+<ul>
+<li>功能：从 Nmap 文本输出提取端口&#x2F;服务&#x2F;版本</li>
+<li>输入：day019_scan.txt</li>
+<li>输出：scan_summary.csv</li>
+<li>代码行数：约 15 行</li>
+<li>可复用性：✅ 高</li>
+</ul>
+<hr>
+<h3 id="五、知识盲区与改进计划"><a href="#五、知识盲区与改进计划" class="headerlink" title="五、知识盲区与改进计划"></a>五、知识盲区与改进计划</h3><h4 id="本周遇到的困难"><a href="#本周遇到的困难" class="headerlink" title="本周遇到的困难"></a>本周遇到的困难</h4><ol>
+<li>[示例] PowerShell 的对象管道概念理解不深，需要多练习</li>
+<li>[示例] 正则表达式语法容易忘记，需要建立速查表</li>
+<li>…</li>
+</ol>
+<h4 id="下周改进计划"><a href="#下周改进计划" class="headerlink" title="下周改进计划"></a>下周改进计划</h4><ol>
+<li>每天至少写 1 个完整脚本（PowerShell 或 Python）</li>
+<li>建立个人的”常用正则表达式库”</li>
+<li>复习 Day015-016 的加固清单，应用到实际环境</li>
+</ol>
+<hr>
+<h3 id="六、评估标准达成情况"><a href="#六、评估标准达成情况" class="headerlink" title="六、评估标准达成情况"></a>六、评估标准达成情况</h3><ul>
+<li>✅ 能给出 Windows&#x2F;Linux 各 5 条加固项（并有证据）</li>
+<li>✅ 能对授权目标做一次端口&#x2F;服务枚举并导出结果</li>
+<li>✅ 能用脚本整理输出为 CSV&#x2F;JSON</li>
+<li>✅ 能输出一份完整的周报（含证据链）</li>
+</ul>
+<hr>
+<h3 id="七、附件清单"><a href="#七、附件清单" class="headerlink" title="七、附件清单"></a>七、附件清单</h3><ul>
+<li><input checked="" disabled="" type="checkbox"> <code>win_logins.csv</code>（Windows 登录事件）</li>
+<li><input checked="" disabled="" type="checkbox"> <code>win_firewall.csv</code>（防火墙规则）</li>
+<li><input checked="" disabled="" type="checkbox"> <code>win_ports.csv</code>（监听端口）</li>
+<li><input checked="" disabled="" type="checkbox"> <code>scan.xml</code>（Nmap 扫描结果）</li>
+<li><input checked="" disabled="" type="checkbox"> <code>scan_results.csv</code>（解析后的服务清单）</li>
+<li><input checked="" disabled="" type="checkbox"> <code>user_stats.csv</code>（日志统计结果）</li>
+<li><input checked="" disabled="" type="checkbox"> 脚本代码（<code>analyze_log.py</code>&#x2F;<code>parse_nmap.ps1</code>）</li>
+</ul>
+<hr>
+<h2 id="五、巩固练习"><a href="#五、巩固练习" class="headerlink" title="五、巩固练习"></a>五、巩固练习</h2><h3 id="练习-1：设计一套-Windows-加固方案"><a href="#练习-1：设计一套-Windows-加固方案" class="headerlink" title="练习 1：设计一套 Windows 加固方案"></a>练习 1：设计一套 Windows 加固方案</h3><p><strong>场景</strong>：新上线一台 Windows Server 2019，需要加固。</p>
+<p><strong>参考答案</strong>（15 条）：</p>
+<ol>
+<li>禁用或重命名默认 <code>Administrator</code> 账号</li>
+<li>最小化管理员组成员</li>
+<li>启用密码复杂性（12 位+大小写+数字+符号）</li>
+<li>启用账户锁定策略（5 次失败锁定 30 分钟）</li>
+<li>禁用 Guest 账户</li>
+<li>启用 Windows 自动更新</li>
+<li>防火墙默认拒绝入站，按需放通</li>
+<li>RDP（3389）仅允许 VPN&#x2F;堡垒机 IP</li>
+<li>禁用 SMBv1</li>
+<li>禁用不必要的服务（Telnet&#x2F;FTP）</li>
+<li>启用安全审计（4624&#x2F;4625&#x2F;4688&#x2F;4720&#x2F;7045）</li>
+<li>日志至少保留 90 天</li>
+<li>启用 Windows Defender 实时保护</li>
+<li>配置 AppLocker 白名单</li>
+<li>定期审计管理员组成员和登录日志</li>
+</ol>
+<hr>
+<h3 id="练习-2：设计一套-Linux-加固方案"><a href="#练习-2：设计一套-Linux-加固方案" class="headerlink" title="练习 2：设计一套 Linux 加固方案"></a>练习 2：设计一套 Linux 加固方案</h3><p><strong>参考答案</strong>（15 条）：</p>
+<ol>
+<li>禁用 root 直接登录（<code>PermitRootLogin no</code>）</li>
+<li>使用 SSH 密钥认证，禁用密码登录</li>
+<li><code>/etc/shadow</code> 权限设为 600 或 000</li>
+<li>最小化 sudo 权限，避免 <code>NOPASSWD: ALL</code></li>
+<li>禁用不必要的服务（<code>systemctl disable telnet</code>）</li>
+<li>监听端口仅绑定必要网卡（不用 <code>0.0.0.0</code>）</li>
+<li>启用 UFW&#x2F;firewalld，默认拒绝入站</li>
+<li>SSH 端口改为非标准端口（如 2222）</li>
+<li>配置 fail2ban 防暴力破解</li>
+<li>日志至少保留 90 天</li>
+<li>定期检查 <code>/etc/passwd</code>、<code>/etc/shadow</code> 完整性</li>
+<li>禁用不必要的 SUID 程序</li>
+<li>启用 SELinux&#x2F;AppArmor</li>
+<li>定期更新系统补丁（<code>apt update &amp;&amp; apt upgrade</code>）</li>
+<li>审计 cron 任务和 systemd timer</li>
+</ol>
+<hr>
+<h2 id="六、评估标准"><a href="#六、评估标准" class="headerlink" title="六、评估标准"></a>六、评估标准</h2><ul>
+<li>✅ 完成 Windows 或 Linux 主机自查（至少一个）</li>
+<li>✅ 完成授权目标的端口扫描+服务枚举</li>
+<li>✅ 写出至少 1 个可复用的脚本（PowerShell 或 Python）</li>
+<li>✅ 输出一份完整的第 3 周周报</li>
+<li>✅ 识别并整改至少 3 个安全风险</li>
+</ul>
+<hr>
+<h2 id="七、参考资料"><a href="#七、参考资料" class="headerlink" title="七、参考资料"></a>七、参考资料</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cisecurity.org/benchmark/microsoft_windows_server">CIS Windows Server 2019 Benchmark</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.cisecurity.org/benchmark/ubuntu_linux">CIS Ubuntu Linux 20.04 Benchmark</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.nist.gov/cyberframework">NIST Cybersecurity Framework</a></li>
+</ul>
+<hr>
+<h2 id="八、学习成果达成情况（由学习者填写）"><a href="#八、学习成果达成情况（由学习者填写）" class="headerlink" title="八、学习成果达成情况（由学习者填写）"></a>八、学习成果达成情况（由学习者填写）</h2><h3 id="Windows-自查证据"><a href="#Windows-自查证据" class="headerlink" title="Windows 自查证据"></a>Windows 自查证据</h3><ul>
+<li><input disabled="" type="checkbox"> 管理员组成员截图</li>
+<li><input disabled="" type="checkbox"> 登录事件 CSV 文件</li>
+<li><input disabled="" type="checkbox"> 防火墙规则 CSV 文件</li>
+<li><input disabled="" type="checkbox"> 监听端口 CSV 文件</li>
+</ul>
+<h3 id="Linux-自查证据（如有）"><a href="#Linux-自查证据（如有）" class="headerlink" title="Linux 自查证据（如有）"></a>Linux 自查证据（如有）</h3><ul>
+<li><input disabled="" type="checkbox"> 关键文件权限截图</li>
+<li><input disabled="" type="checkbox"> sudo 配置截图</li>
+<li><input disabled="" type="checkbox"> 监听端口截图</li>
+<li><input disabled="" type="checkbox"> 登录记录截图</li>
+</ul>
+<h3 id="端口扫描证据"><a href="#端口扫描证据" class="headerlink" title="端口扫描证据"></a>端口扫描证据</h3><ul>
+<li><input disabled="" type="checkbox"> Nmap 扫描结果（XML 或文本）</li>
+<li><input disabled="" type="checkbox"> 解析后的服务清单（CSV）</li>
+</ul>
+<h3 id="脚本工具"><a href="#脚本工具" class="headerlink" title="脚本工具"></a>脚本工具</h3><ul>
+<li><input disabled="" type="checkbox"> 日志统计工具代码</li>
+<li><input disabled="" type="checkbox"> Nmap 解析工具代码</li>
+</ul>
+<h3 id="周报"><a href="#周报" class="headerlink" title="周报"></a>周报</h3><ul>
+<li><input disabled="" type="checkbox"> 完整的第 3 周周报（Markdown 或 Word）</li>
+</ul>
+<hr>
+<p><strong>恭喜！你已完成第 3 周的学习。下周我们将进入第 4 周：Web 应用安全基础！</strong> 🎉</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Tigercoll 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+              <a href="/tags/%E5%AE%89%E5%85%A8/" rel="tag"># 安全</a>
+              <a href="/tags/%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" rel="tag"># 学习计划</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/404be563.html" rel="prev" title="Day020：操作系统与脚本 - 服务枚举与指纹识别">
+                  <i class="fa fa-chevron-left"></i> Day020：操作系统与脚本 - 服务枚举与指纹识别
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/6de128c9.html" rel="next" title="Day022：漏洞扫描与基线 - 漏洞类型与编号体系">
+                  Day022：漏洞扫描与基线 - 漏洞类型与编号体系 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true,"react":{"opacity":0.7}}});</script></body>
+</html>

@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-center-simple.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Day016：操作系统与脚本 - Windows 安全基础 日期：2026-01-09 周次：第 3 周  学习目标学完今天你应该能做到：  掌握 Windows 操作系统安全基础，包括 UAC 原理、用户与组管理、事件日志分析、防火墙配置、本地安全策略、端口监听排查 学会通过 GUI + PowerShell 双工具进行 Windows 安全审计与加固 能输出一份 15 条的 Windows 加">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day016：操作系统与脚本 - Windows 安全基础">
+<meta property="og:url" content="https://tigercoll.top/post/f97e6e0d.html">
+<meta property="og:site_name" content="Tigercoll&#39;s Blog">
+<meta property="og:description" content="Day016：操作系统与脚本 - Windows 安全基础 日期：2026-01-09 周次：第 3 周  学习目标学完今天你应该能做到：  掌握 Windows 操作系统安全基础，包括 UAC 原理、用户与组管理、事件日志分析、防火墙配置、本地安全策略、端口监听排查 学会通过 GUI + PowerShell 双工具进行 Windows 安全审计与加固 能输出一份 15 条的 Windows 加">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-01-08T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-08T16:00:00.000Z">
+<meta property="article:author" content="Tigercoll">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="学习计划">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://tigercoll.top/post/f97e6e0d.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/f97e6e0d.html","path":"post/f97e6e0d.html","title":"Day016：操作系统与脚本 - Windows 安全基础"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day016：操作系统与脚本 - Windows 安全基础 | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Day016%EF%BC%9A%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B8%8E%E8%84%9A%E6%9C%AC-Windows-%E5%AE%89%E5%85%A8%E5%9F%BA%E7%A1%80"><span class="nav-number">1.</span> <span class="nav-text">Day016：操作系统与脚本 - Windows 安全基础</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E7%9B%AE%E6%A0%87"><span class="nav-number">1.1.</span> <span class="nav-text">学习目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%B8%BA%E4%BB%80%E4%B9%88-Windows-%E5%AE%89%E5%85%A8%E6%98%AF%E2%80%9D%E5%BF%85%E4%BF%AE%E8%AF%BE%E2%80%9D%EF%BC%9F"><span class="nav-number">1.2.</span> <span class="nav-text">一、为什么 Windows 安全是”必修课”？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-Windows-%E5%9C%A8%E5%AE%89%E5%85%A8%E8%BF%90%E8%90%A5%E4%B8%AD%E7%9A%84%E5%9C%B0%E4%BD%8D"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.1 Windows 在安全运营中的地位</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E5%AD%A6%E5%AE%8C%E4%BB%8A%E5%A4%A9%E4%BD%A0%E8%83%BD%E5%81%9A%E4%BB%80%E4%B9%88%EF%BC%9F"><span class="nav-number">1.2.2.</span> <span class="nav-text">1.2 学完今天你能做什么？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E6%A0%B8%E5%BF%83%E7%9F%A5%E8%AF%86%E7%82%B9%E8%AF%A6%E8%A7%A3%EF%BC%88%E5%82%BB%E7%93%9C%E7%BA%A7%E8%AE%B2%E8%A7%A3%EF%BC%89"><span class="nav-number">1.3.</span> <span class="nav-text">二、核心知识点详解（傻瓜级讲解）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-%E7%94%A8%E6%88%B7%E8%B4%A6%E6%88%B7%E6%8E%A7%E5%88%B6%EF%BC%88UAC%EF%BC%89%E5%8E%9F%E7%90%86"><span class="nav-number">1.3.1.</span> <span class="nav-text">2.1 用户账户控制（UAC）原理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-1-%E4%BB%80%E4%B9%88%E6%98%AF-UAC%EF%BC%9F"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">2.1.1 什么是 UAC？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-2-UAC-%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">2.1.2 UAC 工作流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-3-UAC-%E7%9A%84-4-%E4%B8%AA%E5%AE%89%E5%85%A8%E7%BA%A7%E5%88%AB"><span class="nav-number">1.3.1.3.</span> <span class="nav-text">2.1.3 UAC 的 4 个安全级别</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-4-%E6%9F%A5%E7%9C%8B%E5%BD%93%E5%89%8D-UAC-%E7%8A%B6%E6%80%81"><span class="nav-number">1.3.1.4.</span> <span class="nav-text">2.1.4 查看当前 UAC 状态</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-%E7%94%A8%E6%88%B7%E4%B8%8E%E7%BB%84%E7%AE%A1%E7%90%86%EF%BC%88%E6%9C%AC%E5%9C%B0%E8%B4%A6%E6%88%B7%EF%BC%89"><span class="nav-number">1.3.2.</span> <span class="nav-text">2.2 用户与组管理（本地账户）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-1-%E5%B8%B8%E8%A7%81%E6%9C%AC%E5%9C%B0%E7%94%A8%E6%88%B7%E7%BB%84"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">2.2.1 常见本地用户组</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-2-%E7%AE%A1%E7%90%86%E5%91%98%E7%BB%84%E5%AE%A1%E8%AE%A1%E5%AE%9E%E6%88%98"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">2.2.2 管理员组审计实战</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-3-%E5%88%9B%E5%BB%BA%E2%80%9D%E5%AE%89%E5%85%A8%E7%9A%84%E6%9C%AC%E5%9C%B0%E7%AE%A1%E7%90%86%E5%91%98%E8%B4%A6%E5%8F%B7%E2%80%9D"><span class="nav-number">1.3.2.3.</span> <span class="nav-text">2.2.3 创建”安全的本地管理员账号”</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-Windows-%E4%BA%8B%E4%BB%B6%E6%97%A5%E5%BF%97%EF%BC%88%E5%AE%89%E5%85%A8%E5%AE%A1%E8%AE%A1%E7%9A%84%E2%80%9D%E9%BB%91%E5%8C%A3%E5%AD%90%E2%80%9D%EF%BC%89"><span class="nav-number">1.3.3.</span> <span class="nav-text">2.3 Windows 事件日志（安全审计的”黑匣子”）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-1-%E4%BA%8B%E4%BB%B6%E6%97%A5%E5%BF%97%E5%88%86%E7%B1%BB"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">2.3.1 事件日志分类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-2-%E5%85%B3%E9%94%AE%E5%AE%89%E5%85%A8%E4%BA%8B%E4%BB%B6-ID-%E8%AF%A6%E8%A7%A3"><span class="nav-number">1.3.3.2.</span> <span class="nav-text">2.3.2 关键安全事件 ID 详解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-3-%E4%BA%8B%E4%BB%B6-4624-%E8%AF%A6%E7%BB%86%E8%A7%A3%E8%AF%BB%EF%BC%88%E7%99%BB%E5%BD%95%E6%88%90%E5%8A%9F%EF%BC%89"><span class="nav-number">1.3.3.3.</span> <span class="nav-text">2.3.3 事件 4624 详细解读（登录成功）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-4-%E5%AE%9E%E6%88%98%EF%BC%9A%E6%9F%A5%E6%89%BE%E2%80%9D%E5%8F%AF%E7%96%91%E7%9A%84-RDP-%E7%99%BB%E5%BD%95%E2%80%9D"><span class="nav-number">1.3.3.4.</span> <span class="nav-text">2.3.4 实战：查找”可疑的 RDP 登录”</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-5-%E5%AE%9E%E6%88%98-%E7%BB%9F%E8%AE%A1%E2%80%9D%E5%AF%86%E7%A0%81%E7%88%86%E7%A0%B4%E6%94%BB%E5%87%BB%E2%80%9D%EF%BC%88%E4%BA%8B%E4%BB%B6-4625%EF%BC%89"><span class="nav-number">1.3.3.5.</span> <span class="nav-text">2.3.5 实战:统计”密码爆破攻击”（事件 4625）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-Windows-%E9%98%B2%E7%81%AB%E5%A2%99%E9%85%8D%E7%BD%AE"><span class="nav-number">1.3.4.</span> <span class="nav-text">2.4 Windows 防火墙配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-1-%E9%98%B2%E7%81%AB%E5%A2%99%E5%B7%A5%E4%BD%9C%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.3.4.1.</span> <span class="nav-text">2.4.1 防火墙工作模式</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-2-%E5%B8%B8%E7%94%A8%E9%98%B2%E7%81%AB%E5%A2%99%E5%91%BD%E4%BB%A4"><span class="nav-number">1.3.4.2.</span> <span class="nav-text">2.4.2 常用防火墙命令</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-4-3-%E5%B8%B8%E8%A7%81%E5%AE%89%E5%85%A8%E9%85%8D%E7%BD%AE%E9%94%99%E8%AF%AF"><span class="nav-number">1.3.4.3.</span> <span class="nav-text">2.4.3 常见安全配置错误</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-%E6%9C%AC%E5%9C%B0%E5%AE%89%E5%85%A8%E7%AD%96%E7%95%A5%EF%BC%88Local-Security-Policy%EF%BC%89"><span class="nav-number">1.3.5.</span> <span class="nav-text">2.5 本地安全策略（Local Security Policy）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-1-%E8%AE%BF%E9%97%AE%E6%9C%AC%E5%9C%B0%E5%AE%89%E5%85%A8%E7%AD%96%E7%95%A5"><span class="nav-number">1.3.5.1.</span> <span class="nav-text">2.5.1 访问本地安全策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-5-2-%E5%85%B3%E9%94%AE%E7%AD%96%E7%95%A5%E9%85%8D%E7%BD%AE"><span class="nav-number">1.3.5.2.</span> <span class="nav-text">2.5.2 关键策略配置</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-6-%E7%9B%91%E5%90%AC%E7%AB%AF%E5%8F%A3%E6%8E%92%E6%9F%A5"><span class="nav-number">1.3.6.</span> <span class="nav-text">2.6 监听端口排查</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-6-1-%E6%9F%A5%E7%9C%8B%E7%9B%91%E5%90%AC%E7%AB%AF%E5%8F%A3%E7%9A%84-3-%E7%A7%8D%E6%96%B9%E6%B3%95"><span class="nav-number">1.3.6.1.</span> <span class="nav-text">2.6.1 查看监听端口的 3 种方法</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-6-2-%E5%B8%B8%E8%A7%81%E7%AB%AF%E5%8F%A3%E9%A3%8E%E9%99%A9%E8%AF%84%E4%BC%B0%E8%A1%A8"><span class="nav-number">1.3.6.2.</span> <span class="nav-text">2.6.2 常见端口风险评估表</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-6-3-%E5%AE%9E%E6%88%98%EF%BC%9A%E6%8E%92%E6%9F%A5%E2%80%9D%E4%B8%8D%E8%AF%A5%E7%9B%91%E5%90%AC%E7%9A%84%E7%AB%AF%E5%8F%A3%E2%80%9D"><span class="nav-number">1.3.6.3.</span> <span class="nav-text">2.6.3 实战：排查”不该监听的端口”</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E5%AE%9E%E8%B7%B5%E4%BB%BB%E5%8A%A1%EF%BC%88%E6%89%8B%E6%8A%8A%E6%89%8B%E6%93%8D%E4%BD%9C%EF%BC%89"><span class="nav-number">1.4.</span> <span class="nav-text">三、实践任务（手把手操作）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-1%EF%BC%9A%E5%AE%A1%E8%AE%A1%E6%9C%AC%E5%9C%B0%E7%AE%A1%E7%90%86%E5%91%98%E7%BB%84%E6%88%90%E5%91%98"><span class="nav-number">1.4.1.</span> <span class="nav-text">任务 1：审计本地管理员组成员</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-2%EF%BC%9A%E5%AF%BC%E5%87%BA%E6%9C%80%E8%BF%91-24-%E5%B0%8F%E6%97%B6%E7%9A%84%E7%99%BB%E5%BD%95%E4%BA%8B%E4%BB%B6%EF%BC%884624-x2F-4625%EF%BC%89"><span class="nav-number">1.4.2.</span> <span class="nav-text">任务 2：导出最近 24 小时的登录事件（4624&#x2F;4625）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-3%EF%BC%9A%E6%A3%80%E6%9F%A5%E9%98%B2%E7%81%AB%E5%A2%99%E5%85%A5%E7%AB%99%E8%A7%84%E5%88%99%E5%B9%B6%E8%AF%84%E4%BC%B0%E9%A3%8E%E9%99%A9"><span class="nav-number">1.4.3.</span> <span class="nav-text">任务 3：检查防火墙入站规则并评估风险</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-4%EF%BC%9A%E7%9B%98%E7%82%B9%E5%BD%93%E5%89%8D%E7%9B%91%E5%90%AC%E7%AB%AF%E5%8F%A3%E5%B9%B6%E8%AF%86%E5%88%AB%E5%BC%82%E5%B8%B8%E8%BF%9B%E7%A8%8B"><span class="nav-number">1.4.4.</span> <span class="nav-text">任务 4：盘点当前监听端口并识别异常进程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-5%EF%BC%9A%E9%85%8D%E7%BD%AE%E8%B4%A6%E6%88%B7%E9%94%81%E5%AE%9A%E7%AD%96%E7%95%A5%EF%BC%88%E9%98%B2%E7%88%86%E7%A0%B4%EF%BC%89"><span class="nav-number">1.4.5.</span> <span class="nav-text">任务 5：配置账户锁定策略（防爆破）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%B7%A9%E5%9B%BA%E7%BB%83%E4%B9%A0%EF%BC%88%E9%A2%98%E4%B8%8E%E5%A4%8D%E7%9B%98%EF%BC%89"><span class="nav-number">1.5.</span> <span class="nav-text">四、巩固练习（题与复盘）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-1%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E5%BB%BA%E8%AE%AE%E5%90%AF%E7%94%A8%E5%8C%BF%E5%90%8D%E5%85%B1%E4%BA%AB%EF%BC%9F"><span class="nav-number">1.5.1.</span> <span class="nav-text">题 1：为什么不建议启用匿名共享？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-2%EF%BC%9A%E5%88%97%E5%87%BA-5-%E6%9D%A1-Windows-%E4%B8%BB%E6%9C%BA%E5%8A%A0%E5%9B%BA%E9%A1%B9%E5%B9%B6%E8%AF%B4%E6%98%8E%E5%8E%9F%E5%9B%A0"><span class="nav-number">1.5.2.</span> <span class="nav-text">题 2：列出 5 条 Windows 主机加固项并说明原因</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-3%EF%BC%9A%E5%A6%82%E4%BD%95%E5%88%A4%E6%96%AD%E4%BA%8B%E4%BB%B6-4624-%E6%98%AF%E2%80%9D%E6%AD%A3%E5%B8%B8-RDP-%E7%99%BB%E5%BD%95%E2%80%9D%E8%BF%98%E6%98%AF%E2%80%9D%E5%8F%AF%E7%96%91%E7%99%BB%E5%BD%95%E2%80%9D%EF%BC%9F"><span class="nav-number">1.5.3.</span> <span class="nav-text">题 3：如何判断事件 4624 是”正常 RDP 登录”还是”可疑登录”？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-4%EF%BC%9A%E5%A6%82%E4%BD%95%E9%80%9A%E8%BF%87-PowerShell-%E6%89%BE%E5%87%BA%E2%80%9D%E6%9C%80%E8%BF%91-7-%E5%A4%A9%E5%88%9B%E5%BB%BA%E7%9A%84%E6%9C%AC%E5%9C%B0%E8%B4%A6%E6%88%B7%E2%80%9D%EF%BC%9F"><span class="nav-number">1.5.4.</span> <span class="nav-text">题 4：如何通过 PowerShell 找出”最近 7 天创建的本地账户”？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E8%AF%84%E4%BC%B0%E6%A0%87%E5%87%86%EF%BC%88%E8%BE%BE%E6%88%90%E5%88%A4%E5%AE%9A%EF%BC%89"><span class="nav-number">1.6.</span> <span class="nav-text">五、评估标准（达成判定）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81Windows-%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA%E6%B8%85%E5%8D%95%EF%BC%8815-%E6%9D%A1%EF%BC%89"><span class="nav-number">1.7.</span> <span class="nav-text">六、Windows 安全加固清单（15 条）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B4%A6%E5%8F%B7%E5%AE%89%E5%85%A8%EF%BC%885-%E6%9D%A1%EF%BC%89"><span class="nav-number">1.7.1.</span> <span class="nav-text">账号安全（5 条）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%A1%A5%E4%B8%81%E4%B8%8E%E6%9B%B4%E6%96%B0%EF%BC%882-%E6%9D%A1%EF%BC%89"><span class="nav-number">1.7.2.</span> <span class="nav-text">补丁与更新（2 条）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8%EF%BC%884-%E6%9D%A1%EF%BC%89"><span class="nav-number">1.7.3.</span> <span class="nav-text">网络安全（4 条）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%A1%E8%AE%A1%E4%B8%8E%E6%97%A5%E5%BF%97%EF%BC%882-%E6%9D%A1%EF%BC%89"><span class="nav-number">1.7.4.</span> <span class="nav-text">审计与日志（2 条）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%AB%98%E7%BA%A7%E9%98%B2%E6%8A%A4%EF%BC%882-%E6%9D%A1%EF%BC%89"><span class="nav-number">1.7.5.</span> <span class="nav-text">高级防护（2 条）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E8%BE%BE%E6%88%90%E6%83%85%E5%86%B5%EF%BC%88%E7%94%B1%E5%AD%A6%E4%B9%A0%E8%80%85%E5%A1%AB%E5%86%99%EF%BC%89"><span class="nav-number">1.8.</span> <span class="nav-text">七、学习成果达成情况（由学习者填写）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%AA%E5%9B%BE%E4%B8%8E%E8%AF%81%E6%8D%AE"><span class="nav-number">1.8.1.</span> <span class="nav-text">截图与证据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%91%BD%E4%BB%A4%E4%B8%8E%E8%BE%93%E5%87%BA"><span class="nav-number">1.8.2.</span> <span class="nav-text">关键命令与输出</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E4%B8%8E%E5%8F%8D%E6%80%9D"><span class="nav-number">1.8.3.</span> <span class="nav-text">结论与反思</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">1.9.</span> <span class="nav-text">八、参考资料</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3"><span class="nav-number">1.9.1.</span> <span class="nav-text">官方文档</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B7%A5%E5%85%B7%E4%B8%8B%E8%BD%BD"><span class="nav-number">1.9.2.</span> <span class="nav-text">工具下载</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E5%9F%BA%E7%BA%BF"><span class="nav-number">1.9.3.</span> <span class="nav-text">安全基线</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B9%9D%E3%80%81%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E7%A4%BA%E4%BE%8B%E5%A1%AB%E5%86%99%EF%BC%88%E5%8F%AF%E7%85%A7%E6%8A%84%EF%BC%89"><span class="nav-number">1.10.</span> <span class="nav-text">九、学习成果示例填写（可照抄）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E4%B8%8E%E5%8F%8D%E6%80%9D%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.10.1.</span> <span class="nav-text">结论与反思（示例）</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">75</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Tigercoll" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/f97e6e0d.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day016：操作系统与脚本 - Windows 安全基础 | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day016：操作系统与脚本 - Windows 安全基础
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-01-09 00:00:00" itemprop="dateCreated datePublished" datetime="2026-01-09T00:00:00+08:00">2026-01-09</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Day016：操作系统与脚本-Windows-安全基础"><a href="#Day016：操作系统与脚本-Windows-安全基础" class="headerlink" title="Day016：操作系统与脚本 - Windows 安全基础"></a>Day016：操作系统与脚本 - Windows 安全基础</h1><ul>
+<li>日期：2026-01-09</li>
+<li>周次：第 3 周</li>
+</ul>
+<h2 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h2><p>学完今天你应该能做到：</p>
+<ul>
+<li>掌握 Windows 操作系统安全基础，包括 UAC 原理、用户与组管理、事件日志分析、防火墙配置、本地安全策略、端口监听排查</li>
+<li>学会通过 GUI + PowerShell 双工具进行 Windows 安全审计与加固</li>
+<li>能输出一份 15 条的 Windows 加固清单</li>
+</ul>
+<hr>
+<span id="more"></span>
+
+<h2 id="一、为什么-Windows-安全是”必修课”？"><a href="#一、为什么-Windows-安全是”必修课”？" class="headerlink" title="一、为什么 Windows 安全是”必修课”？"></a>一、为什么 Windows 安全是”必修课”？</h2><h3 id="1-1-Windows-在安全运营中的地位"><a href="#1-1-Windows-在安全运营中的地位" class="headerlink" title="1.1 Windows 在安全运营中的地位"></a>1.1 Windows 在安全运营中的地位</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">企业环境占比</span><br><span class="line">├─ 服务器：Windows Server 占 30-40%（AD/IIS/SQL Server）</span><br><span class="line">├─ 办公终端：Windows 10/11 占 70-80%（Office/OA/邮件客户端）</span><br><span class="line">└─ 攻击者视角：域控（DC）是内网攻击的&quot;皇冠明珠&quot;</span><br><span class="line"></span><br><span class="line">攻击链典型路径</span><br><span class="line">1. 钓鱼邮件打开 Excel 宏 → RCE 在用户 PC</span><br><span class="line">2. 获取明文密码/Kerberos 票据 → 横向移动</span><br><span class="line">3. 域管账号劫持 → 控制整个域（GPO/DC）</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2-学完今天你能做什么？"><a href="#1-2-学完今天你能做什么？" class="headerlink" title="1.2 学完今天你能做什么？"></a>1.2 学完今天你能做什么？</h3><table>
+<thead>
+<tr>
+<th>能力项</th>
+<th>实战场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>识别异常登录</strong></td>
+<td>通过事件 4625（失败登录）发现爆破攻击</td>
+</tr>
+<tr>
+<td><strong>审计管理员组</strong></td>
+<td>发现”不该在管理员组的账号”（内鬼&#x2F;残留）</td>
+</tr>
+<tr>
+<td><strong>排查开放端口</strong></td>
+<td>用 <code>netstat</code>&#x2F;<code>Get-NetTCPConnection</code> 找到可疑监听进程</td>
+</tr>
+<tr>
+<td><strong>配置防火墙规则</strong></td>
+<td>阻断 RDP 对公网暴露、放通必要服务</td>
+</tr>
+<tr>
+<td><strong>制作加固方案</strong></td>
+<td>输出 15 条 Windows 加固清单（账号&#x2F;服务&#x2F;网络&#x2F;审计）</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="二、核心知识点详解（傻瓜级讲解）"><a href="#二、核心知识点详解（傻瓜级讲解）" class="headerlink" title="二、核心知识点详解（傻瓜级讲解）"></a>二、核心知识点详解（傻瓜级讲解）</h2><h3 id="2-1-用户账户控制（UAC）原理"><a href="#2-1-用户账户控制（UAC）原理" class="headerlink" title="2.1 用户账户控制（UAC）原理"></a>2.1 用户账户控制（UAC）原理</h3><h4 id="2-1-1-什么是-UAC？"><a href="#2-1-1-什么是-UAC？" class="headerlink" title="2.1.1 什么是 UAC？"></a>2.1.1 什么是 UAC？</h4><p><strong>UAC（User Account Control）</strong> 是 Windows 从 Vista 开始引入的安全机制，目标是：<strong>即使是管理员账号，默认也以普通权限运行程序，需要提升权限时才弹窗确认</strong>。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">传统模式（XP 时代）             UAC 模式（Vista 后）</span><br><span class="line">管理员登录                      管理员登录</span><br><span class="line">↓                               ↓</span><br><span class="line">直接拥有完整权限                 默认获得&quot;过滤的令牌&quot;（Filtered Token）</span><br><span class="line">↓                               ↓</span><br><span class="line">任意程序都可修改系统             需要提权时弹出&quot;UAC 提示框&quot;</span><br><span class="line">↓                               ↓</span><br><span class="line">恶意软件也能静默提权             用户确认后才获得完整权限</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-1-2-UAC-工作流程"><a href="#2-1-2-UAC-工作流程" class="headerlink" title="2.1.2 UAC 工作流程"></a>2.1.2 UAC 工作流程</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">用户双击&quot;需要管理员权限&quot;的程序（如 regedit）</span><br><span class="line">↓</span><br><span class="line">检查 manifest（是否标记 requireAdministrator）</span><br><span class="line">↓</span><br><span class="line">【是】→ 触发 UAC 提示框（&quot;是否允许此应用更改设备？&quot;）</span><br><span class="line">       ↓</span><br><span class="line">       用户点击&quot;是&quot; → 创建新进程，使用完整令牌（Full Token）</span><br><span class="line">       用户点击&quot;否&quot; → 拒绝运行</span><br><span class="line">↓</span><br><span class="line">【否】→ 直接以普通权限运行（即使是管理员账号）</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-1-3-UAC-的-4-个安全级别"><a href="#2-1-3-UAC-的-4-个安全级别" class="headerlink" title="2.1.3 UAC 的 4 个安全级别"></a>2.1.3 UAC 的 4 个安全级别</h4><table>
+<thead>
+<tr>
+<th>级别</th>
+<th>行为</th>
+<th>安全性</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>始终通知</strong></td>
+<td>所有程序提权都弹窗，且切换安全桌面</td>
+<td>⭐⭐⭐⭐⭐</td>
+<td>高风险环境（如域控）</td>
+</tr>
+<tr>
+<td><strong>默认</strong></td>
+<td>程序提权弹窗，Windows 设置更改不弹窗</td>
+<td>⭐⭐⭐⭐</td>
+<td>一般办公环境</td>
+</tr>
+<tr>
+<td><strong>仅在应用尝试更改时通知</strong></td>
+<td>不切换安全桌面（可被劫持）</td>
+<td>⭐⭐⭐</td>
+<td>开发测试环境</td>
+</tr>
+<tr>
+<td><strong>从不通知</strong></td>
+<td>完全关闭 UAC</td>
+<td>⚠️ 极不推荐</td>
+<td>仅用于兼容老旧软件</td>
+</tr>
+</tbody></table>
+<p><strong>安全桌面（Secure Desktop）</strong>：UAC 弹窗时屏幕变暗，此时只有系统进程可绘制界面，防止木马伪造确认按钮。</p>
+<h4 id="2-1-4-查看当前-UAC-状态"><a href="#2-1-4-查看当前-UAC-状态" class="headerlink" title="2.1.4 查看当前 UAC 状态"></a>2.1.4 查看当前 UAC 状态</h4><p><strong>方法 1：GUI</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">控制面板 → 用户账户 → 更改用户账户控制设置</span><br><span class="line">拖动滑块查看当前级别</span><br></pre></td></tr></table></figure>
+
+<p><strong>方法 2：PowerShell</strong></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查询 UAC 启用状态</span></span><br><span class="line"><span class="built_in">Get-ItemProperty</span> <span class="literal">-Path</span> <span class="string">&quot;HKLM:\Software\Microsoft\Windows\CurrentVersion\Policies\System&quot;</span> <span class="literal">-Name</span> <span class="string">&quot;EnableLUA&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 返回值：</span></span><br><span class="line"><span class="comment"># 1 = UAC 已启用</span></span><br><span class="line"><span class="comment"># 0 = UAC 已禁用</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>方法 3：命令行提权测试</strong></p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># 测试当前 Shell 是否有管理员权限</span><br><span class="line">whoami /groups | <span class="built_in">findstr</span> &quot;High Mandatory Level&quot;</span><br><span class="line"></span><br><span class="line"># 如果有输出 → 当前是高权限 Shell</span><br><span class="line"># 如果无输出 → 当前是普通权限 Shell</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2-2-用户与组管理（本地账户）"><a href="#2-2-用户与组管理（本地账户）" class="headerlink" title="2.2 用户与组管理（本地账户）"></a>2.2 用户与组管理（本地账户）</h3><h4 id="2-2-1-常见本地用户组"><a href="#2-2-1-常见本地用户组" class="headerlink" title="2.2.1 常见本地用户组"></a>2.2.1 常见本地用户组</h4><table>
+<thead>
+<tr>
+<th>组名</th>
+<th>权限</th>
+<th>典型用途</th>
+<th>安全要点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Administrators</strong></td>
+<td>完整系统控制</td>
+<td>IT 管理员</td>
+<td>⚠️ 应最小化成员数量</td>
+</tr>
+<tr>
+<td><strong>Users</strong></td>
+<td>运行程序、访问自己的文件</td>
+<td>普通员工</td>
+<td>✅ 日常办公应使用此组</td>
+</tr>
+<tr>
+<td><strong>Remote Desktop Users</strong></td>
+<td>允许 RDP 登录</td>
+<td>远程运维人员</td>
+<td>⚠️ 需配合强密码+MFA</td>
+</tr>
+<tr>
+<td><strong>Guests</strong></td>
+<td>临时访问，权限极低</td>
+<td>访客账号</td>
+<td>⚠️ 应禁用（默认禁用）</td>
+</tr>
+<tr>
+<td><strong>Backup Operators</strong></td>
+<td>可备份&#x2F;还原任意文件</td>
+<td>备份系统管理员</td>
+<td>⚠️ 可能绕过文件权限</td>
+</tr>
+</tbody></table>
+<h4 id="2-2-2-管理员组审计实战"><a href="#2-2-2-管理员组审计实战" class="headerlink" title="2.2.2 管理员组审计实战"></a>2.2.2 管理员组审计实战</h4><p><strong>任务：列出所有管理员组成员，识别异常账号</strong></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 方法 1：PowerShell（推荐）</span></span><br><span class="line"><span class="built_in">Get-LocalGroupMember</span> <span class="literal">-Group</span> <span class="string">&quot;Administrators&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出示例：</span></span><br><span class="line"><span class="comment"># Name                           PrincipalSource</span></span><br><span class="line"><span class="comment"># ----                           ---------------</span></span><br><span class="line"><span class="comment"># PC01\Administrator             Local</span></span><br><span class="line"><span class="comment"># PC01\alice                     Local</span></span><br><span class="line"><span class="comment"># AzureAD\bob@company.com        Azure Active Directory</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 方法 2：命令行</span></span><br><span class="line">net localgroup Administrators</span><br></pre></td></tr></table></figure>
+
+<p><strong>安全检查清单</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 是否存在”未知账号”（离职员工&#x2F;外包人员）</li>
+<li><input disabled="" type="checkbox"> 是否有”不该有管理员权限的账号”（如前台&#x2F;访客）</li>
+<li><input disabled="" type="checkbox"> 是否有”命名异常”的账号（如 <code>admin123</code>、<code>temp_admin</code>）</li>
+<li><input disabled="" type="checkbox"> 是否有”域账号”在本地管理员组（检查域策略是否符合预期）</li>
+</ul>
+<h4 id="2-2-3-创建”安全的本地管理员账号”"><a href="#2-2-3-创建”安全的本地管理员账号”" class="headerlink" title="2.2.3 创建”安全的本地管理员账号”"></a>2.2.3 创建”安全的本地管理员账号”</h4><p><strong>场景</strong>：需要临时授予 IT 外包人员管理员权限，合同到期后收回。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 创建本地用户</span></span><br><span class="line"><span class="variable">$Password</span> = <span class="built_in">ConvertTo-SecureString</span> <span class="string">&quot;P@ssw0rd!2024&quot;</span> <span class="literal">-AsPlainText</span> <span class="literal">-Force</span></span><br><span class="line"><span class="built_in">New-LocalUser</span> <span class="literal">-Name</span> <span class="string">&quot;ITSupport01&quot;</span> <span class="literal">-Password</span> <span class="variable">$Password</span> <span class="literal">-Description</span> <span class="string">&quot;Temporary admin for contractor&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 添加到管理员组</span></span><br><span class="line"><span class="built_in">Add-LocalGroupMember</span> <span class="literal">-Group</span> <span class="string">&quot;Administrators&quot;</span> <span class="literal">-Member</span> <span class="string">&quot;ITSupport01&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 设置密码策略</span></span><br><span class="line"><span class="comment"># 强制下次登录修改密码</span></span><br><span class="line"><span class="built_in">Set-LocalUser</span> <span class="literal">-Name</span> <span class="string">&quot;ITSupport01&quot;</span> <span class="literal">-PasswordNeverExpires</span> <span class="variable">$false</span> <span class="literal">-UserMayChangePassword</span> <span class="variable">$true</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 4. 合同到期后移除</span></span><br><span class="line"><span class="built_in">Remove-LocalGroupMember</span> <span class="literal">-Group</span> <span class="string">&quot;Administrators&quot;</span> <span class="literal">-Member</span> <span class="string">&quot;ITSupport01&quot;</span></span><br><span class="line"><span class="built_in">Remove-LocalUser</span> <span class="literal">-Name</span> <span class="string">&quot;ITSupport01&quot;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2-3-Windows-事件日志（安全审计的”黑匣子”）"><a href="#2-3-Windows-事件日志（安全审计的”黑匣子”）" class="headerlink" title="2.3 Windows 事件日志（安全审计的”黑匣子”）"></a>2.3 Windows 事件日志（安全审计的”黑匣子”）</h3><h4 id="2-3-1-事件日志分类"><a href="#2-3-1-事件日志分类" class="headerlink" title="2.3.1 事件日志分类"></a>2.3.1 事件日志分类</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Windows 日志</span><br><span class="line">├─ Security（安全日志）← 最重要！记录登录/提权/访问控制</span><br><span class="line">├─ System（系统日志）  ← 记录服务启动/停止、驱动加载</span><br><span class="line">├─ Application（应用日志）← 记录程序错误/崩溃</span><br><span class="line">└─ Setup（安装日志）   ← 记录补丁安装/系统更新</span><br><span class="line"></span><br><span class="line">应用程序和服务日志</span><br><span class="line">└─ Microsoft-Windows-Sysmon/Operational ← Sysmon 日志（需单独安装）</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-3-2-关键安全事件-ID-详解"><a href="#2-3-2-关键安全事件-ID-详解" class="headerlink" title="2.3.2 关键安全事件 ID 详解"></a>2.3.2 关键安全事件 ID 详解</h4><table>
+<thead>
+<tr>
+<th>事件 ID</th>
+<th>含义</th>
+<th>威胁指示</th>
+<th>查看方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>4624</strong></td>
+<td>登录成功</td>
+<td>登录类型 10&#x3D;RDP，3&#x3D;网络，2&#x3D;交互式</td>
+<td>筛选 <code>Logon Type</code> 字段</td>
+</tr>
+<tr>
+<td><strong>4625</strong></td>
+<td>登录失败</td>
+<td>短时间内大量 4625 → 密码爆破</td>
+<td>统计失败次数 Top 5</td>
+</tr>
+<tr>
+<td><strong>4672</strong></td>
+<td>特殊权限登录</td>
+<td>管理员&#x2F;域管账号登录</td>
+<td>审计”不该有管理员权限的人”</td>
+</tr>
+<tr>
+<td><strong>4648</strong></td>
+<td>使用显式凭据登录</td>
+<td><code>runas</code> 或 <code>psexec</code>（横向移动）</td>
+<td>审计”非管理员使用他人凭据”</td>
+</tr>
+<tr>
+<td><strong>4688</strong></td>
+<td>进程创建</td>
+<td>可疑进程（如 <code>mimikatz.exe</code>）</td>
+<td>需启用”进程创建审计”</td>
+</tr>
+<tr>
+<td><strong>4720</strong></td>
+<td>创建用户账户</td>
+<td>后门账户创建</td>
+<td>审计”非预期的账户创建”</td>
+</tr>
+<tr>
+<td><strong>7045</strong></td>
+<td>安装系统服务</td>
+<td>恶意软件注册服务（如勒索软件）</td>
+<td>在 System 日志中查看</td>
+</tr>
+</tbody></table>
+<h4 id="2-3-3-事件-4624-详细解读（登录成功）"><a href="#2-3-3-事件-4624-详细解读（登录成功）" class="headerlink" title="2.3.3 事件 4624 详细解读（登录成功）"></a>2.3.3 事件 4624 详细解读（登录成功）</h4><p><strong>示例事件</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">事件 ID: 4624</span><br><span class="line">任务类别: 登录</span><br><span class="line">关键字: 审核成功</span><br><span class="line">主题:</span><br><span class="line">  安全 ID: S-1-5-21-xxx（谁登录）</span><br><span class="line">  账户名: alice</span><br><span class="line">登录类型: 10（RDP）</span><br><span class="line">新登录:</span><br><span class="line">  安全 ID: S-1-5-21-xxx</span><br><span class="line">  账户名: alice</span><br><span class="line">  登录 GUID: &#123;xxx&#125;</span><br><span class="line">进程信息:</span><br><span class="line">  进程 ID: 0x1234</span><br><span class="line">  进程名: C:\Windows\System32\winlogon.exe</span><br><span class="line">网络信息:</span><br><span class="line">  工作站名: DESKTOP-ABC</span><br><span class="line">  源网络地址: 192.168.1.100</span><br><span class="line">  源端口: 54321</span><br></pre></td></tr></table></figure>
+
+<p><strong>登录类型（Logon Type）对照表</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>类型</th>
+<th>含义</th>
+<th>典型场景</th>
+<th>安全关注点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>2</strong></td>
+<td>交互式登录</td>
+<td>本地键盘登录、Ctrl+Alt+Del</td>
+<td>正常物理访问</td>
+</tr>
+<tr>
+<td><strong>3</strong></td>
+<td>网络登录</td>
+<td>访问共享文件夹（\server\share）</td>
+<td>可能是横向移动</td>
+</tr>
+<tr>
+<td><strong>4</strong></td>
+<td>批处理</td>
+<td>计划任务运行</td>
+<td>持久化后门常用</td>
+</tr>
+<tr>
+<td><strong>5</strong></td>
+<td>服务登录</td>
+<td>Windows 服务启动</td>
+<td>正常，除非服务名可疑</td>
+</tr>
+<tr>
+<td><strong>7</strong></td>
+<td>解锁</td>
+<td>屏保解锁</td>
+<td>正常</td>
+</tr>
+<tr>
+<td><strong>8</strong></td>
+<td>网络明文</td>
+<td>IIS 基本认证</td>
+<td>⚠️ 密码明文传输</td>
+</tr>
+<tr>
+<td><strong>10</strong></td>
+<td>远程交互式（RDP）</td>
+<td>远程桌面登录</td>
+<td>⚠️ 需审计源 IP</td>
+</tr>
+<tr>
+<td><strong>11</strong></td>
+<td>缓存交互式</td>
+<td>域账号离线登录（使用缓存凭据）</td>
+<td>可能在域控不可达时</td>
+</tr>
+</tbody></table>
+<h4 id="2-3-4-实战：查找”可疑的-RDP-登录”"><a href="#2-3-4-实战：查找”可疑的-RDP-登录”" class="headerlink" title="2.3.4 实战：查找”可疑的 RDP 登录”"></a>2.3.4 实战：查找”可疑的 RDP 登录”</h4><p><strong>场景</strong>：排查是否有未授权的远程桌面登录（事件 4624，登录类型 10）。</p>
+<p><strong>方法 1：GUI（事件查看器）</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">1. Win+R → eventvwr.msc</span><br><span class="line">2. Windows 日志 → 安全</span><br><span class="line">3. 右侧&quot;筛选当前日志&quot; → 事件 ID 输入 4624</span><br><span class="line">4. 创建自定义视图 → XML 编辑：</span><br><span class="line">   &lt;QueryList&gt;</span><br><span class="line">     &lt;Query Id=&quot;0&quot; Path=&quot;Security&quot;&gt;</span><br><span class="line">       &lt;Select Path=&quot;Security&quot;&gt;</span><br><span class="line">         *[System[(EventID=4624)]]</span><br><span class="line">         and</span><br><span class="line">         *[EventData[Data[@Name=&#x27;LogonType&#x27;]=&#x27;10&#x27;]]</span><br><span class="line">       &lt;/Select&gt;</span><br><span class="line">     &lt;/Query&gt;</span><br><span class="line">   &lt;/QueryList&gt;</span><br><span class="line">5. 查看&quot;源网络地址&quot;字段，检查是否有外网 IP</span><br></pre></td></tr></table></figure>
+
+<p><strong>方法 2：PowerShell（批量导出分析）</strong></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导出最近 24 小时的 RDP 登录事件</span></span><br><span class="line"><span class="built_in">Get-WinEvent</span> <span class="literal">-FilterHashtable</span> <span class="selector-tag">@</span>&#123;</span><br><span class="line">    LogName=<span class="string">&#x27;Security&#x27;</span></span><br><span class="line">    ID=<span class="number">4624</span></span><br><span class="line">    StartTime=(<span class="built_in">Get-Date</span>).AddDays(<span class="literal">-1</span>)</span><br><span class="line">&#125; | <span class="built_in">Where-Object</span> &#123;</span><br><span class="line">    <span class="variable">$_</span>.Properties[<span class="number">8</span>].Value <span class="operator">-eq</span> <span class="number">10</span>  <span class="comment"># 登录类型=10（RDP）</span></span><br><span class="line">&#125; | <span class="built_in">Select-Object</span> TimeCreated,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;User&quot;</span>;Expression=&#123;<span class="variable">$_</span>.Properties[<span class="number">5</span>].Value&#125;&#125;,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;SourceIP&quot;</span>;Expression=&#123;<span class="variable">$_</span>.Properties[<span class="number">18</span>].Value&#125;&#125;,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;LogonType&quot;</span>;Expression=&#123;<span class="variable">$_</span>.Properties[<span class="number">8</span>].Value&#125;&#125; |</span><br><span class="line"><span class="built_in">Format-Table</span> <span class="literal">-AutoSize</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>分析要点</strong>：</p>
+<ul>
+<li>✅ <strong>正常</strong>：内网 IP（192.168.x.x &#x2F; 10.x.x.x）+ 已知运维人员账号</li>
+<li>⚠️ <strong>可疑</strong>：公网 IP + 非运维时间段（如凌晨 3 点）</li>
+<li>🚨 <strong>高危</strong>：异常地理位置（如来自国外 IP）+ 管理员账号</li>
+</ul>
+<h4 id="2-3-5-实战-统计”密码爆破攻击”（事件-4625）"><a href="#2-3-5-实战-统计”密码爆破攻击”（事件-4625）" class="headerlink" title="2.3.5 实战:统计”密码爆破攻击”（事件 4625）"></a>2.3.5 实战:统计”密码爆破攻击”（事件 4625）</h4><p><strong>场景</strong>：检测短时间内大量登录失败（暴力破解 RDP）。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 统计最近 1 小时失败登录的 Top 5 账户</span></span><br><span class="line"><span class="built_in">Get-WinEvent</span> <span class="literal">-FilterHashtable</span> <span class="selector-tag">@</span>&#123;</span><br><span class="line">    LogName=<span class="string">&#x27;Security&#x27;</span></span><br><span class="line">    ID=<span class="number">4625</span></span><br><span class="line">    StartTime=(<span class="built_in">Get-Date</span>).AddHours(<span class="literal">-1</span>)</span><br><span class="line">&#125; | <span class="built_in">Select-Object</span> <span class="selector-tag">@</span>&#123;</span><br><span class="line">    Name=<span class="string">&quot;User&quot;</span></span><br><span class="line">    Expression=&#123;<span class="variable">$_</span>.Properties[<span class="number">5</span>].Value&#125;</span><br><span class="line">&#125; | <span class="built_in">Group-Object</span> User |</span><br><span class="line"><span class="built_in">Sort-Object</span> Count <span class="literal">-Descending</span> |</span><br><span class="line"><span class="built_in">Select-Object</span> <span class="literal">-First</span> <span class="number">5</span> Name, Count</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Name          Count</span><br><span class="line">----          -----</span><br><span class="line">Administrator   127</span><br><span class="line">admin            89</span><br><span class="line">root             56</span><br><span class="line">test             34</span><br><span class="line">backup           23</span><br></pre></td></tr></table></figure>
+
+<p><strong>判断标准</strong>：</p>
+<ul>
+<li>🚨 <strong>单账号 &gt; 50 次失败</strong>：高度疑似爆破</li>
+<li>⚠️ <strong>多账号均失败 10+ 次</strong>：可能在字典攻击</li>
+<li>✅ <strong>少量失败</strong>：可能是用户忘记密码</li>
+</ul>
+<p><strong>防御措施</strong>：</p>
+<ol>
+<li>启用账户锁定策略（5 次失败锁定 30 分钟）</li>
+<li>使用防火墙限制 RDP（3389）仅对内网开放</li>
+<li>启用 MFA（多因素认证）</li>
+</ol>
+<hr>
+<h3 id="2-4-Windows-防火墙配置"><a href="#2-4-Windows-防火墙配置" class="headerlink" title="2.4 Windows 防火墙配置"></a>2.4 Windows 防火墙配置</h3><h4 id="2-4-1-防火墙工作模式"><a href="#2-4-1-防火墙工作模式" class="headerlink" title="2.4.1 防火墙工作模式"></a>2.4.1 防火墙工作模式</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">Windows Defender 防火墙配置文件</span><br><span class="line">├─ 域配置文件（Domain Profile）</span><br><span class="line">│   └─ 适用于：主机加入域，且域控可达</span><br><span class="line">├─ 专用配置文件（Private Profile）</span><br><span class="line">│   └─ 适用于：家庭/公司网络（可信）</span><br><span class="line">└─ 公用配置文件（Public Profile）</span><br><span class="line">    └─ 适用于：机场/咖啡厅 Wi-Fi（不可信）</span><br><span class="line"></span><br><span class="line">默认策略</span><br><span class="line">├─ 入站：拒绝（除非明确放通）</span><br><span class="line">├─ 出站：允许（所有流量）</span><br><span class="line">└─ 推荐：保持此默认配置！</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-4-2-常用防火墙命令"><a href="#2-4-2-常用防火墙命令" class="headerlink" title="2.4.2 常用防火墙命令"></a>2.4.2 常用防火墙命令</h4><p><strong>查看当前防火墙状态</strong>：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 方法 1：PowerShell</span></span><br><span class="line"><span class="built_in">Get-NetFirewallProfile</span> | <span class="built_in">Select-Object</span> Name, Enabled</span><br><span class="line"></span><br><span class="line"><span class="comment"># 方法 2：命令行</span></span><br><span class="line">netsh advfirewall show allprofiles</span><br></pre></td></tr></table></figure>
+
+<p><strong>查看所有入站规则</strong>：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 列出所有&quot;允许&quot;的入站规则</span></span><br><span class="line"><span class="built_in">Get-NetFirewallRule</span> <span class="literal">-Direction</span> Inbound <span class="literal">-Enabled</span> True <span class="literal">-Action</span> Allow |</span><br><span class="line"><span class="built_in">Select-Object</span> DisplayName, Profile, LocalPort, RemoteAddress |</span><br><span class="line"><span class="built_in">Format-Table</span> <span class="literal">-AutoSize</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>创建规则：允许特定程序</strong>：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 场景：允许 Python Web 服务（Flask）监听 5000 端口</span></span><br><span class="line"><span class="built_in">New-NetFirewallRule</span> <span class="literal">-DisplayName</span> <span class="string">&quot;Allow Flask App&quot;</span> `</span><br><span class="line">    <span class="literal">-Direction</span> Inbound `</span><br><span class="line">    <span class="literal">-Protocol</span> TCP `</span><br><span class="line">    <span class="literal">-LocalPort</span> <span class="number">5000</span> `</span><br><span class="line">    <span class="literal">-Action</span> Allow `</span><br><span class="line">    <span class="literal">-Profile</span> Private</span><br></pre></td></tr></table></figure>
+
+<p><strong>删除规则</strong>：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Remove-NetFirewallRule</span> <span class="literal">-DisplayName</span> <span class="string">&quot;Allow Flask App&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>阻断特定 IP</strong>：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 场景：阻断可疑 IP 的所有流量</span></span><br><span class="line"><span class="built_in">New-NetFirewallRule</span> <span class="literal">-DisplayName</span> <span class="string">&quot;Block Attacker IP&quot;</span> `</span><br><span class="line">    <span class="literal">-Direction</span> Inbound `</span><br><span class="line">    <span class="literal">-RemoteAddress</span> <span class="number">1.2</span>.<span class="number">3.4</span> `</span><br><span class="line">    <span class="literal">-Action</span> Block</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-4-3-常见安全配置错误"><a href="#2-4-3-常见安全配置错误" class="headerlink" title="2.4.3 常见安全配置错误"></a>2.4.3 常见安全配置错误</h4><table>
+<thead>
+<tr>
+<th>错误配置</th>
+<th>风险</th>
+<th>正确做法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>关闭防火墙</strong></td>
+<td>所有端口暴露</td>
+<td>保持开启，按需放通</td>
+</tr>
+<tr>
+<td><strong>RDP（3389）对公网开放</strong></td>
+<td>成为暴力破解目标</td>
+<td>仅允许 VPN&#x2F;堡垒机 IP</td>
+</tr>
+<tr>
+<td><strong>允许”所有配置文件”</strong></td>
+<td>公共 Wi-Fi 也放通</td>
+<td>仅允许”域+专用”</td>
+</tr>
+<tr>
+<td><strong>出站规则”全部允许”</strong></td>
+<td>木马可联网下载工具</td>
+<td>高敏感环境考虑白名单</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="2-5-本地安全策略（Local-Security-Policy）"><a href="#2-5-本地安全策略（Local-Security-Policy）" class="headerlink" title="2.5 本地安全策略（Local Security Policy）"></a>2.5 本地安全策略（Local Security Policy）</h3><h4 id="2-5-1-访问本地安全策略"><a href="#2-5-1-访问本地安全策略" class="headerlink" title="2.5.1 访问本地安全策略"></a>2.5.1 访问本地安全策略</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">方法 1：Win+R → secpol.msc（本地安全策略）</span><br><span class="line">方法 2：gpedit.msc（本地组策略编辑器）→ 计算机配置 → Windows 设置 → 安全设置</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-5-2-关键策略配置"><a href="#2-5-2-关键策略配置" class="headerlink" title="2.5.2 关键策略配置"></a>2.5.2 关键策略配置</h4><p><strong>账户策略</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th>推荐值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>密码最短长度</strong></td>
+<td>12 位</td>
+<td>防止弱密码</td>
+</tr>
+<tr>
+<td><strong>密码复杂性要求</strong></td>
+<td>已启用</td>
+<td>必须包含大小写+数字+特殊字符</td>
+</tr>
+<tr>
+<td><strong>密码最长使用期限</strong></td>
+<td>90 天</td>
+<td>定期更换（争议项）</td>
+</tr>
+<tr>
+<td><strong>强制密码历史</strong></td>
+<td>记住 24 个</td>
+<td>防止重复使用旧密码</td>
+</tr>
+<tr>
+<td><strong>账户锁定阈值</strong></td>
+<td>5 次</td>
+<td>失败 5 次后锁定</td>
+</tr>
+<tr>
+<td><strong>账户锁定时间</strong></td>
+<td>30 分钟</td>
+<td>锁定后自动解锁时间</td>
+</tr>
+</tbody></table>
+<p><strong>审核策略</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>策略</th>
+<th>推荐值</th>
+<th>审计内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>审核登录事件</strong></td>
+<td>成功和失败</td>
+<td>记录 4624&#x2F;4625</td>
+</tr>
+<tr>
+<td><strong>审核账户管理</strong></td>
+<td>成功和失败</td>
+<td>记录账户创建&#x2F;删除（4720&#x2F;4726）</td>
+</tr>
+<tr>
+<td><strong>审核进程跟踪</strong></td>
+<td>成功</td>
+<td>记录进程创建（4688）</td>
+</tr>
+<tr>
+<td><strong>审核特权使用</strong></td>
+<td>成功</td>
+<td>记录管理员提权（4672）</td>
+</tr>
+</tbody></table>
+<p><strong>配置方法（PowerShell）</strong>：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 启用进程创建审计（4688）</span></span><br><span class="line">auditpol /<span class="built_in">set</span> /subcategory:<span class="string">&quot;Process Creation&quot;</span> /success:enable</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看当前审计策略</span></span><br><span class="line">auditpol /get /category:*</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2-6-监听端口排查"><a href="#2-6-监听端口排查" class="headerlink" title="2.6 监听端口排查"></a>2.6 监听端口排查</h3><h4 id="2-6-1-查看监听端口的-3-种方法"><a href="#2-6-1-查看监听端口的-3-种方法" class="headerlink" title="2.6.1 查看监听端口的 3 种方法"></a>2.6.1 查看监听端口的 3 种方法</h4><p><strong>方法 1：netstat（传统命令）</strong></p>
+<figure class="highlight cmd"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">netstat -ano | <span class="built_in">findstr</span> LISTENING</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">TCP    0.0.0.0:135      0.0.0.0:0     LISTENING       912</span><br><span class="line">TCP    0.0.0.0:445      0.0.0.0:0     LISTENING       4</span><br><span class="line">TCP    0.0.0.0:3389     0.0.0.0:0     LISTENING       1024</span><br></pre></td></tr></table></figure>
+
+<p><strong>字段解释</strong>：</p>
+<ul>
+<li><code>0.0.0.0:135</code> → 监听所有网卡的 135 端口</li>
+<li><code>LISTENING</code> → 当前正在监听</li>
+<li><code>912</code> → 进程 PID</li>
+</ul>
+<p><strong>方法 2：PowerShell（推荐）</strong></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Get-NetTCPConnection</span> <span class="literal">-State</span> Listen |</span><br><span class="line"><span class="built_in">Select-Object</span> LocalAddress, LocalPort,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;Process&quot;</span>;Expression=&#123;(<span class="built_in">Get-Process</span> <span class="literal">-Id</span> <span class="variable">$_</span>.OwningProcess).ProcessName&#125;&#125; |</span><br><span class="line"><span class="built_in">Format-Table</span> <span class="literal">-AutoSize</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>输出示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">LocalAddress LocalPort Process</span><br><span class="line">------------ --------- -------</span><br><span class="line">0.0.0.0      135       svchost</span><br><span class="line">0.0.0.0      445       System</span><br><span class="line">0.0.0.0      3389      TermService</span><br></pre></td></tr></table></figure>
+
+<p><strong>方法 3：使用 Sysinternals TCPView（GUI 工具）</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">下载：https://learn.microsoft.com/en-us/sysinternals/downloads/tcpview</span><br><span class="line">功能：实时显示所有 TCP/UDP 连接，颜色标识新建/关闭连接</span><br></pre></td></tr></table></figure>
+
+<h4 id="2-6-2-常见端口风险评估表"><a href="#2-6-2-常见端口风险评估表" class="headerlink" title="2.6.2 常见端口风险评估表"></a>2.6.2 常见端口风险评估表</h4><table>
+<thead>
+<tr>
+<th>端口</th>
+<th>服务</th>
+<th>用途</th>
+<th>风险等级</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>135</strong></td>
+<td>RPC</td>
+<td>Windows 远程过程调用</td>
+<td>⚠️ 中</td>
+<td>仅内网开放</td>
+</tr>
+<tr>
+<td><strong>139&#x2F;445</strong></td>
+<td>SMB</td>
+<td>文件共享</td>
+<td>🚨 高</td>
+<td>仅内网开放，禁止公网访问</td>
+</tr>
+<tr>
+<td><strong>3389</strong></td>
+<td>RDP</td>
+<td>远程桌面</td>
+<td>🚨 高</td>
+<td>仅通过 VPN 访问</td>
+</tr>
+<tr>
+<td><strong>5985&#x2F;5986</strong></td>
+<td>WinRM</td>
+<td>PowerShell 远程管理</td>
+<td>⚠️ 中</td>
+<td>仅管理员网段开放</td>
+</tr>
+<tr>
+<td><strong>80&#x2F;443</strong></td>
+<td>HTTP&#x2F;HTTPS</td>
+<td>Web 服务</td>
+<td>✅ 低</td>
+<td>确认是否需要对外暴露</td>
+</tr>
+<tr>
+<td><strong>1433</strong></td>
+<td>MSSQL</td>
+<td>SQL Server</td>
+<td>⚠️ 中</td>
+<td>禁止直接暴露，使用跳板机</td>
+</tr>
+<tr>
+<td><strong>3306</strong></td>
+<td>MySQL</td>
+<td>数据库</td>
+<td>⚠️ 中</td>
+<td>同上</td>
+</tr>
+<tr>
+<td><strong>22</strong></td>
+<td>SSH</td>
+<td>Linux 远程管理</td>
+<td>⚠️ 中</td>
+<td>需强密码+密钥认证</td>
+</tr>
+</tbody></table>
+<h4 id="2-6-3-实战：排查”不该监听的端口”"><a href="#2-6-3-实战：排查”不该监听的端口”" class="headerlink" title="2.6.3 实战：排查”不该监听的端口”"></a>2.6.3 实战：排查”不该监听的端口”</h4><p><strong>场景</strong>：发现主机监听了意外的高端口（如 4444、5555），怀疑是木马。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 找到可疑端口的进程</span></span><br><span class="line"><span class="built_in">Get-NetTCPConnection</span> <span class="literal">-LocalPort</span> <span class="number">4444</span> |</span><br><span class="line"><span class="built_in">Select-Object</span> State, OwningProcess,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;Process&quot;</span>;Expression=&#123;(<span class="built_in">Get-Process</span> <span class="literal">-Id</span> <span class="variable">$_</span>.OwningProcess).Path&#125;&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出示例：</span></span><br><span class="line"><span class="comment"># State      : Listen</span></span><br><span class="line"><span class="comment"># OwningProcess : 3456</span></span><br><span class="line"><span class="comment"># Process    : C:\Users\alice\AppData\Roaming\svchost.exe  ← 可疑！</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 查看进程详细信息</span></span><br><span class="line"><span class="built_in">Get-Process</span> <span class="literal">-Id</span> <span class="number">3456</span> | <span class="built_in">Select-Object</span> *</span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 查看进程签名（判断是否为合法程序）</span></span><br><span class="line"><span class="built_in">Get-AuthenticodeSignature</span> <span class="string">&quot;C:\Users\alice\AppData\Roaming\svchost.exe&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果返回 NotSigned → 高度可疑</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>判断恶意进程的技巧</strong>：</p>
+<ul>
+<li>✅ <strong>合法进程</strong>：位于 <code>C:\Windows\System32\</code>，有微软数字签名</li>
+<li>⚠️ <strong>可疑进程</strong>：位于用户目录（<code>AppData</code>）、临时目录（<code>Temp</code>）</li>
+<li>🚨 <strong>恶意进程</strong>：伪装成系统进程名（如 <code>svchost.exe</code> 但不在 System32）</li>
+</ul>
+<hr>
+<h2 id="三、实践任务（手把手操作）"><a href="#三、实践任务（手把手操作）" class="headerlink" title="三、实践任务（手把手操作）"></a>三、实践任务（手把手操作）</h2><h3 id="任务-1：审计本地管理员组成员"><a href="#任务-1：审计本地管理员组成员" class="headerlink" title="任务 1：审计本地管理员组成员"></a>任务 1：审计本地管理员组成员</h3><p><strong>目标</strong>：列出所有管理员组成员，识别不合规账号。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 执行命令</span></span><br><span class="line"><span class="built_in">Get-LocalGroupMember</span> <span class="literal">-Group</span> <span class="string">&quot;Administrators&quot;</span> |</span><br><span class="line"><span class="built_in">Select-Object</span> Name, PrincipalSource, ObjectClass</span><br><span class="line"></span><br><span class="line"><span class="comment"># 输出示例：</span></span><br><span class="line"><span class="comment"># Name                          PrincipalSource ObjectClass</span></span><br><span class="line"><span class="comment"># ----                          --------------- -----------</span></span><br><span class="line"><span class="comment"># PC01\Administrator            Local           User</span></span><br><span class="line"><span class="comment"># PC01\alice                    Local           User</span></span><br><span class="line"><span class="comment"># AzureAD\ITAdmin@company.com   AzureActiveDirectory User</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>检查清单</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 是否有”离职员工”残留账号</li>
+<li><input disabled="" type="checkbox"> 是否有”临时账号”未删除（如 <code>temp_admin</code>）</li>
+<li><input disabled="" type="checkbox"> 是否有”非 IT 人员”在管理员组</li>
+<li><input disabled="" type="checkbox"> 域账号是否符合组策略要求</li>
+</ul>
+<p><strong>输出结果</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[你的截图/输出粘贴到这里]</span><br><span class="line"></span><br><span class="line">发现的问题：</span><br><span class="line">-</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="任务-2：导出最近-24-小时的登录事件（4624-x2F-4625）"><a href="#任务-2：导出最近-24-小时的登录事件（4624-x2F-4625）" class="headerlink" title="任务 2：导出最近 24 小时的登录事件（4624&#x2F;4625）"></a>任务 2：导出最近 24 小时的登录事件（4624&#x2F;4625）</h3><p><strong>目标</strong>：导出登录成功&#x2F;失败事件，检测异常登录。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导出 RDP 登录（事件 4624，登录类型 10）</span></span><br><span class="line"><span class="built_in">Get-WinEvent</span> <span class="literal">-FilterHashtable</span> <span class="selector-tag">@</span>&#123;</span><br><span class="line">    LogName=<span class="string">&#x27;Security&#x27;</span></span><br><span class="line">    ID=<span class="number">4624</span></span><br><span class="line">    StartTime=(<span class="built_in">Get-Date</span>).AddDays(<span class="literal">-1</span>)</span><br><span class="line">&#125; | <span class="built_in">Where-Object</span> &#123;</span><br><span class="line">    <span class="variable">$_</span>.Properties[<span class="number">8</span>].Value <span class="operator">-eq</span> <span class="number">10</span></span><br><span class="line">&#125; | <span class="built_in">Select-Object</span> TimeCreated,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;User&quot;</span>;Expression=&#123;<span class="variable">$_</span>.Properties[<span class="number">5</span>].Value&#125;&#125;,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;SourceIP&quot;</span>;Expression=&#123;<span class="variable">$_</span>.Properties[<span class="number">18</span>].Value&#125;&#125; |</span><br><span class="line"><span class="built_in">Export-Csv</span> <span class="literal">-Path</span> <span class="string">&quot;RDP_Logins.csv&quot;</span> <span class="literal">-NoTypeInformation</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 导出登录失败事件（4625）</span></span><br><span class="line"><span class="built_in">Get-WinEvent</span> <span class="literal">-FilterHashtable</span> <span class="selector-tag">@</span>&#123;</span><br><span class="line">    LogName=<span class="string">&#x27;Security&#x27;</span></span><br><span class="line">    ID=<span class="number">4625</span></span><br><span class="line">    StartTime=(<span class="built_in">Get-Date</span>).AddDays(<span class="literal">-1</span>)</span><br><span class="line">&#125; | <span class="built_in">Select-Object</span> TimeCreated,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;User&quot;</span>;Expression=&#123;<span class="variable">$_</span>.Properties[<span class="number">5</span>].Value&#125;&#125;,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;FailureReason&quot;</span>;Expression=&#123;<span class="variable">$_</span>.Properties[<span class="number">8</span>].Value&#125;&#125; |</span><br><span class="line"><span class="built_in">Export-Csv</span> <span class="literal">-Path</span> <span class="string">&quot;Failed_Logins.csv&quot;</span> <span class="literal">-NoTypeInformation</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>分析要点</strong>：</p>
+<ol>
+<li>打开 <code>RDP_Logins.csv</code>，检查是否有”非预期的源 IP”</li>
+<li>打开 <code>Failed_Logins.csv</code>，统计失败次数最多的账号（可能被爆破）</li>
+</ol>
+<p><strong>输出结果</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[粘贴 CSV 前 10 行或异常记录]</span><br><span class="line"></span><br><span class="line">发现的异常：</span><br><span class="line">-</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="任务-3：检查防火墙入站规则并评估风险"><a href="#任务-3：检查防火墙入站规则并评估风险" class="headerlink" title="任务 3：检查防火墙入站规则并评估风险"></a>任务 3：检查防火墙入站规则并评估风险</h3><p><strong>目标</strong>：列出所有”允许”的入站规则，找出不必要的暴露。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导出所有允许的入站规则</span></span><br><span class="line"><span class="built_in">Get-NetFirewallRule</span> <span class="literal">-Direction</span> Inbound <span class="literal">-Enabled</span> True <span class="literal">-Action</span> Allow |</span><br><span class="line"><span class="built_in">Select-Object</span> DisplayName, Profile,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;LocalPort&quot;</span>;Expression=&#123;(<span class="built_in">Get-NetFirewallPortFilter</span> <span class="literal">-AssociatedNetFirewallRule</span> <span class="variable">$_</span>).LocalPort&#125;&#125;,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;RemoteAddress&quot;</span>;Expression=&#123;(<span class="built_in">Get-NetFirewallAddressFilter</span> <span class="literal">-AssociatedNetFirewallRule</span> <span class="variable">$_</span>).RemoteAddress&#125;&#125; |</span><br><span class="line"><span class="built_in">Export-Csv</span> <span class="literal">-Path</span> <span class="string">&quot;Firewall_Inbound.csv&quot;</span> <span class="literal">-NoTypeInformation</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>风险评估表</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>规则名称</th>
+<th>端口</th>
+<th>远程地址</th>
+<th>风险等级</th>
+<th>建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Remote Desktop</td>
+<td>3389</td>
+<td>Any</td>
+<td>🚨 高</td>
+<td>限制为 VPN IP</td>
+</tr>
+<tr>
+<td>File and Printer Sharing</td>
+<td>445</td>
+<td>Any</td>
+<td>🚨 高</td>
+<td>限制为内网</td>
+</tr>
+<tr>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody></table>
+<p><strong>输出结果</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[粘贴 CSV 或截图]</span><br><span class="line"></span><br><span class="line">需要整改的规则：</span><br><span class="line">-</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="任务-4：盘点当前监听端口并识别异常进程"><a href="#任务-4：盘点当前监听端口并识别异常进程" class="headerlink" title="任务 4：盘点当前监听端口并识别异常进程"></a>任务 4：盘点当前监听端口并识别异常进程</h3><p><strong>目标</strong>：使用 <code>netstat</code> 或 PowerShell 列出所有监听端口，识别可疑服务。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 列出所有监听端口及其进程</span></span><br><span class="line"><span class="built_in">Get-NetTCPConnection</span> <span class="literal">-State</span> Listen |</span><br><span class="line"><span class="built_in">Select-Object</span> LocalAddress, LocalPort, State,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;ProcessName&quot;</span>;Expression=&#123;(<span class="built_in">Get-Process</span> <span class="literal">-Id</span> <span class="variable">$_</span>.OwningProcess <span class="literal">-ErrorAction</span> SilentlyContinue).ProcessName&#125;&#125;,</span><br><span class="line">    <span class="selector-tag">@</span>&#123;Name=<span class="string">&quot;ProcessPath&quot;</span>;Expression=&#123;(<span class="built_in">Get-Process</span> <span class="literal">-Id</span> <span class="variable">$_</span>.OwningProcess <span class="literal">-ErrorAction</span> SilentlyContinue).Path&#125;&#125; |</span><br><span class="line"><span class="built_in">Format-Table</span> <span class="literal">-AutoSize</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>检查清单</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 是否有”非预期的高端口监听”（如 4444、5555）</li>
+<li><input disabled="" type="checkbox"> 进程路径是否在 <code>AppData</code> 或 <code>Temp</code>（可疑）</li>
+<li><input disabled="" type="checkbox"> 进程名是否伪装成系统进程（如 <code>svchost.exe</code> 但不在 System32）</li>
+</ul>
+<p><strong>输出结果</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[粘贴输出或截图]</span><br><span class="line"></span><br><span class="line">发现的可疑进程：</span><br><span class="line">-</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="任务-5：配置账户锁定策略（防爆破）"><a href="#任务-5：配置账户锁定策略（防爆破）" class="headerlink" title="任务 5：配置账户锁定策略（防爆破）"></a>任务 5：配置账户锁定策略（防爆破）</h3><p><strong>目标</strong>：设置”5 次失败锁定 30 分钟”策略。</p>
+<p><strong>方法 1：GUI</strong></p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">1. Win+R → secpol.msc</span><br><span class="line">2. 账户策略 → 账户锁定策略</span><br><span class="line">3. 设置：</span><br><span class="line">   - 账户锁定阈值：5 次无效登录</span><br><span class="line">   - 账户锁定时间：30 分钟</span><br><span class="line">   - 重置账户锁定计数器：30 分钟</span><br><span class="line">4. 点击&quot;应用&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>方法 2：PowerShell（需管理员权限）</strong></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 导出当前策略到临时文件</span></span><br><span class="line">secedit /export /cfg C:\Temp\secpol.cfg</span><br><span class="line"></span><br><span class="line"><span class="comment"># 编辑文件，添加以下内容：</span></span><br><span class="line"><span class="comment"># [System Access]</span></span><br><span class="line"><span class="comment"># LockoutBadCount = 5</span></span><br><span class="line"><span class="comment"># LockoutDuration = 30</span></span><br><span class="line"><span class="comment"># ResetLockoutCount = 30</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 导入策略</span></span><br><span class="line">secedit /configure /db C:\Windows\security\local.sdb /cfg C:\Temp\secpol.cfg</span><br></pre></td></tr></table></figure>
+
+<p><strong>验证</strong>：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看当前锁定策略</span></span><br><span class="line">net accounts</span><br></pre></td></tr></table></figure>
+
+<p><strong>输出示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">强制用户在时间到期之后多久必须注销?:     从不</span><br><span class="line">密码最短使用期限(天):                     0</span><br><span class="line">密码最长使用期限(天):                     42</span><br><span class="line">密码长度最小值:                           0</span><br><span class="line">保持的密码历史记录长度:                   None</span><br><span class="line">锁定阈值:                                 5        ← 确认生效</span><br><span class="line">锁定持续时间(分钟):                       30</span><br><span class="line">锁定观测窗口(分钟):                       30</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、巩固练习（题与复盘）"><a href="#四、巩固练习（题与复盘）" class="headerlink" title="四、巩固练习（题与复盘）"></a>四、巩固练习（题与复盘）</h2><h3 id="题-1：为什么不建议启用匿名共享？"><a href="#题-1：为什么不建议启用匿名共享？" class="headerlink" title="题 1：为什么不建议启用匿名共享？"></a>题 1：为什么不建议启用匿名共享？</h3><p><strong>思路</strong>：</p>
+<ul>
+<li>匿名共享 &#x3D; 不鉴权访问</li>
+<li>权限边界失效 → 容易数据泄露</li>
+<li>内网横向移动的跳板</li>
+</ul>
+<p><strong>参考答案</strong>：<br>匿名共享允许任何人无需身份验证即可访问共享资源，导致：</p>
+<ol>
+<li><strong>信息泄露</strong>：敏感文件被未授权用户下载</li>
+<li><strong>横向移动</strong>：攻击者利用匿名共享在内网传播恶意软件（如 WannaCry）</li>
+<li><strong>合规风险</strong>：违反 GDPR&#x2F;等保 2.0 对访问控制的要求</li>
+</ol>
+<p><strong>防御措施</strong>：</p>
+<ul>
+<li>禁用匿名共享：<code>net share IPC$ /delete</code></li>
+<li>使用 NTFS 权限控制文件访问</li>
+<li>启用 SMB 签名（防中间人攻击）</li>
+</ul>
+<hr>
+<h3 id="题-2：列出-5-条-Windows-主机加固项并说明原因"><a href="#题-2：列出-5-条-Windows-主机加固项并说明原因" class="headerlink" title="题 2：列出 5 条 Windows 主机加固项并说明原因"></a>题 2：列出 5 条 Windows 主机加固项并说明原因</h3><p><strong>思路</strong>：账号、补丁、防火墙、远程服务、日志审计。</p>
+<p><strong>参考答案</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>加固项</th>
+<th>原因</th>
+<th>实施方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1. 最小化管理员组成员</strong></td>
+<td>减少高权限账号被攻击面</td>
+<td><code>Get-LocalGroupMember Administrators</code> 审计</td>
+</tr>
+<tr>
+<td><strong>2. 启用自动更新</strong></td>
+<td>及时修复 CVE 漏洞（如 EternalBlue）</td>
+<td>组策略 → Windows Update</td>
+</tr>
+<tr>
+<td><strong>3. 限制 RDP 访问</strong></td>
+<td>防止暴力破解</td>
+<td>防火墙仅允许 VPN IP</td>
+</tr>
+<tr>
+<td><strong>4. 启用账户锁定策略</strong></td>
+<td>5 次失败锁定 30 分钟</td>
+<td><code>secpol.msc</code> 配置</td>
+</tr>
+<tr>
+<td><strong>5. 启用审计日志</strong></td>
+<td>记录 4624&#x2F;4625&#x2F;4688 用于事件溯源</td>
+<td><code>auditpol /set /category:*</code></td>
+</tr>
+</tbody></table>
+<p><strong>额外 3 条（进阶）</strong>： 6. 禁用不必要的服务（如 Telnet、FTP） 7. 启用 BitLocker 磁盘加密 8. 配置 AppLocker 白名单（限制可执行程序）</p>
+<hr>
+<h3 id="题-3：如何判断事件-4624-是”正常-RDP-登录”还是”可疑登录”？"><a href="#题-3：如何判断事件-4624-是”正常-RDP-登录”还是”可疑登录”？" class="headerlink" title="题 3：如何判断事件 4624 是”正常 RDP 登录”还是”可疑登录”？"></a>题 3：如何判断事件 4624 是”正常 RDP 登录”还是”可疑登录”？</h3><p><strong>参考答案</strong>：</p>
+<p><strong>需要检查的字段</strong>：</p>
+<ol>
+<li><strong>Logon Type</strong>：必须是 10（RDP）</li>
+<li><strong>Source Network Address</strong>：检查 IP 是否为：<ul>
+<li>✅ 内网 IP（192.168.x.x &#x2F; 10.x.x.x）</li>
+<li>⚠️ 公网 IP（需对照 VPN 出口 IP 白名单）</li>
+<li>🚨 异常地理位置（如来自国外）</li>
+</ul>
+</li>
+<li><strong>Account Name</strong>：是否为已知运维人员账号</li>
+<li><strong>Time Created</strong>：是否在工作时间段</li>
+</ol>
+<p><strong>可疑登录特征</strong>：</p>
+<ul>
+<li>凌晨 3 点有 RDP 登录（非值班时间）</li>
+<li>源 IP 来自云服务商（如 AWS&#x2F;Azure），但公司未使用</li>
+<li>账号为 <code>Administrator</code>（应禁用或重命名）</li>
+<li>短时间内多次登录失败后成功（可能爆破成功）</li>
+</ul>
+<p><strong>应急响应</strong>：</p>
+<ol>
+<li>立即隔离主机（断网）</li>
+<li>导出 4624&#x2F;4625&#x2F;4672 事件做证据保全</li>
+<li>检查是否有 4720（创建账户）&#x2F;7045（安装服务）</li>
+<li>使用 Autoruns 检查持久化</li>
+</ol>
+<hr>
+<h3 id="题-4：如何通过-PowerShell-找出”最近-7-天创建的本地账户”？"><a href="#题-4：如何通过-PowerShell-找出”最近-7-天创建的本地账户”？" class="headerlink" title="题 4：如何通过 PowerShell 找出”最近 7 天创建的本地账户”？"></a>题 4：如何通过 PowerShell 找出”最近 7 天创建的本地账户”？</h3><p><strong>参考答案</strong>：</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 方法 1：查询安全日志（事件 4720）</span></span><br><span class="line"><span class="built_in">Get-WinEvent</span> <span class="literal">-FilterHashtable</span> <span class="selector-tag">@</span>&#123;</span><br><span class="line">    LogName=<span class="string">&#x27;Security&#x27;</span></span><br><span class="line">    ID=<span class="number">4720</span></span><br><span class="line">    StartTime=(<span class="built_in">Get-Date</span>).AddDays(<span class="literal">-7</span>)</span><br><span class="line">&#125; | <span class="built_in">ForEach-Object</span> &#123;</span><br><span class="line">    [<span class="type">PSCustomObject</span>]<span class="selector-tag">@</span>&#123;</span><br><span class="line">        Time = <span class="variable">$_</span>.TimeCreated</span><br><span class="line">        NewAccount = <span class="variable">$_</span>.Properties[<span class="number">0</span>].Value</span><br><span class="line">        CreatedBy = <span class="variable">$_</span>.Properties[<span class="number">4</span>].Value</span><br><span class="line">    &#125;</span><br><span class="line">&#125; | <span class="built_in">Format-Table</span> <span class="literal">-AutoSize</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 方法 2：查询本地用户（需判断创建时间）</span></span><br><span class="line"><span class="comment"># 注意：Get-LocalUser 没有直接的&quot;创建时间&quot;属性，需结合注册表</span></span><br><span class="line"><span class="built_in">Get-LocalUser</span> | <span class="built_in">ForEach-Object</span> &#123;</span><br><span class="line">    <span class="variable">$sid</span> = <span class="variable">$_</span>.SID</span><br><span class="line">    <span class="variable">$regPath</span> = <span class="string">&quot;HKLM:\SAM\SAM\Domains\Account\Users\<span class="variable">$sid</span>&quot;</span></span><br><span class="line">    <span class="comment"># 需要管理员权限+SYSTEM权限才能访问 SAM 注册表</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么优先查事件日志？</strong></p>
+<ul>
+<li>事件 4720 明确记录”谁在什么时间创建了账户”</li>
+<li>包含创建者账号（追溯责任）</li>
+<li>即使账户被删除，日志仍保留</li>
+</ul>
+<hr>
+<h2 id="五、评估标准（达成判定）"><a href="#五、评估标准（达成判定）" class="headerlink" title="五、评估标准（达成判定）"></a>五、评估标准（达成判定）</h2><ul>
+<li>✅ 你能列出管理员组成员并解释”谁应该在里面”</li>
+<li>✅ 你能导出 4624&#x2F;4625 某一类事件做证据</li>
+<li>✅ 你能指出 1-2 条”可能不该对外暴露”的入站服务&#x2F;端口</li>
+<li>✅ 你能配置账户锁定策略（5 次失败锁定 30 分钟）</li>
+<li>✅ 你能写出 Windows 加固清单（15 条以上）</li>
+</ul>
+<hr>
+<h2 id="六、Windows-安全加固清单（15-条）"><a href="#六、Windows-安全加固清单（15-条）" class="headerlink" title="六、Windows 安全加固清单（15 条）"></a>六、Windows 安全加固清单（15 条）</h2><h3 id="账号安全（5-条）"><a href="#账号安全（5-条）" class="headerlink" title="账号安全（5 条）"></a>账号安全（5 条）</h3><ol>
+<li>✅ 禁用或重命名默认 <code>Administrator</code> 账号</li>
+<li>✅ 最小化管理员组成员（定期审计）</li>
+<li>✅ 启用密码复杂性（12 位，大小写+数字+符号）</li>
+<li>✅ 启用账户锁定策略（5 次失败锁定 30 分钟）</li>
+<li>✅ 禁用 Guest 账户</li>
+</ol>
+<h3 id="补丁与更新（2-条）"><a href="#补丁与更新（2-条）" class="headerlink" title="补丁与更新（2 条）"></a>补丁与更新（2 条）</h3><ol start="6">
+<li>✅ 启用 Windows 自动更新</li>
+<li>✅ 每月检查未安装的关键更新（<code>wuauclt /detectnow</code>）</li>
+</ol>
+<h3 id="网络安全（4-条）"><a href="#网络安全（4-条）" class="headerlink" title="网络安全（4 条）"></a>网络安全（4 条）</h3><ol start="8">
+<li>✅ 防火墙默认拒绝入站，按需放通</li>
+<li>✅ RDP（3389）仅允许 VPN&#x2F;堡垒机 IP</li>
+<li>✅ 禁用 SMBv1（<code>Disable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol</code>）</li>
+<li>✅ 禁用不必要的服务（Telnet&#x2F;FTP&#x2F;IIS）</li>
+</ol>
+<h3 id="审计与日志（2-条）"><a href="#审计与日志（2-条）" class="headerlink" title="审计与日志（2 条）"></a>审计与日志（2 条）</h3><ol start="12">
+<li>✅ 启用安全审计（4624&#x2F;4625&#x2F;4688&#x2F;4720&#x2F;7045）</li>
+<li>✅ 日志至少保留 90 天（组策略配置）</li>
+</ol>
+<h3 id="高级防护（2-条）"><a href="#高级防护（2-条）" class="headerlink" title="高级防护（2 条）"></a>高级防护（2 条）</h3><ol start="14">
+<li>✅ 启用 Windows Defender 实时保护</li>
+<li>✅ 配置 AppLocker 白名单（限制可执行程序路径）</li>
+</ol>
+<hr>
+<h2 id="七、学习成果达成情况（由学习者填写）"><a href="#七、学习成果达成情况（由学习者填写）" class="headerlink" title="七、学习成果达成情况（由学习者填写）"></a>七、学习成果达成情况（由学习者填写）</h2><h3 id="截图与证据"><a href="#截图与证据" class="headerlink" title="截图与证据"></a>截图与证据</h3><ul>
+<li><input disabled="" type="checkbox"> <code>Get-LocalGroupMember Administrators</code> 输出截图</li>
+<li><input disabled="" type="checkbox"> 4624&#x2F;4625 事件导出 CSV 文件</li>
+<li><input disabled="" type="checkbox"> 防火墙入站规则截图</li>
+<li><input disabled="" type="checkbox"> 监听端口列表截图</li>
+</ul>
+<h3 id="关键命令与输出"><a href="#关键命令与输出" class="headerlink" title="关键命令与输出"></a>关键命令与输出</h3><p><strong>管理员组成员</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[粘贴你的输出]</span><br></pre></td></tr></table></figure>
+
+<p><strong>登录事件（4624&#x2F;4625）关键行</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[粘贴异常记录]</span><br></pre></td></tr></table></figure>
+
+<p><strong>入站规则观察到的”可疑&#x2F;不需要”项</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">[列出具体规则名称和端口]</span><br></pre></td></tr></table></figure>
+
+<h3 id="结论与反思"><a href="#结论与反思" class="headerlink" title="结论与反思"></a>结论与反思</h3><ul>
+<li><strong>我今天确认到的 1 个事实证据</strong>：</li>
+<li><strong>我需要立刻改的 1 个设置（如果是自用电脑）</strong>：</li>
+<li><strong>我不确定但要查的 1 件事</strong>：</li>
+</ul>
+<hr>
+<h2 id="八、参考资料"><a href="#八、参考资料" class="headerlink" title="八、参考资料"></a>八、参考资料</h2><h3 id="官方文档"><a href="#官方文档" class="headerlink" title="官方文档"></a>官方文档</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/plan/appendix-l--events-to-monitor">Windows 安全审核事件 ID</a></li>
+<li><a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/windows/security/application-security/application-control/user-account-control/how-it-works">UAC 工作原理</a></li>
+<li><a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/windows/security/operating-system-security/network-security/windows-firewall/best-practices-configuring">Windows Defender 防火墙最佳实践</a></li>
+</ul>
+<h3 id="工具下载"><a href="#工具下载" class="headerlink" title="工具下载"></a>工具下载</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/sysinternals/">Sysinternals Suite</a>（包含 TCPView&#x2F;Autoruns&#x2F;PsExec）</li>
+<li><a target="_blank" rel="noopener" href="https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon">Sysmon</a>（高级日志记录）</li>
+</ul>
+<h3 id="安全基线"><a href="#安全基线" class="headerlink" title="安全基线"></a>安全基线</h3><ul>
+<li><a target="_blank" rel="noopener" href="https://www.cisecurity.org/benchmark/microsoft_windows_desktop">CIS Windows 10 Benchmark</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.microsoft.com/en-us/download/details.aspx?id=55319">Microsoft Security Compliance Toolkit</a></li>
+</ul>
+<hr>
+<h2 id="九、学习成果示例填写（可照抄）"><a href="#九、学习成果示例填写（可照抄）" class="headerlink" title="九、学习成果示例填写（可照抄）"></a>九、学习成果示例填写（可照抄）</h2><h3 id="结论与反思（示例）"><a href="#结论与反思（示例）" class="headerlink" title="结论与反思（示例）"></a>结论与反思（示例）</h3><p><strong>我今天确认到的 1 个事实证据</strong>：</p>
+<ul>
+<li>在管理员组中发现了离职员工 <code>Bob</code> 的账号残留，已通过 <code>Remove-LocalUser</code> 删除。</li>
+</ul>
+<p><strong>我需要立刻改的 1 个设置（如果是自用电脑）</strong>：</p>
+<ul>
+<li>我的 RDP（3389）端口对所有 IP 开放，需要修改防火墙规则，仅允许家庭网络 IP 段（192.168.1.0&#x2F;24）访问。</li>
+</ul>
+<p><strong>我不确定但要查的 1 件事</strong>：</p>
+<ul>
+<li>事件日志中出现了大量事件 ID 4648（使用显式凭据登录），不确定是否为正常运维行为，需要与 IT 部门确认。</li>
+</ul>
+<hr>
+<p><strong>恭喜！你已掌握 Windows 安全审计与加固的核心技能。明天我们将学习 PowerShell 脚本，进一步提升自动化能力！</strong> 🎉</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Tigercoll 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+              <a href="/tags/%E5%AE%89%E5%85%A8/" rel="tag"># 安全</a>
+              <a href="/tags/%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" rel="tag"># 学习计划</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/3ca7da61.html" rel="prev" title="Day015：操作系统与脚本 - Linux 安全基础">
+                  <i class="fa fa-chevron-left"></i> Day015：操作系统与脚本 - Linux 安全基础
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/44b1dfb5.html" rel="next" title="Day017：操作系统与脚本 - Shell/PowerShell 脚本入门与批处理">
+                  Day017：操作系统与脚本 - Shell/PowerShell 脚本入门与批处理 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true,"react":{"opacity":0.7}}});</script></body>
+</html>

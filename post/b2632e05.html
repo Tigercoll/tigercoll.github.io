@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-center-simple.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Day014：安全协议与加密 - 第 2 周综合实验与测评 日期：2026-01-07 周次：第 2 周  学习目标今天是”收口日”，学完你应该能做到：  把本周知识串成一条完整的线： 网络基础：DNS 解析 → HTTP 明文传输 → Wireshark 抓包分析 安全协议：TLS 握手 → 证书链验证 → HTTPS 加密传输 远程管理：SSH 密钥认证 → known_hosts vs au">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day014：安全协议与加密 - 第 2 周综合实验与测评">
+<meta property="og:url" content="https://tigercoll.top/post/b2632e05.html">
+<meta property="og:site_name" content="Tigercoll&#39;s Blog">
+<meta property="og:description" content="Day014：安全协议与加密 - 第 2 周综合实验与测评 日期：2026-01-07 周次：第 2 周  学习目标今天是”收口日”，学完你应该能做到：  把本周知识串成一条完整的线： 网络基础：DNS 解析 → HTTP 明文传输 → Wireshark 抓包分析 安全协议：TLS 握手 → 证书链验证 → HTTPS 加密传输 远程管理：SSH 密钥认证 → known_hosts vs au">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-01-06T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-06T16:00:00.000Z">
+<meta property="article:author" content="Tigercoll">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="学习计划">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://tigercoll.top/post/b2632e05.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/b2632e05.html","path":"post/b2632e05.html","title":"Day014：安全协议与加密 - 第 2 周综合实验与测评"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day014：安全协议与加密 - 第 2 周综合实验与测评 | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Day014%EF%BC%9A%E5%AE%89%E5%85%A8%E5%8D%8F%E8%AE%AE%E4%B8%8E%E5%8A%A0%E5%AF%86-%E7%AC%AC-2-%E5%91%A8%E7%BB%BC%E5%90%88%E5%AE%9E%E9%AA%8C%E4%B8%8E%E6%B5%8B%E8%AF%84"><span class="nav-number">1.</span> <span class="nav-text">Day014：安全协议与加密 - 第 2 周综合实验与测评</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E7%9B%AE%E6%A0%87"><span class="nav-number">1.1.</span> <span class="nav-text">学习目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E5%91%A8%E7%9F%A5%E8%AF%86%E5%9C%B0%E5%9B%BE%EF%BC%8810-%E5%88%86%E9%92%9F%E5%BF%AB%E9%80%9F%E5%9B%9E%E9%A1%BE%EF%BC%89"><span class="nav-number">1.2.</span> <span class="nav-text">本周知识地图（10 分钟快速回顾）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%A6%82%E5%BF%B5%E4%B8%B2%E8%81%94"><span class="nav-number">1.2.1.</span> <span class="nav-text">核心概念串联</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%AC%E5%91%A8-4-%E4%B8%AA%E5%85%B3%E9%94%AE%E7%AA%81%E7%A0%B4"><span class="nav-number">1.2.2.</span> <span class="nav-text">本周 4 个关键突破</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E5%91%A8%E7%9F%A5%E8%AF%86%E7%82%B9%E5%9B%9E%E9%A1%BE%EF%BC%88%E4%BD%A0%E8%A6%81%E4%BC%9A%E7%94%A8%EF%BC%8C%E4%B8%8D%E8%A6%81%E6%AD%BB%E8%83%8C%EF%BC%89"><span class="nav-number">1.3.</span> <span class="nav-text">本周知识点回顾（你要会用，不要死背）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-%E8%AF%81%E6%8D%AE%E6%84%8F%E8%AF%86%EF%BC%9A%E6%AF%8F%E6%AC%A1%E5%AE%9E%E9%AA%8C%E9%83%BD%E8%A6%81%E7%95%99%E4%B8%8B%E4%BB%80%E4%B9%88"><span class="nav-number">1.3.1.</span> <span class="nav-text">1️⃣ 证据意识：每次实验都要留下什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-%E8%BF%99%E5%91%A8%E6%9C%80%E5%AE%B9%E6%98%93%E6%B7%B7%E6%B7%86%E7%9A%84-10-%E4%B8%AA%E7%82%B9%EF%BC%88%E5%BF%85%E9%A1%BB%E7%BA%A0%E6%AD%A3%EF%BC%89"><span class="nav-number">1.3.2.</span> <span class="nav-text">2️⃣ 这周最容易混淆的 10 个点（必须纠正）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%EF%B8%8F%E2%83%A3-%E6%A0%B8%E5%BF%83%E5%91%BD%E4%BB%A4%E9%80%9F%E6%9F%A5%E8%A1%A8%EF%BC%88Windows-%E7%89%88%EF%BC%89"><span class="nav-number">1.3.3.</span> <span class="nav-text">3️⃣ 核心命令速查表（Windows 版）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%EF%B8%8F%E2%83%A3-Wireshark-%E6%A0%B8%E5%BF%83%E8%BF%87%E6%BB%A4%E5%99%A8%EF%BC%88%E5%BF%85%E9%A1%BB%E6%8E%8C%E6%8F%A1%EF%BC%89"><span class="nav-number">1.3.4.</span> <span class="nav-text">4️⃣ Wireshark 核心过滤器（必须掌握）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E8%B7%B5%E4%BB%BB%E5%8A%A1%EF%BC%88%E5%90%88%E6%B3%95%E6%8E%88%E6%9D%83%E8%8C%83%E5%9B%B4%E5%86%85%EF%BC%89"><span class="nav-number">1.4.</span> <span class="nav-text">实践任务（合法授权范围内）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-1%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89%EF%BC%9ATLS-x2F-HTTPS-%E6%8A%93%E5%8C%85%E5%AE%8C%E6%95%B4%E6%B5%81%E7%A8%8B"><span class="nav-number">1.4.1.</span> <span class="nav-text">任务 1（必做）：TLS&#x2F;HTTPS 抓包完整流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A%E5%90%AF%E5%8A%A8-Wireshark"><span class="nav-number">1.4.1.1.</span> <span class="nav-text">步骤 1：启动 Wireshark</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-2%EF%BC%9A%E5%BC%80%E5%A7%8B%E6%8A%93%E5%8C%85%E5%B9%B6%E8%AE%BF%E9%97%AE-HTTPS-%E7%AB%99%E7%82%B9"><span class="nav-number">1.4.1.2.</span> <span class="nav-text">步骤 2：开始抓包并访问 HTTPS 站点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-3%EF%BC%9A%E5%BA%94%E7%94%A8%E8%BF%87%E6%BB%A4%E5%99%A8%E5%AE%9A%E4%BD%8D-TLS-%E6%8F%A1%E6%89%8B"><span class="nav-number">1.4.1.3.</span> <span class="nav-text">步骤 3：应用过滤器定位 TLS 握手</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-4%EF%BC%9A%E8%AF%86%E5%88%AB%E5%85%B3%E9%94%AE%E6%95%B0%E6%8D%AE%E5%8C%85%EF%BC%88%E5%BF%85%E9%A1%BB%E6%88%AA%E5%9B%BE%EF%BC%89"><span class="nav-number">1.4.1.4.</span> <span class="nav-text">步骤 4：识别关键数据包（必须截图）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-5%EF%BC%9A%E5%88%86%E6%9E%90-SNI%EF%BC%88%E6%9C%8D%E5%8A%A1%E5%99%A8%E5%90%8D%E7%A7%B0%E6%8C%87%E7%A4%BA%EF%BC%89"><span class="nav-number">1.4.1.5.</span> <span class="nav-text">步骤 5：分析 SNI（服务器名称指示）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E4%BD%A0%E8%A6%81%E6%8F%90%E4%BA%A4%E7%9A%84%E8%AF%81%E6%8D%AE%EF%BC%9A"><span class="nav-number">1.4.1.6.</span> <span class="nav-text">你要提交的证据：</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-2%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89%EF%BC%9A%E8%AF%81%E4%B9%A6%E9%93%BE%E5%AE%8C%E6%95%B4%E6%80%A7%E6%A3%80%E6%9F%A5"><span class="nav-number">1.4.2.</span> <span class="nav-text">任务 2（必做）：证书链完整性检查</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%A1%88-A%EF%BC%9A%E7%94%A8-curl%EF%BC%88Windows-%E8%87%AA%E5%B8%A6%EF%BC%89"><span class="nav-number">1.4.2.1.</span> <span class="nav-text">方案 A：用 curl（Windows 自带）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%A1%88-B%EF%BC%9A%E7%94%A8-PowerShell%EF%BC%88%E6%9F%A5%E7%9C%8B%E8%AF%81%E4%B9%A6%E8%AF%A6%E6%83%85%EF%BC%89"><span class="nav-number">1.4.2.2.</span> <span class="nav-text">方案 B：用 PowerShell（查看证书详情）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%A1%88-C%EF%BC%9A%E6%B5%8F%E8%A7%88%E5%99%A8%E6%9F%A5%E7%9C%8B%EF%BC%88%E6%9C%80%E7%9B%B4%E8%A7%82%EF%BC%89"><span class="nav-number">1.4.2.3.</span> <span class="nav-text">方案 C：浏览器查看（最直观）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-3%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89%EF%BC%9ASSH-%E5%AF%86%E9%92%A5%E4%B8%8E%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E6%A3%80%E6%9F%A5"><span class="nav-number">1.4.3.</span> <span class="nav-text">任务 3（必做）：SSH 密钥与配置文件检查</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A%E6%A3%80%E6%9F%A5%E6%9C%AC%E5%9C%B0%E5%AF%86%E9%92%A5%E6%96%87%E4%BB%B6"><span class="nav-number">1.4.3.1.</span> <span class="nav-text">步骤 1：检查本地密钥文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-2%EF%BC%9A%E6%9F%A5%E7%9C%8B-known-hosts-%E5%86%85%E5%AE%B9%EF%BC%88%E4%BA%86%E8%A7%A3%E6%A0%BC%E5%BC%8F%EF%BC%89"><span class="nav-number">1.4.3.2.</span> <span class="nav-text">步骤 2：查看 known_hosts 内容（了解格式）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-3%EF%BC%9A%E6%9F%A5%E7%9C%8B-config-%E6%96%87%E4%BB%B6%EF%BC%88%E5%A6%82%E6%9E%9C%E6%9C%89%EF%BC%89"><span class="nav-number">1.4.3.3.</span> <span class="nav-text">步骤 3：查看 config 文件（如果有）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%AD%A5%E9%AA%A4-4%EF%BC%9A%E7%90%86%E8%A7%A3-known-hosts-vs-authorized-keys"><span class="nav-number">1.4.3.4.</span> <span class="nav-text">步骤 4：理解 known_hosts vs authorized_keys</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-4%EF%BC%88%E5%BC%BA%E7%83%88%E6%8E%A8%E8%8D%90%EF%BC%89%EF%BC%9A%E5%AF%86%E7%A0%81%E5%93%88%E5%B8%8C%E6%80%A7%E8%83%BD%E5%AF%B9%E6%AF%94%E5%AE%9E%E9%AA%8C"><span class="nav-number">1.4.4.</span> <span class="nav-text">任务 4（强烈推荐）：密码哈希性能对比实验</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%8C%E6%95%B4%E4%BB%A3%E7%A0%81%EF%BC%88%E5%8F%AF%E7%9B%B4%E6%8E%A5%E8%BF%90%E8%A1%8C%EF%BC%89"><span class="nav-number">1.4.4.1.</span> <span class="nav-text">完整代码（可直接运行）</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A9%E5%9B%BA%E7%BB%83%E4%B9%A0%EF%BC%88%E9%A2%98%E4%B8%8E%E5%A4%8D%E7%9B%98%EF%BC%89"><span class="nav-number">1.5.</span> <span class="nav-text">巩固练习（题与复盘）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-1%EF%BC%9A%E5%81%9A%E4%B8%80%E4%B8%AA-5-%E5%88%86%E9%92%9F%E8%AE%B2%E8%A7%A3%E6%8F%90%E7%BA%B2%EF%BC%88%E5%BF%85%E5%86%99%EF%BC%89"><span class="nav-number">1.5.1.</span> <span class="nav-text">题 1：做一个 5 分钟讲解提纲（必写）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%89%E9%A1%B9-A%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88-HTTPS-%E6%8A%93%E5%8C%85%E4%BB%8D%E7%84%B6%E6%9C%89%E4%BB%B7%E5%80%BC"><span class="nav-number">1.5.1.1.</span> <span class="nav-text">选项 A：为什么 HTTPS 抓包仍然有价值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%89%E9%A1%B9-B%EF%BC%9A%E8%AF%81%E4%B9%A6%E9%93%BE%E5%88%B0%E5%BA%95%E5%9C%A8%E9%AA%8C%E8%AF%81%E4%BB%80%E4%B9%88"><span class="nav-number">1.5.1.2.</span> <span class="nav-text">选项 B：证书链到底在验证什么</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%89%E9%A1%B9-C%EF%BC%9ASSH-%E7%9A%84-known-hosts-vs-authorized-keys"><span class="nav-number">1.5.1.3.</span> <span class="nav-text">选项 C：SSH 的 known_hosts vs authorized_keys</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%89%E9%A1%B9-D%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E5%AF%86%E7%A0%81%E8%A6%81%E7%94%A8-KDF%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%98%AF-SHA-256"><span class="nav-number">1.5.1.4.</span> <span class="nav-text">选项 D：为什么密码要用 KDF，而不是 SHA-256</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-2%EF%BC%9A%E6%9C%AC%E5%91%A8%E9%94%99%E9%A2%98-x2F-%E6%98%93%E9%94%99%E7%82%B9%E6%B8%85%E5%8D%95%EF%BC%88%E8%87%B3%E5%B0%91-5-%E6%9D%A1%EF%BC%89"><span class="nav-number">1.5.2.</span> <span class="nav-text">题 2：本周错题&#x2F;易错点清单（至少 5 条）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-3%EF%BC%88%E6%96%B0%E5%A2%9E%EF%BC%89%EF%BC%9A%E7%94%BB%E4%B8%80%E4%B8%AA-TLS-%E6%8F%A1%E6%89%8B%E6%B5%81%E7%A8%8B%E5%9B%BE"><span class="nav-number">1.5.3.</span> <span class="nav-text">题 3（新增）：画一个 TLS 握手流程图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-4%EF%BC%88%E6%96%B0%E5%A2%9E%EF%BC%89%EF%BC%9A%E8%AE%BE%E8%AE%A1%E4%B8%80%E4%B8%AA%E5%AF%86%E7%A0%81%E9%87%8D%E7%BD%AE%E6%B5%81%E7%A8%8B"><span class="nav-number">1.5.4.</span> <span class="nav-text">题 4（新增）：设计一个密码重置流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E6%A0%87%E5%87%86%EF%BC%88%E8%BE%BE%E6%88%90%E5%88%A4%E5%AE%9A%EF%BC%89"><span class="nav-number">1.6.</span> <span class="nav-text">评估标准（达成判定）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E8%BE%BE%E6%88%90%E6%83%85%E5%86%B5%EF%BC%88%E5%91%A8%E6%8A%A5%E6%A8%A1%E6%9D%BF%EF%BC%8C%E7%9B%B4%E6%8E%A5%E5%A1%AB%E5%86%99%EF%BC%89"><span class="nav-number">1.7.</span> <span class="nav-text">学习成果达成情况（周报模板，直接填写）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%9C%AC%E5%91%A8%E6%88%91%E5%AE%8C%E6%88%90%E4%BA%86%E4%BB%80%E4%B9%88%EF%BC%88%E7%94%A8%E4%B8%80%E5%8F%A5%E8%AF%9D%E6%80%BB%E8%BF%B0%EF%BC%89"><span class="nav-number">1.7.1.</span> <span class="nav-text">1) 本周我完成了什么（用一句话总述）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%85%B3%E9%94%AE%E8%AF%81%E6%8D%AE%E6%B8%85%E5%8D%95%EF%BC%88%E6%8A%8A%E6%88%AA%E5%9B%BE%E6%96%87%E4%BB%B6%E5%90%8D%E5%88%97%E5%87%BA%E6%9D%A5%EF%BC%89"><span class="nav-number">1.7.2.</span> <span class="nav-text">2) 关键证据清单（把截图文件名列出来）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%88%91%E6%9C%AC%E5%91%A8%E6%9C%80%E9%87%8D%E8%A6%81%E7%9A%84-10-%E8%A1%8C%E8%AE%B0%E5%BD%95%EF%BC%88%E5%91%BD%E4%BB%A4-x2F-%E8%BF%87%E6%BB%A4%E5%99%A8-x2F-%E8%BE%93%E5%87%BA%EF%BC%89"><span class="nav-number">1.7.3.</span> <span class="nav-text">3) 我本周最重要的 10 行记录（命令&#x2F;过滤器&#x2F;输出）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E7%BB%93%E8%AE%BA%E4%B8%8E%E5%8F%8D%E6%80%9D%EF%BC%88%E5%BF%85%E9%A1%BB%E5%86%99%EF%BC%89"><span class="nav-number">1.7.4.</span> <span class="nav-text">4) 结论与反思（必须写）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E4%B8%8B%E5%91%A8%E8%AE%A1%E5%88%92%EF%BC%883-%E6%9D%A1%E5%8D%B3%E5%8F%AF%EF%BC%89"><span class="nav-number">1.7.5.</span> <span class="nav-text">5) 下周计划（3 条即可）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E4%B8%AD%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%88%E5%90%AB%E6%80%9D%E8%B7%AF%EF%BC%89"><span class="nav-number">1.8.</span> <span class="nav-text">集中参考答案（含思路）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-1-%E5%8F%82%E8%80%83%E6%8F%90%E7%BA%B2%EF%BC%88%E5%AE%8C%E6%95%B4%E7%89%88%EF%BC%89"><span class="nav-number">1.8.1.</span> <span class="nav-text">题 1 参考提纲（完整版）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%89%E9%A1%B9-A%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88-HTTPS-%E6%8A%93%E5%8C%85%E4%BB%8D%E7%84%B6%E6%9C%89%E4%BB%B7%E5%80%BC-1"><span class="nav-number">1.8.1.1.</span> <span class="nav-text">选项 A：为什么 HTTPS 抓包仍然有价值</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%89%E9%A1%B9-B%EF%BC%9A%E8%AF%81%E4%B9%A6%E9%93%BE%E5%88%B0%E5%BA%95%E5%9C%A8%E9%AA%8C%E8%AF%81%E4%BB%80%E4%B9%88-1"><span class="nav-number">1.8.1.2.</span> <span class="nav-text">选项 B：证书链到底在验证什么</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%89%E9%A1%B9-C%EF%BC%9ASSH-%E7%9A%84-known-hosts-vs-authorized-keys-1"><span class="nav-number">1.8.1.3.</span> <span class="nav-text">选项 C：SSH 的 known_hosts vs authorized_keys</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%80%89%E9%A1%B9-D%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E5%AF%86%E7%A0%81%E8%A6%81%E7%94%A8-KDF%EF%BC%8C%E8%80%8C%E4%B8%8D%E6%98%AF-SHA-256-1"><span class="nav-number">1.8.1.4.</span> <span class="nav-text">选项 D：为什么密码要用 KDF，而不是 SHA-256</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-2-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%88%E5%AE%8C%E6%95%B4-10-%E6%9D%A1%EF%BC%89"><span class="nav-number">1.8.2.</span> <span class="nav-text">题 2 参考答案（完整 10 条）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-3-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%88TLS-1-3-%E6%8F%A1%E6%89%8B%E6%B5%81%E7%A8%8B%E5%9B%BE%EF%BC%89"><span class="nav-number">1.8.3.</span> <span class="nav-text">题 3 参考答案（TLS 1.3 握手流程图）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-4-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%88%E5%AF%86%E7%A0%81%E9%87%8D%E7%BD%AE%E6%B5%81%E7%A8%8B%EF%BC%89"><span class="nav-number">1.8.4.</span> <span class="nav-text">题 4 参考答案（密码重置流程）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%AE%89%E5%85%A8%E7%9A%84%E5%AF%86%E7%A0%81%E9%87%8D%E7%BD%AE%E6%B5%81%E7%A8%8B%EF%BC%885-%E6%AD%A5%E6%B3%95%EF%BC%89"><span class="nav-number">1.8.4.1.</span> <span class="nav-text">安全的密码重置流程（5 步法）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E9%98%B2%E6%BB%A5%E7%94%A8%E6%8E%AA%E6%96%BD"><span class="nav-number">1.8.4.2.</span> <span class="nav-text">防滥用措施</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E7%A4%BA%E4%BE%8B%E5%A1%AB%E5%86%99%EF%BC%88%E5%8F%AF%E7%85%A7%E6%8A%84%EF%BC%89"><span class="nav-number">1.9.</span> <span class="nav-text">学习成果示例填写（可照抄）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-%E6%80%BB%E8%BF%B0%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.9.1.</span> <span class="nav-text">1) 总述（示例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E5%85%B3%E9%94%AE%E8%AF%81%E6%8D%AE%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.9.2.</span> <span class="nav-text">2) 关键证据（示例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E6%9C%80%E9%87%8D%E8%A6%81%E7%9A%84-10-%E8%A1%8C%E8%AE%B0%E5%BD%95%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.9.3.</span> <span class="nav-text">3) 最重要的 10 行记录（示例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-%E5%8F%8D%E6%80%9D%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.9.4.</span> <span class="nav-text">4) 反思（示例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-%E4%B8%8B%E5%91%A8%E8%AE%A1%E5%88%92%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.9.5.</span> <span class="nav-text">5) 下周计划（示例）</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">75</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Tigercoll" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/b2632e05.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day014：安全协议与加密 - 第 2 周综合实验与测评 | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day014：安全协议与加密 - 第 2 周综合实验与测评
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-01-07 00:00:00" itemprop="dateCreated datePublished" datetime="2026-01-07T00:00:00+08:00">2026-01-07</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Day014：安全协议与加密-第-2-周综合实验与测评"><a href="#Day014：安全协议与加密-第-2-周综合实验与测评" class="headerlink" title="Day014：安全协议与加密 - 第 2 周综合实验与测评"></a>Day014：安全协议与加密 - 第 2 周综合实验与测评</h1><ul>
+<li>日期：2026-01-07</li>
+<li>周次：第 2 周</li>
+</ul>
+<h2 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h2><p>今天是”收口日”，学完你应该能做到：</p>
+<ul>
+<li>把本周知识串成一条完整的线：<ul>
+<li><strong>网络基础</strong>：DNS 解析 → HTTP 明文传输 → Wireshark 抓包分析</li>
+<li><strong>安全协议</strong>：TLS 握手 → 证书链验证 → HTTPS 加密传输</li>
+<li><strong>远程管理</strong>：SSH 密钥认证 → known_hosts vs authorized_keys</li>
+<li><strong>加密基础</strong>：哈希&#x2F;对称&#x2F;非对称 → KDF 密码存储 → 密钥管理</li>
+</ul>
+</li>
+<li>把”证据”收集齐全：截图、过滤器、关键输出，能给别人复现</li>
+<li>写出一份结构化周报：目标 → 证据 → 结论 → 反思 → 下周计划</li>
+<li>识别并纠正本周 5+ 个易错点</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="本周知识地图（10-分钟快速回顾）"><a href="#本周知识地图（10-分钟快速回顾）" class="headerlink" title="本周知识地图（10 分钟快速回顾）"></a>本周知识地图（10 分钟快速回顾）</h2><h3 id="核心概念串联"><a href="#核心概念串联" class="headerlink" title="核心概念串联"></a>核心概念串联</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">                       【第 2 周知识架构】</span><br><span class="line">                               </span><br><span class="line">   ┌─────────────────────────────────────────────┐</span><br><span class="line">   │          网络协议与安全基础                  │</span><br><span class="line">   └─────────────────────────────────────────────┘</span><br><span class="line">             │                     │</span><br><span class="line">        明文协议               加密协议</span><br><span class="line">             │                     │</span><br><span class="line">   ┌─────────┴─────────┐  ┌───────┴────────┐</span><br><span class="line">   │                   │  │                │</span><br><span class="line"> DNS解析          HTTP传输  TLS/HTTPS    SSH</span><br><span class="line">   │                   │  │                │</span><br><span class="line">域名→IP           明文可见  证书+加密    密钥认证</span><br><span class="line">   │                   │  │                │</span><br><span class="line">   └───────────────────┴──┴────────────────┘</span><br><span class="line">                    │</span><br><span class="line">             ┌──────┴──────┐</span><br><span class="line">             │   加密基础   │</span><br><span class="line">             └──────┬──────┘</span><br><span class="line">                    │</span><br><span class="line">       ┌────────────┼────────────┐</span><br><span class="line">       │            │            │</span><br><span class="line">     哈希        对称加密      非对称加密</span><br><span class="line">       │            │            │</span><br><span class="line">   完整性校验    数据加密      密钥交换</span><br><span class="line">   密码存储      AES-GCM      RSA/ECDSA</span><br><span class="line">       │            │            │</span><br><span class="line">       └────────────┴────────────┘</span><br><span class="line">                    │</span><br><span class="line">             【密钥管理】</span><br><span class="line">          轮换/分离/最小权限</span><br></pre></td></tr></table></figure>
+
+<h3 id="本周-4-个关键突破"><a href="#本周-4-个关键突破" class="headerlink" title="本周 4 个关键突破"></a>本周 4 个关键突破</h3><table>
+<thead>
+<tr>
+<th>突破点</th>
+<th>从”不会”到”会做”</th>
+<th>证据要求</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>1. 协议分析能力</strong></td>
+<td>能用 Wireshark 抓包并读懂 HTTP&#x2F;TLS 握手</td>
+<td>Wireshark 截图 + 过滤器</td>
+</tr>
+<tr>
+<td><strong>2. 证书验证能力</strong></td>
+<td>能检查证书链&#x2F;有效期&#x2F;域名匹配</td>
+<td>curl 输出 + 浏览器截图</td>
+</tr>
+<tr>
+<td><strong>3. SSH 认证理解</strong></td>
+<td>能区分 known_hosts 和 authorized_keys</td>
+<td>本地密钥文件截图</td>
+</tr>
+<tr>
+<td><strong>4. 密码安全意识</strong></td>
+<td>知道用 KDF 而不是快哈希存密码</td>
+<td>PBKDF2 性能对比截图</td>
+</tr>
+</tbody></table>
+<h2 id="本周知识点回顾（你要会用，不要死背）"><a href="#本周知识点回顾（你要会用，不要死背）" class="headerlink" title="本周知识点回顾（你要会用，不要死背）"></a>本周知识点回顾（你要会用，不要死背）</h2><h3 id="1️⃣-证据意识：每次实验都要留下什么"><a href="#1️⃣-证据意识：每次实验都要留下什么" class="headerlink" title="1️⃣ 证据意识：每次实验都要留下什么"></a>1️⃣ 证据意识：每次实验都要留下什么</h3><table>
+<thead>
+<tr>
+<th>证据类型</th>
+<th>必须包含</th>
+<th>格式</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>命令行输出</strong></td>
+<td>完整命令 + 关键输出行</td>
+<td>文本&#x2F;截图</td>
+<td><code>curl -I https://example.com</code> + 状态码&#x2F;响应头</td>
+</tr>
+<tr>
+<td><strong>Wireshark 截图</strong></td>
+<td>过滤器 + 数据包列表 + 详情面板</td>
+<td>PNG</td>
+<td><code>tls.handshake</code> + ClientHello 详情</td>
+</tr>
+<tr>
+<td><strong>结论</strong></td>
+<td>你想证明的事实</td>
+<td>1-2 句话</td>
+<td>“证明该站点使用 TLS 1.3 + ECDHE 密钥交换”</td>
+</tr>
+<tr>
+<td><strong>反思</strong></td>
+<td>遇到的问题 + 解决方法</td>
+<td>简短记录</td>
+<td>“一开始用 <code>ssl</code> 过滤器没结果，改成 <code>tls</code> 才对”</td>
+</tr>
+</tbody></table>
+<p><strong>为什么要留证据？</strong></p>
+<ul>
+<li>学习层面：3 个月后你会忘记细节，截图能快速唤醒记忆</li>
+<li>求职层面：面试官问”你做过什么”，拿出证据比空口说强 10 倍</li>
+<li>技术层面：遇到问题时能快速对比”上次是怎么做的”</li>
+</ul>
+<h3 id="2️⃣-这周最容易混淆的-10-个点（必须纠正）"><a href="#2️⃣-这周最容易混淆的-10-个点（必须纠正）" class="headerlink" title="2️⃣ 这周最容易混淆的 10 个点（必须纠正）"></a>2️⃣ 这周最容易混淆的 10 个点（必须纠正）</h3><table>
+<thead>
+<tr>
+<th>易错点</th>
+<th>错误理解</th>
+<th>正确理解</th>
+<th>记忆诀窍</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>HTTPS 抓包</strong></td>
+<td>“抓不到明文就是抓包失败”</td>
+<td>抓包成功，只是内容被加密了</td>
+<td>能看到握手、证书、密文长度</td>
+</tr>
+<tr>
+<td><strong>证书验证</strong></td>
+<td>“看见证书就是安全的”</td>
+<td>还要检查：域名匹配&#x2F;有效期&#x2F;链完整&#x2F;受信任</td>
+<td>证书像身份证，要检查 4 要素</td>
+</tr>
+<tr>
+<td><strong>known_hosts</strong></td>
+<td>“服务器端的配置文件”</td>
+<td><strong>客户端</strong>文件，存”我信任哪些服务器”</td>
+<td>known &#x3D; 已知的（我认识谁）</td>
+</tr>
+<tr>
+<td><strong>authorized_keys</strong></td>
+<td>“客户端的配置文件”</td>
+<td><strong>服务器端</strong>文件，存”谁可以登录我”</td>
+<td>authorized &#x3D; 授权的（谁能进来）</td>
+</tr>
+<tr>
+<td><strong>密码存储</strong></td>
+<td>“AES 加密存密码就安全”</td>
+<td>密码用 KDF 哈希，不用加密</td>
+<td>密码是凭据（不需要还原），敏感数据才加密</td>
+</tr>
+<tr>
+<td><strong>salt</strong></td>
+<td>“全局一个 salt 就够了”</td>
+<td>每个用户独立随机 salt</td>
+<td>防止重复密码暴露（同密码不同 hash）</td>
+</tr>
+<tr>
+<td><strong>签名 vs 加密</strong></td>
+<td>“签名就是加密的一种”</td>
+<td>签名是防篡改+证明身份，不一定保密</td>
+<td>签名像盖章（证明是我），加密像保险箱（别人看不到）</td>
+</tr>
+<tr>
+<td><strong>HMAC vs 哈希</strong></td>
+<td>“HMAC 就是 SHA-256”</td>
+<td>HMAC 是”带密钥的哈希”，需要 secret</td>
+<td>HMAC &#x3D; Hash + MAC（消息认证码）</td>
+</tr>
+<tr>
+<td><strong>IV 是否保密</strong></td>
+<td>“IV 要像密钥一样保密”</td>
+<td>IV 可以公开，但不能重复使用</td>
+<td>IV 像信封编号（可见但不能重复）</td>
+</tr>
+<tr>
+<td><strong>TLS vs SSL</strong></td>
+<td>“SSL 是最新的”</td>
+<td>SSL 已废弃，现在用 TLS（1.2&#x2F;1.3）</td>
+<td>TLS &#x3D; Transport Layer Security（传输层安全）</td>
+</tr>
+</tbody></table>
+<h3 id="3️⃣-核心命令速查表（Windows-版）"><a href="#3️⃣-核心命令速查表（Windows-版）" class="headerlink" title="3️⃣ 核心命令速查表（Windows 版）"></a>3️⃣ 核心命令速查表（Windows 版）</h3><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>命令</th>
+<th>关键参数</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>查看证书</strong></td>
+<td><code>curl.exe -Iv &lt;url&gt;</code></td>
+<td><code>-I</code>(只看头) <code>-v</code>(详细)</td>
+<td><code>curl.exe -Iv https://github.com</code></td>
+</tr>
+<tr>
+<td><strong>DNS 查询</strong></td>
+<td><code>nslookup &lt;域名&gt;</code></td>
+<td>默认查 A 记录</td>
+<td><code>nslookup github.com</code></td>
+</tr>
+<tr>
+<td><strong>端口扫描</strong></td>
+<td><code>Test-NetConnection -Port</code></td>
+<td><code>-Port 443</code></td>
+<td><code>Test-NetConnection github.com -Port 443</code></td>
+</tr>
+<tr>
+<td><strong>SSH 密钥生成</strong></td>
+<td><code>ssh-keygen -t ed25519</code></td>
+<td><code>-t</code>(类型) <code>-f</code>(文件名)</td>
+<td><code>ssh-keygen -t ed25519 -f ~/.ssh/id_demo</code></td>
+</tr>
+<tr>
+<td><strong>查看 SSH 配置</strong></td>
+<td><code>Get-Content $env:USERPROFILE\.ssh\config</code></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td><strong>Python 快速测试</strong></td>
+<td><code>python -c &quot;import hashlib; ...&quot;</code></td>
+<td></td>
+<td>见 Day012&#x2F;013 示例</td>
+</tr>
+</tbody></table>
+<h3 id="4️⃣-Wireshark-核心过滤器（必须掌握）"><a href="#4️⃣-Wireshark-核心过滤器（必须掌握）" class="headerlink" title="4️⃣ Wireshark 核心过滤器（必须掌握）"></a>4️⃣ Wireshark 核心过滤器（必须掌握）</h3><table>
+<thead>
+<tr>
+<th>协议</th>
+<th>过滤器</th>
+<th>用途</th>
+<th>进阶过滤</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>HTTP</strong></td>
+<td><code>http</code></td>
+<td>查看 HTTP 请求&#x2F;响应</td>
+<td><code>http.request.method == &quot;POST&quot;</code></td>
+</tr>
+<tr>
+<td><strong>TLS 握手</strong></td>
+<td><code>tls.handshake</code></td>
+<td>查看 ClientHello&#x2F;ServerHello&#x2F;Certificate</td>
+<td><code>tls.handshake.type == 1</code> (ClientHello)</td>
+</tr>
+<tr>
+<td><strong>DNS</strong></td>
+<td><code>dns</code></td>
+<td>查看 DNS 查询&#x2F;响应</td>
+<td><code>dns.qry.name == &quot;example.com&quot;</code></td>
+</tr>
+<tr>
+<td><strong>TCP 连接</strong></td>
+<td><code>tcp.flags.syn == 1</code></td>
+<td>查看 TCP 三次握手</td>
+<td><code>tcp.port == 443</code></td>
+</tr>
+<tr>
+<td><strong>特定 IP</strong></td>
+<td><code>ip.addr == 1.2.3.4</code></td>
+<td>筛选特定 IP 的流量</td>
+<td><code>ip.src == 1.2.3.4</code> (仅源 IP)</td>
+</tr>
+</tbody></table>
+<h2 id="实践任务（合法授权范围内）"><a href="#实践任务（合法授权范围内）" class="headerlink" title="实践任务（合法授权范围内）"></a>实践任务（合法授权范围内）</h2><blockquote>
+<p>今天的任务是”证据收集”：完成 4 个必做任务，每个任务都要有截图&#x2F;输出证据。</p>
+</blockquote>
+<h3 id="任务-1（必做）：TLS-x2F-HTTPS-抓包完整流程"><a href="#任务-1（必做）：TLS-x2F-HTTPS-抓包完整流程" class="headerlink" title="任务 1（必做）：TLS&#x2F;HTTPS 抓包完整流程"></a>任务 1（必做）：TLS&#x2F;HTTPS 抓包完整流程</h3><p><strong>目标</strong>：证明你能抓到 HTTPS 握手并识别关键信息。</p>
+<h4 id="步骤-1：启动-Wireshark"><a href="#步骤-1：启动-Wireshark" class="headerlink" title="步骤 1：启动 Wireshark"></a>步骤 1：启动 Wireshark</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 如果没安装 Wireshark，先安装</span></span><br><span class="line"><span class="comment"># 官网：https://www.wireshark.org/download.html</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 启动 Wireshark（管理员权限）</span></span><br><span class="line"><span class="comment"># 选择网络接口（通常是 Wi-Fi 或 以太网）</span></span><br></pre></td></tr></table></figure>
+
+<h4 id="步骤-2：开始抓包并访问-HTTPS-站点"><a href="#步骤-2：开始抓包并访问-HTTPS-站点" class="headerlink" title="步骤 2：开始抓包并访问 HTTPS 站点"></a>步骤 2：开始抓包并访问 HTTPS 站点</h4><ol>
+<li>点击 Wireshark 的”开始抓包”（鲨鱼鳍图标）</li>
+<li>打开浏览器访问一个 HTTPS 站点（例如 <code>https://github.com</code>）</li>
+<li>等待页面完全加载（约 3-5 秒）</li>
+<li>停止抓包</li>
+</ol>
+<h4 id="步骤-3：应用过滤器定位-TLS-握手"><a href="#步骤-3：应用过滤器定位-TLS-握手" class="headerlink" title="步骤 3：应用过滤器定位 TLS 握手"></a>步骤 3：应用过滤器定位 TLS 握手</h4><p>在 Wireshark 顶部过滤器栏输入：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tls.handshake</span><br></pre></td></tr></table></figure>
+
+<p>按 Enter 后，只显示 TLS 握手相关的数据包。</p>
+<h4 id="步骤-4：识别关键数据包（必须截图）"><a href="#步骤-4：识别关键数据包（必须截图）" class="headerlink" title="步骤 4：识别关键数据包（必须截图）"></a>步骤 4：识别关键数据包（必须截图）</h4><p>找到以下 3 种数据包并截图：</p>
+<table>
+<thead>
+<tr>
+<th>数据包类型</th>
+<th>特征</th>
+<th>截图要求</th>
+<th>关键信息</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>ClientHello</strong></td>
+<td><code>Handshake Type: Client Hello (1)</code></td>
+<td>截图 1：数据包列表 + 详情面板</td>
+<td>TLS 版本、支持的 Cipher Suites、SNI（服务器名称）</td>
+</tr>
+<tr>
+<td><strong>ServerHello</strong></td>
+<td><code>Handshake Type: Server Hello (2)</code></td>
+<td>截图 2：选中的 Cipher Suite</td>
+<td>服务器选择的加密套件（如 TLS_AES_128_GCM_SHA256）</td>
+</tr>
+<tr>
+<td><strong>Certificate</strong></td>
+<td><code>Handshake Type: Certificate (11)</code></td>
+<td>截图 3：证书链</td>
+<td>网站证书 + 中间 CA + 根 CA</td>
+</tr>
+</tbody></table>
+<h4 id="步骤-5：分析-SNI（服务器名称指示）"><a href="#步骤-5：分析-SNI（服务器名称指示）" class="headerlink" title="步骤 5：分析 SNI（服务器名称指示）"></a>步骤 5：分析 SNI（服务器名称指示）</h4><p>在 ClientHello 中展开：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">Transport Layer Security</span><br><span class="line">  └─ TLSv1.3 Record Layer: Handshake Protocol: Client Hello</span><br><span class="line">      └─ Handshake Protocol: Client Hello</span><br><span class="line">          └─ Extension: server_name (len=xx)</span><br><span class="line">              └─ Server Name: github.com  ← 这里！</span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么 SNI 重要？</strong></p>
+<ul>
+<li>SNI 允许一个 IP 托管多个 HTTPS 站点（虚拟主机）</li>
+<li>CDN&#x2F;负载均衡器根据 SNI 路由到正确的后端</li>
+<li>注意：SNI 是明文的，可能泄露你访问的域名（即使 HTTPS 加密了内容）</li>
+</ul>
+<h4 id="你要提交的证据："><a href="#你要提交的证据：" class="headerlink" title="你要提交的证据："></a>你要提交的证据：</h4><ul>
+<li><input disabled="" type="checkbox"> 截图 1：ClientHello 数据包（能看到 TLS 版本 + SNI）</li>
+<li><input disabled="" type="checkbox"> 截图 2：ServerHello 数据包（能看到选中的 Cipher Suite）</li>
+<li><input disabled="" type="checkbox"> 截图 3：Certificate 数据包（能看到证书链）</li>
+<li><input disabled="" type="checkbox"> 文字说明：访问的站点、TLS 版本、选中的加密套件</li>
+</ul>
+<h3 id="任务-2（必做）：证书链完整性检查"><a href="#任务-2（必做）：证书链完整性检查" class="headerlink" title="任务 2（必做）：证书链完整性检查"></a>任务 2（必做）：证书链完整性检查</h3><p><strong>目标</strong>：用命令行工具验证证书链。</p>
+<h4 id="方案-A：用-curl（Windows-自带）"><a href="#方案-A：用-curl（Windows-自带）" class="headerlink" title="方案 A：用 curl（Windows 自带）"></a>方案 A：用 curl（Windows 自带）</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看证书详细信息</span></span><br><span class="line">curl.exe <span class="literal">-Iv</span> https://github.com <span class="number">2</span>&gt;&amp;<span class="number">1</span> | <span class="built_in">Select-String</span> <span class="string">&quot;SSL&quot;</span>, <span class="string">&quot;certificate&quot;</span>, <span class="string">&quot;ALPN&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>你要记录的关键行</strong>（示例）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">* SSL connection using TLSv1.3 / TLS_AES_128_GCM_SHA256</span><br><span class="line">* ALPN: server accepted h2</span><br><span class="line">* Server certificate:</span><br><span class="line">*  subject: C=US; ST=California; L=San Francisco; O=GitHub, Inc.; CN=github.com</span><br><span class="line">*  start date: Feb  5 00:00:00 2024 GMT</span><br><span class="line">*  expire date: Feb  5 23:59:59 2025 GMT</span><br><span class="line">*  subjectAltName: host &quot;github.com&quot; matched cert&#x27;s &quot;github.com&quot;</span><br><span class="line">*  issuer: C=US; O=DigiCert Inc; CN=DigiCert TLS Hybrid ECC SHA384 2020 CA1</span><br><span class="line">*  SSL certificate verify ok.</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键信息解读</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>字段</th>
+<th>含义</th>
+<th>检查点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>SSL connection using</code></td>
+<td>使用的 TLS 版本和加密套件</td>
+<td>应该是 TLS 1.2+ 或 TLS 1.3</td>
+</tr>
+<tr>
+<td><code>subject: CN=github.com</code></td>
+<td>证书颁发给谁</td>
+<td>CN（Common Name）应与访问的域名一致</td>
+</tr>
+<tr>
+<td><code>start date / expire date</code></td>
+<td>证书有效期</td>
+<td>当前日期应在有效期内</td>
+</tr>
+<tr>
+<td><code>issuer</code></td>
+<td>证书颁发机构（CA）</td>
+<td>应该是知名 CA（如 DigiCert、Let’s Encrypt）</td>
+</tr>
+<tr>
+<td><code>SSL certificate verify ok</code></td>
+<td>证书验证结果</td>
+<td>必须是 “ok”，否则有安全风险</td>
+</tr>
+</tbody></table>
+<h4 id="方案-B：用-PowerShell（查看证书详情）"><a href="#方案-B：用-PowerShell（查看证书详情）" class="headerlink" title="方案 B：用 PowerShell（查看证书详情）"></a>方案 B：用 PowerShell（查看证书详情）</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 获取证书详细信息</span></span><br><span class="line"><span class="variable">$uri</span> = <span class="string">&quot;https://github.com&quot;</span></span><br><span class="line"><span class="variable">$request</span> = [<span class="type">System.Net.HttpWebRequest</span>]::Create(<span class="variable">$uri</span>)</span><br><span class="line"><span class="variable">$request</span>.GetResponse() | <span class="built_in">Out-Null</span></span><br><span class="line"><span class="variable">$cert</span> = <span class="variable">$request</span>.ServicePoint.Certificate</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> (<span class="variable">$cert</span>) &#123;</span><br><span class="line">    <span class="built_in">Write-Host</span> <span class="string">&quot;证书主题: <span class="variable">$</span>(<span class="variable">$cert</span>.Subject)&quot;</span></span><br><span class="line">    <span class="built_in">Write-Host</span> <span class="string">&quot;证书颁发者: <span class="variable">$</span>(<span class="variable">$cert</span>.Issuer)&quot;</span></span><br><span class="line">    <span class="built_in">Write-Host</span> <span class="string">&quot;有效期: <span class="variable">$</span>(<span class="variable">$cert</span>.GetEffectiveDateString()) 到 <span class="variable">$</span>(<span class="variable">$cert</span>.GetExpirationDateString())&quot;</span></span><br><span class="line">    <span class="built_in">Write-Host</span> <span class="string">&quot;证书序列号: <span class="variable">$</span>(<span class="variable">$cert</span>.GetSerialNumberString())&quot;</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">Write-Host</span> <span class="string">&quot;未能获取证书&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="方案-C：浏览器查看（最直观）"><a href="#方案-C：浏览器查看（最直观）" class="headerlink" title="方案 C：浏览器查看（最直观）"></a>方案 C：浏览器查看（最直观）</h4><ol>
+<li>在 Chrome&#x2F;Edge 中访问 HTTPS 站点</li>
+<li>点击地址栏左侧的🔒图标</li>
+<li>点击”连接是安全的” → “证书有效”</li>
+<li>查看证书详情：<ul>
+<li><strong>常规</strong>：有效期、颁发给、颁发者</li>
+<li><strong>详细信息</strong>：公钥、签名算法、扩展字段</li>
+<li><strong>证书路径</strong>：Root CA → Intermediate CA → 网站证书</li>
+</ul>
+</li>
+</ol>
+<p><strong>你要提交的证据</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> curl 输出截图（或粘贴文本）</li>
+<li><input disabled="" type="checkbox"> 浏览器证书查看器截图（可选）</li>
+<li><input disabled="" type="checkbox"> 文字说明：证书有效期、颁发者、是否验证通过</li>
+</ul>
+<h3 id="任务-3（必做）：SSH-密钥与配置文件检查"><a href="#任务-3（必做）：SSH-密钥与配置文件检查" class="headerlink" title="任务 3（必做）：SSH 密钥与配置文件检查"></a>任务 3（必做）：SSH 密钥与配置文件检查</h3><p><strong>目标</strong>：证明你理解 SSH 密钥认证机制。</p>
+<h4 id="步骤-1：检查本地密钥文件"><a href="#步骤-1：检查本地密钥文件" class="headerlink" title="步骤 1：检查本地密钥文件"></a>步骤 1：检查本地密钥文件</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 列出 .ssh 目录下的所有文件</span></span><br><span class="line"><span class="built_in">Get-ChildItem</span> <span class="string">&quot;<span class="variable">$env:USERPROFILE</span>\.ssh&quot;</span> | <span class="built_in">Select-Object</span> Name, Length, LastWriteTime | <span class="built_in">Format-Table</span> <span class="literal">-AutoSize</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>常见文件说明</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>文件名</th>
+<th>类型</th>
+<th>作用</th>
+<th>是否保密</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>id_rsa</code> &#x2F; <code>id_ed25519</code></td>
+<td><strong>私钥</strong></td>
+<td>证明”我是我”，用于登录服务器</td>
+<td>✅ 必须保密（权限 600）</td>
+</tr>
+<tr>
+<td><code>id_rsa.pub</code> &#x2F; <code>id_ed25519.pub</code></td>
+<td><strong>公钥</strong></td>
+<td>放到服务器的 <code>authorized_keys</code></td>
+<td>可公开</td>
+</tr>
+<tr>
+<td><code>known_hosts</code></td>
+<td>已知主机列表</td>
+<td>客户端文件，存”我信任哪些服务器”</td>
+<td>不敏感</td>
+</tr>
+<tr>
+<td><code>authorized_keys</code></td>
+<td>授权密钥列表</td>
+<td><strong>服务器端</strong>文件（这里不应该有）</td>
+<td>不敏感</td>
+</tr>
+<tr>
+<td><code>config</code></td>
+<td>SSH 配置</td>
+<td>定义主机别名、端口、密钥路径</td>
+<td>不敏感</td>
+</tr>
+</tbody></table>
+<h4 id="步骤-2：查看-known-hosts-内容（了解格式）"><a href="#步骤-2：查看-known-hosts-内容（了解格式）" class="headerlink" title="步骤 2：查看 known_hosts 内容（了解格式）"></a>步骤 2：查看 known_hosts 内容（了解格式）</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看前 3 行（避免泄露完整内容）</span></span><br><span class="line"><span class="built_in">Get-Content</span> <span class="string">&quot;<span class="variable">$env:USERPROFILE</span>\.ssh\known_hosts&quot;</span> <span class="literal">-TotalCount</span> <span class="number">3</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>格式示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl</span><br><span class="line">192.168.1.100 ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTY...</span><br></pre></td></tr></table></figure>
+
+<p><strong>格式解读</strong>：<code>主机名/IP 密钥类型 公钥内容</code></p>
+<h4 id="步骤-3：查看-config-文件（如果有）"><a href="#步骤-3：查看-config-文件（如果有）" class="headerlink" title="步骤 3：查看 config 文件（如果有）"></a>步骤 3：查看 config 文件（如果有）</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 检查 config 是否存在</span></span><br><span class="line"><span class="keyword">if</span> (<span class="built_in">Test-Path</span> <span class="string">&quot;<span class="variable">$env:USERPROFILE</span>\.ssh\config&quot;</span>) &#123;</span><br><span class="line">    <span class="built_in">Write-Host</span> <span class="string">&quot;✅ config 文件存在&quot;</span></span><br><span class="line">    <span class="built_in">Get-Content</span> <span class="string">&quot;<span class="variable">$env:USERPROFILE</span>\.ssh\config&quot;</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="built_in">Write-Host</span> <span class="string">&quot;❌ config 文件不存在（这是正常的）&quot;</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>config 示例</strong>（如果你有）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Host github</span><br><span class="line">    HostName github.com</span><br><span class="line">    User git</span><br><span class="line">    IdentityFile ~/.ssh/id_ed25519</span><br><span class="line"></span><br><span class="line">Host myserver</span><br><span class="line">    HostName 192.168.1.100</span><br><span class="line">    User admin</span><br><span class="line">    Port 2222</span><br><span class="line">    IdentityFile ~/.ssh/id_rsa</span><br></pre></td></tr></table></figure>
+
+<h4 id="步骤-4：理解-known-hosts-vs-authorized-keys"><a href="#步骤-4：理解-known-hosts-vs-authorized-keys" class="headerlink" title="步骤 4：理解 known_hosts vs authorized_keys"></a>步骤 4：理解 known_hosts vs authorized_keys</h4><table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>known_hosts</th>
+<th>authorized_keys</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>位置</strong></td>
+<td><strong>客户端</strong> <code>~/.ssh/known_hosts</code></td>
+<td><strong>服务器端</strong> <code>~/.ssh/authorized_keys</code></td>
+</tr>
+<tr>
+<td><strong>作用</strong></td>
+<td>存”我信任哪些服务器的公钥”</td>
+<td>存”哪些客户端可以登录我”</td>
+</tr>
+<tr>
+<td><strong>内容</strong></td>
+<td>服务器的公钥</td>
+<td>客户端的公钥</td>
+</tr>
+<tr>
+<td><strong>场景</strong></td>
+<td>首次 SSH 连接时，客户端会问”是否信任这个服务器？”</td>
+<td>服务器验证”这个客户端的私钥对应的公钥在我的 authorized_keys 里吗？”</td>
+</tr>
+<tr>
+<td><strong>记忆诀窍</strong></td>
+<td>known &#x3D; 已知的（我认识谁）</td>
+<td>authorized &#x3D; 授权的（谁能进来）</td>
+</tr>
+</tbody></table>
+<p><strong>你要提交的证据</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> <code>Get-ChildItem .ssh</code> 输出截图</li>
+<li><input disabled="" type="checkbox"> known_hosts 文件存在证明（行数即可，不要泄露完整内容）</li>
+<li><input disabled="" type="checkbox"> 文字说明：你理解 known_hosts 和 authorized_keys 的区别</li>
+</ul>
+<h3 id="任务-4（强烈推荐）：密码哈希性能对比实验"><a href="#任务-4（强烈推荐）：密码哈希性能对比实验" class="headerlink" title="任务 4（强烈推荐）：密码哈希性能对比实验"></a>任务 4（强烈推荐）：密码哈希性能对比实验</h3><p><strong>目标</strong>：直观感受”为什么要用 KDF 而不是快哈希”。</p>
+<h4 id="完整代码（可直接运行）"><a href="#完整代码（可直接运行）" class="headerlink" title="完整代码（可直接运行）"></a>完整代码（可直接运行）</h4><figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line">python - &lt;&lt; <span class="string">&#x27;PY&#x27;</span></span><br><span class="line">import os</span><br><span class="line">import time</span><br><span class="line">import hashlib</span><br><span class="line"></span><br><span class="line">password = b<span class="string">&quot;P@ssw0rd!&quot;</span></span><br><span class="line">salt = os.urandom(<span class="number">16</span>)</span><br><span class="line"></span><br><span class="line">print(<span class="string">&quot;=&quot;</span> * <span class="number">60</span>)</span><br><span class="line">print(<span class="string">&quot;密码哈希性能对比实验&quot;</span>)</span><br><span class="line">print(<span class="string">&quot;=&quot;</span> * <span class="number">60</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试 1：SHA-256（快哈希，不推荐用于密码）</span></span><br><span class="line">print(<span class="string">&quot;\n【测试 1】SHA-256（快哈希）&quot;</span>)</span><br><span class="line"><span class="built_in">start</span> = time.time()</span><br><span class="line">sha_hash = hashlib.sha256(password).hexdigest()</span><br><span class="line">sha_time = (time.time() - <span class="built_in">start</span>) * <span class="number">1000</span></span><br><span class="line">print(f<span class="string">&quot;  哈希值: &#123;sha_hash[:32]&#125;...&quot;</span>)</span><br><span class="line">print(f<span class="string">&quot;  耗时: &#123;sha_time:.4f&#125; ms&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试 2：PBKDF2（KDF，推荐用于密码）</span></span><br><span class="line">print(<span class="string">&quot;\n【测试 2】PBKDF2（KDF，200,000 次迭代）&quot;</span>)</span><br><span class="line"><span class="built_in">start</span> = time.time()</span><br><span class="line">pbkdf2_hash = hashlib.pbkdf2_hmac(<span class="string">&#x27;sha256&#x27;</span>, password, salt, <span class="number">200</span>_000).hex()</span><br><span class="line">pbkdf2_time = (time.time() - <span class="built_in">start</span>) * <span class="number">1000</span></span><br><span class="line">print(f<span class="string">&quot;  哈希值: &#123;pbkdf2_hash[:32]&#125;...&quot;</span>)</span><br><span class="line">print(f<span class="string">&quot;  耗时: &#123;pbkdf2_time:.4f&#125; ms&quot;</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 对比分析</span></span><br><span class="line">print(<span class="string">&quot;\n&quot;</span> + <span class="string">&quot;=&quot;</span> * <span class="number">60</span>)</span><br><span class="line">print(<span class="string">&quot;性能对比分析&quot;</span>)</span><br><span class="line">print(<span class="string">&quot;=&quot;</span> * <span class="number">60</span>)</span><br><span class="line">slowdown_factor = pbkdf2_time / sha_time</span><br><span class="line">print(f<span class="string">&quot;  PBKDF2 比 SHA-256 慢: &#123;slowdown_factor:.0f&#125; 倍&quot;</span>)</span><br><span class="line">print(f<span class="string">&quot;  攻击者爆破速度降低: &#123;slowdown_factor:.0f&#125; 倍&quot;</span>)</span><br><span class="line">print(f<span class="string">&quot;\n  单机 GPU 每秒可尝试:&quot;</span>)</span><br><span class="line">print(f<span class="string">&quot;    - SHA-256: ~10,000,000,000 次（100 亿次）&quot;</span>)</span><br><span class="line">print(f<span class="string">&quot;    - PBKDF2:  ~&#123;10_000_000_000 / slowdown_factor:.0f&#125; 次&quot;</span>)</span><br><span class="line">print(f<span class="string">&quot;\n  8 字符密码爆破时间:&quot;</span>)</span><br><span class="line">print(f<span class="string">&quot;    - SHA-256: 几小时&quot;</span>)</span><br><span class="line">print(f<span class="string">&quot;    - PBKDF2:  数百年&quot;</span>)</span><br><span class="line">print(<span class="string">&quot;\n✅ 结论：KDF 的&#x27;慢&#x27;不是缺点，是用来抗爆破的特性&quot;</span>)</span><br><span class="line">PY</span><br></pre></td></tr></table></figure>
+
+<p><strong>预期输出（示例）</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">============================================================</span><br><span class="line">密码哈希性能对比实验</span><br><span class="line">============================================================</span><br><span class="line"></span><br><span class="line">【测试 1】SHA-256（快哈希）</span><br><span class="line">  哈希值: 8e35c2cd3bf6641bdb0e2050...</span><br><span class="line">  耗时: 0.0234 ms</span><br><span class="line"></span><br><span class="line">【测试 2】PBKDF2（KDF，200,000 次迭代）</span><br><span class="line">  哈希值: c5a0f8e7d4b3c2a1f9e8d7c6...</span><br><span class="line">  耗时: 123.4567 ms</span><br><span class="line"></span><br><span class="line">============================================================</span><br><span class="line">性能对比分析</span><br><span class="line">============================================================</span><br><span class="line">  PBKDF2 比 SHA-256 慢: 5279 倍</span><br><span class="line">  攻击者爆破速度降低: 5279 倍</span><br><span class="line"></span><br><span class="line">  单机 GPU 每秒可尝试:</span><br><span class="line">    - SHA-256: ~10,000,000,000 次（100 亿次）</span><br><span class="line">    - PBKDF2:  ~1,894,585 次</span><br><span class="line"></span><br><span class="line">  8 字符密码爆破时间:</span><br><span class="line">    - SHA-256: 几小时</span><br><span class="line">    - PBKDF2:  数百年</span><br><span class="line"></span><br><span class="line">✅ 结论：KDF 的&#x27;慢&#x27;不是缺点，是用来抗爆破的特性</span><br></pre></td></tr></table></figure>
+
+<p><strong>你要提交的证据</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 完整输出截图</li>
+<li><input disabled="" type="checkbox"> 记录你机器上的性能对比（慢了多少倍）</li>
+</ul>
+<h2 id="巩固练习（题与复盘）"><a href="#巩固练习（题与复盘）" class="headerlink" title="巩固练习（题与复盘）"></a>巩固练习（题与复盘）</h2><h3 id="题-1：做一个-5-分钟讲解提纲（必写）"><a href="#题-1：做一个-5-分钟讲解提纲（必写）" class="headerlink" title="题 1：做一个 5 分钟讲解提纲（必写）"></a>题 1：做一个 5 分钟讲解提纲（必写）</h3><p>从下面 4 个里选 1 个写提纲，要求：</p>
+<ul>
+<li><strong>5 个要点</strong>（每个要点 1-2 句话）</li>
+<li><strong>1 个类比</strong>（让外行也能听懂）</li>
+<li><strong>1 个你本周踩过的坑</strong></li>
+</ul>
+<h4 id="选项-A：为什么-HTTPS-抓包仍然有价值"><a href="#选项-A：为什么-HTTPS-抓包仍然有价值" class="headerlink" title="选项 A：为什么 HTTPS 抓包仍然有价值"></a>选项 A：为什么 HTTPS 抓包仍然有价值</h4><p><strong>提纲要点</strong>：</p>
+<ol>
+<li>能看到 TLS 握手过程（版本、加密套件、SNI）</li>
+<li>能定位连接失败原因（证书错误、握手告警）</li>
+<li>能分析性能问题（连接耗时、重传）</li>
+<li>能发现协议选择（HTTP&#x2F;2、QUIC）</li>
+<li>能做安全审计（是否全站 HTTPS、混合内容）</li>
+</ol>
+<p><strong>类比</strong>：（自己写一个）</p>
+<p><strong>踩坑</strong>：（自己写一个）</p>
+<h4 id="选项-B：证书链到底在验证什么"><a href="#选项-B：证书链到底在验证什么" class="headerlink" title="选项 B：证书链到底在验证什么"></a>选项 B：证书链到底在验证什么</h4><p><strong>提纲要点</strong>：</p>
+<ol>
+<li>验证证书有效期（是否过期）</li>
+<li>验证域名匹配（CN&#x2F;SAN 与访问域名一致）</li>
+<li>验证证书链完整性（网站证书 → 中间 CA → 根 CA）</li>
+<li>验证根 CA 是否受信任（在操作系统信任列表中）</li>
+<li>验证证书是否被撤销（CRL&#x2F;OCSP）</li>
+</ol>
+<p><strong>类比</strong>：（自己写一个）</p>
+<p><strong>踩坑</strong>：（自己写一个）</p>
+<h4 id="选项-C：SSH-的-known-hosts-vs-authorized-keys"><a href="#选项-C：SSH-的-known-hosts-vs-authorized-keys" class="headerlink" title="选项 C：SSH 的 known_hosts vs authorized_keys"></a>选项 C：SSH 的 known_hosts vs authorized_keys</h4><p><strong>提纲要点</strong>：</p>
+<ol>
+<li>known_hosts 在客户端，authorized_keys 在服务器端</li>
+<li>known_hosts 存”我信任哪些服务器”，防止中间人攻击</li>
+<li>authorized_keys 存”哪些客户端可以登录我”，实现密钥认证</li>
+<li>首次连接时 known_hosts 为空，会提示是否信任</li>
+<li>公钥放 authorized_keys，私钥永远不离开客户端</li>
+</ol>
+<p><strong>类比</strong>：（自己写一个）</p>
+<p><strong>踩坑</strong>：（自己写一个）</p>
+<h4 id="选项-D：为什么密码要用-KDF，而不是-SHA-256"><a href="#选项-D：为什么密码要用-KDF，而不是-SHA-256" class="headerlink" title="选项 D：为什么密码要用 KDF，而不是 SHA-256"></a>选项 D：为什么密码要用 KDF，而不是 SHA-256</h4><p><strong>提纲要点</strong>：</p>
+<ol>
+<li>SHA-256 太快（GPU 每秒数十亿次），容易被爆破</li>
+<li>KDF 设计就是”慢”（单次 100-300ms），降低爆破速度</li>
+<li>KDF 内置 salt 机制，防止彩虹表和重复密码暴露</li>
+<li>KDF 可调节成本参数，随硬件升级增加难度</li>
+<li>密码是认证凭据（不需要还原），用哈希不用加密</li>
+</ol>
+<p><strong>类比</strong>：（自己写一个）</p>
+<p><strong>踩坑</strong>：（自己写一个）</p>
+<h3 id="题-2：本周错题-x2F-易错点清单（至少-5-条）"><a href="#题-2：本周错题-x2F-易错点清单（至少-5-条）" class="headerlink" title="题 2：本周错题&#x2F;易错点清单（至少 5 条）"></a>题 2：本周错题&#x2F;易错点清单（至少 5 条）</h3><p>把你本周”差点搞错”的点列出来，并写一句纠正。</p>
+<p><strong>示例格式</strong>：</p>
+<ol>
+<li><p>❌ <strong>错误</strong>：以为 HTTPS 抓包看不到任何信息</p>
+<ul>
+<li>✅ <strong>纠正</strong>：能看到握手、证书、密文长度，只是看不到明文内容</li>
+</ul>
+</li>
+<li><p>❌ <strong>错误</strong>：以为 known_hosts 是服务器端文件</p>
+<ul>
+<li>✅ <strong>纠正</strong>：known_hosts 在客户端，存”我信任哪些服务器”</li>
+</ul>
+</li>
+</ol>
+<p>（继续写至少 3 条）</p>
+<h3 id="题-3（新增）：画一个-TLS-握手流程图"><a href="#题-3（新增）：画一个-TLS-握手流程图" class="headerlink" title="题 3（新增）：画一个 TLS 握手流程图"></a>题 3（新增）：画一个 TLS 握手流程图</h3><p>用文字&#x2F;ASCII 画出 TLS 1.3 简化握手流程（至少包含 4 步）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">客户端                                服务器</span><br><span class="line">  │                                    │</span><br><span class="line">  ├──── ClientHello ──────────────────&gt;│  (1) 支持的加密套件、TLS 版本</span><br><span class="line">  │                                    │</span><br><span class="line">  │&lt;──── ServerHello ───────────────────┤  (2) 选中的加密套件、证书</span><br><span class="line">  │                                    │</span><br><span class="line">  │&lt;──── Certificate ────────────────────┤  (3) 服务器证书链</span><br><span class="line">  │                                    │</span><br><span class="line">  ├──── Finished ──────────────────────&gt;│  (4) 握手完成，开始加密通信</span><br><span class="line">  │                                    │</span><br><span class="line">  │&lt;════ 加密的 HTTP 数据 ═══════════════&gt;│</span><br></pre></td></tr></table></figure>
+
+<p>（你可以画得更详细）</p>
+<h3 id="题-4（新增）：设计一个密码重置流程"><a href="#题-4（新增）：设计一个密码重置流程" class="headerlink" title="题 4（新增）：设计一个密码重置流程"></a>题 4（新增）：设计一个密码重置流程</h3><p>要求：安全、可用、防滥用。写出至少 5 个步骤：</p>
+<ol>
+<li>（自己写）</li>
+<li>（自己写）</li>
+<li>…</li>
+</ol>
+<h2 id="评估标准（达成判定）"><a href="#评估标准（达成判定）" class="headerlink" title="评估标准（达成判定）"></a>评估标准（达成判定）</h2><table>
+<thead>
+<tr>
+<th>评估项</th>
+<th>达成标准</th>
+<th>检查方法</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>证据完整性</strong></td>
+<td>至少 3 个必做任务的截图&#x2F;输出</td>
+<td>检查学习成果区的证据清单</td>
+</tr>
+<tr>
+<td><strong>理解深度</strong></td>
+<td>能解释易错点并举例纠正</td>
+<td>检查题 2 是否写了至少 5 条</td>
+</tr>
+<tr>
+<td><strong>结构化能力</strong></td>
+<td>周报包含目标&#x2F;证据&#x2F;结论&#x2F;反思&#x2F;下周计划</td>
+<td>检查周报 5 要素是否齐全</td>
+</tr>
+<tr>
+<td><strong>实操能力</strong></td>
+<td>能独立完成 Wireshark 抓包 + 过滤器</td>
+<td>检查任务 1 的截图质量</td>
+</tr>
+<tr>
+<td><strong>思考能力</strong></td>
+<td>讲解提纲结构清晰，有类比和反思</td>
+<td>检查题 1 是否包含 5 要点+类比+踩坑</td>
+</tr>
+</tbody></table>
+<p><strong>达成判定</strong>：</p>
+<ul>
+<li>✅ <strong>优秀</strong>（5&#x2F;5）：完成所有任务 + 题 1-4 全部完成 + 周报详细</li>
+<li>✅ <strong>良好</strong>（4&#x2F;5）：完成 3+ 任务 + 题 1-2 完成 + 周报基本完整</li>
+<li>✅ <strong>合格</strong>（3&#x2F;5）：完成 3 个必做任务 + 题 1 完成 + 有周报</li>
+<li>⚠️ <strong>需改进</strong>（&lt;3&#x2F;5）：任务不全或无周报</li>
+</ul>
+<h2 id="学习成果达成情况（周报模板，直接填写）"><a href="#学习成果达成情况（周报模板，直接填写）" class="headerlink" title="学习成果达成情况（周报模板，直接填写）"></a>学习成果达成情况（周报模板，直接填写）</h2><h3 id="1-本周我完成了什么（用一句话总述）"><a href="#1-本周我完成了什么（用一句话总述）" class="headerlink" title="1) 本周我完成了什么（用一句话总述）"></a>1) 本周我完成了什么（用一句话总述）</h3><ul>
+<li>（例如：我完成了 HTTPS&#x2F;TLS 抓包、证书链检查、SSH 密钥配置与 KDF 基础演示，并整理了一份可复现实验周报。）</li>
+</ul>
+<h3 id="2-关键证据清单（把截图文件名列出来）"><a href="#2-关键证据清单（把截图文件名列出来）" class="headerlink" title="2) 关键证据清单（把截图文件名列出来）"></a>2) 关键证据清单（把截图文件名列出来）</h3><table>
+<thead>
+<tr>
+<th>任务</th>
+<th>截图文件名</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>任务 1 - ClientHello</td>
+<td><code>images/day014_tls_clienthello.png</code></td>
+<td>能看到 TLS 版本和 SNI</td>
+</tr>
+<tr>
+<td>任务 1 - ServerHello</td>
+<td><code>images/day014_tls_serverhello.png</code></td>
+<td>能看到选中的加密套件</td>
+</tr>
+<tr>
+<td>任务 1 - Certificate</td>
+<td><code>images/day014_tls_certificate.png</code></td>
+<td>能看到证书链</td>
+</tr>
+<tr>
+<td>任务 2 - curl 输出</td>
+<td><code>images/day014_curl_output.png</code></td>
+<td>证书验证结果</td>
+</tr>
+<tr>
+<td>任务 3 - SSH 文件</td>
+<td><code>images/day014_ssh_files.png</code></td>
+<td>.ssh 目录内容</td>
+</tr>
+<tr>
+<td>任务 4 - PBKDF2 对比</td>
+<td><code>images/day014_pbkdf2_comparison.png</code></td>
+<td>性能对比结果</td>
+</tr>
+</tbody></table>
+<h3 id="3-我本周最重要的-10-行记录（命令-x2F-过滤器-x2F-输出）"><a href="#3-我本周最重要的-10-行记录（命令-x2F-过滤器-x2F-输出）" class="headerlink" title="3) 我本周最重要的 10 行记录（命令&#x2F;过滤器&#x2F;输出）"></a>3) 我本周最重要的 10 行记录（命令&#x2F;过滤器&#x2F;输出）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">1. tls.handshake  # Wireshark 过滤 TLS 握手</span><br><span class="line">2. curl.exe -Iv https://github.com  # 查看证书信息</span><br><span class="line">3. Get-ChildItem $env:USERPROFILE\.ssh  # 列出 SSH 密钥</span><br><span class="line">4. nslookup github.com  # DNS 解析</span><br><span class="line">5. Test-NetConnection github.com -Port 443  # 测试 HTTPS 端口</span><br><span class="line">6. python -c &quot;import hashlib; ...&quot;  # 快速测试哈希</span><br><span class="line">7. TLS_AES_128_GCM_SHA256  # 常见加密套件</span><br><span class="line">8. CN=github.com  # 证书主题（Common Name）</span><br><span class="line">9. SSL certificate verify ok  # 证书验证成功</span><br><span class="line">10. $2b$12$...  # bcrypt 哈希格式</span><br></pre></td></tr></table></figure>
+
+<h3 id="4-结论与反思（必须写）"><a href="#4-结论与反思（必须写）" class="headerlink" title="4) 结论与反思（必须写）"></a>4) 结论与反思（必须写）</h3><p><strong>我本周真正理解了</strong>：</p>
+<ul>
+<li>（例如：HTTPS 抓包虽然看不到明文，但能看到握手、证书、协议选择，对排错和性能分析很有价值）</li>
+<li>（例如：密码存储不是”加密存”，而是”KDF 哈希 + salt”，因为密码是认证凭据不需要还原）</li>
+<li>（例如：known_hosts 和 authorized_keys 的区别，一个在客户端一个在服务器端）</li>
+</ul>
+<p><strong>我本周最大的坑是</strong>：</p>
+<ul>
+<li>（例如：一开始用 <code>ssl.handshake</code> 过滤器没结果，后来才知道应该用 <code>tls.handshake</code>）</li>
+<li>（例如：以为 IV 要保密，其实 IV 可以公开但不能重复）</li>
+<li>（例如：把签名当成加密，其实签名是防篡改+证明身份，不一定保密）</li>
+</ul>
+<p><strong>我下周要避免的是</strong>：</p>
+<ul>
+<li>（例如：不要急着做任务，先理解原理再动手）</li>
+<li>（例如：截图要包含完整信息，不要只截一部分）</li>
+<li>（例如：遇到问题先看文档，不要瞎试）</li>
+</ul>
+<h3 id="5-下周计划（3-条即可）"><a href="#5-下周计划（3-条即可）" class="headerlink" title="5) 下周计划（3 条即可）"></a>5) 下周计划（3 条即可）</h3><ol>
+<li>（例如：学习 Linux 文件权限和 sudo 配置）</li>
+<li>（例如：继续深入 Python 脚本自动化）</li>
+<li>（例如：搭建一个本地测试环境练习端口扫描）</li>
+</ol>
+<p><strong>本周学习耗时</strong>：约 ___ 小时</p>
+<p><strong>掌握程度自评</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 😕 只完成了部分任务，理解不深</li>
+<li><input disabled="" type="checkbox"> 🙂 完成了必做任务，基本理解</li>
+<li><input disabled="" type="checkbox"> 😃 完成了所有任务，理解透彻</li>
+<li><input disabled="" type="checkbox"> 🤩 额外做了扩展研究（如对比不同 KDF、研究证书透明度日志）</li>
+</ul>
+<h2 id="集中参考答案（含思路）"><a href="#集中参考答案（含思路）" class="headerlink" title="集中参考答案（含思路）"></a>集中参考答案（含思路）</h2><h3 id="题-1-参考提纲（完整版）"><a href="#题-1-参考提纲（完整版）" class="headerlink" title="题 1 参考提纲（完整版）"></a>题 1 参考提纲（完整版）</h3><h4 id="选项-A：为什么-HTTPS-抓包仍然有价值-1"><a href="#选项-A：为什么-HTTPS-抓包仍然有价值-1" class="headerlink" title="选项 A：为什么 HTTPS 抓包仍然有价值"></a>选项 A：为什么 HTTPS 抓包仍然有价值</h4><p><strong>5 个要点</strong>：</p>
+<ol>
+<li><strong>握手信息可见</strong>：能看到 TLS 版本（1.2&#x2F;1.3）、加密套件（如 TLS_AES_128_GCM_SHA256）、SNI（服务器名称）</li>
+<li><strong>证书可见</strong>：能看到完整证书链（Root CA → Intermediate CA → 网站证书），验证有效期和颁发者</li>
+<li><strong>排错线索</strong>：握手失败时能看到具体告警（如 certificate_expired、handshake_failure）</li>
+<li><strong>性能分析</strong>：能看到连接建立时间、重传次数、RTT（往返时间），虽然看不到明文但能定位慢在哪</li>
+<li><strong>协议发现</strong>：能看到 ALPN 协商结果（HTTP&#x2F;2 还是 HTTP&#x2F;1.1）、是否走 QUIC（UDP 443）</li>
+</ol>
+<p><strong>类比</strong>：</p>
+<ul>
+<li>“就像你看不到快递盒子里装的是什么，但你能看到：寄件人、收件人、物流路线、包裹大小、运输时间。这些信息足够你判断物流是否正常。”</li>
+</ul>
+<p><strong>踩坑示例</strong>：</p>
+<ul>
+<li>“我一开始用 <code>ssl.handshake</code> 过滤器没结果，以为 Wireshark 坏了。后来才知道现在应该用 <code>tls.handshake</code>（SSL 是老名字，已被 TLS 替代）。”</li>
+</ul>
+<h4 id="选项-B：证书链到底在验证什么-1"><a href="#选项-B：证书链到底在验证什么-1" class="headerlink" title="选项 B：证书链到底在验证什么"></a>选项 B：证书链到底在验证什么</h4><p><strong>5 个要点</strong>：</p>
+<ol>
+<li><strong>域名匹配</strong>：证书的 CN（Common Name）或 SAN（Subject Alternative Name）必须与访问的域名一致</li>
+<li><strong>有效期</strong>：当前日期必须在证书的 <code>Not Before</code> 和 <code>Not After</code> 之间</li>
+<li><strong>证书链完整</strong>：网站证书 → 中间 CA → 根 CA，每一级都用上一级的私钥签名</li>
+<li><strong>根 CA 受信任</strong>：根 CA 必须在操作系统&#x2F;浏览器的信任列表中（预装或手动添加）</li>
+<li><strong>未被撤销</strong>：通过 CRL（证书撤销列表）或 OCSP（在线证书状态协议）确认证书未被撤销</li>
+</ol>
+<p><strong>类比</strong>：</p>
+<ul>
+<li>“证书链像身份证的验证流程：看身份证上的名字（域名）、有效期、发证机关（CA）；然后打电话到公安局（根 CA）确认’这个发证机关是真的吗’；最后查黑名单（CRL&#x2F;OCSP）看身份证有没有被注销。”</li>
+</ul>
+<p><strong>踩坑示例</strong>：</p>
+<ul>
+<li>“我以为看到证书就是安全的，后来发现证书可能过期、域名不匹配、或者是自签名的（不在信任列表）。现在知道要检查 4 个要素。”</li>
+</ul>
+<h4 id="选项-C：SSH-的-known-hosts-vs-authorized-keys-1"><a href="#选项-C：SSH-的-known-hosts-vs-authorized-keys-1" class="headerlink" title="选项 C：SSH 的 known_hosts vs authorized_keys"></a>选项 C：SSH 的 known_hosts vs authorized_keys</h4><p><strong>5 个要点</strong>：</p>
+<ol>
+<li><strong>位置不同</strong>：known_hosts 在<strong>客户端</strong> <code>~/.ssh/known_hosts</code>，authorized_keys 在<strong>服务器端</strong> <code>~/.ssh/authorized_keys</code></li>
+<li><strong>作用不同</strong>：known_hosts 存”我信任哪些服务器的公钥”，authorized_keys 存”哪些客户端可以登录我”</li>
+<li><strong>首次连接</strong>：第一次 SSH 到新服务器时，客户端会问”是否信任这个服务器？”，确认后服务器公钥写入 known_hosts</li>
+<li><strong>密钥认证流程</strong>：客户端用私钥签名，服务器用 authorized_keys 中的公钥验证签名</li>
+<li><strong>安全意义</strong>：known_hosts 防止中间人攻击（服务器公钥变了会警告），authorized_keys 实现免密登录</li>
+</ol>
+<p><strong>类比</strong>：</p>
+<ul>
+<li>“known_hosts 像你的’通讯录’（记录你认识的人的电话号码），authorized_keys 像门卫的’访客名单’（记录谁可以进门）。”</li>
+</ul>
+<p><strong>踩坑示例</strong>：</p>
+<ul>
+<li>“我以前以为 known_hosts 和 authorized_keys 都在客户端，后来才知道一个在客户端一个在服务器端，名字就是提示：known &#x3D; 我知道谁，authorized &#x3D; 谁被授权。”</li>
+</ul>
+<h4 id="选项-D：为什么密码要用-KDF，而不是-SHA-256-1"><a href="#选项-D：为什么密码要用-KDF，而不是-SHA-256-1" class="headerlink" title="选项 D：为什么密码要用 KDF，而不是 SHA-256"></a>选项 D：为什么密码要用 KDF，而不是 SHA-256</h4><p><strong>5 个要点</strong>：</p>
+<ol>
+<li><strong>速度对比</strong>：SHA-256 太快（&lt;0.1ms），GPU 每秒能尝试数十亿次；KDF 设计就是”慢”（100-300ms），让爆破速度降低数千倍</li>
+<li><strong>salt 机制</strong>：SHA-256 需要手动加 salt，KDF 内置 salt 并包含在输出中，防止彩虹表和重复密码暴露</li>
+<li><strong>可调节性</strong>：SHA-256 固定速度，KDF 有成本参数（如 bcrypt 的 work_factor），可以随硬件升级增加难度</li>
+<li><strong>用途区分</strong>：SHA-256 是通用哈希（文件校验、数字签名），KDF 专门为密码设计（抗爆破）</li>
+<li><strong>根本原因</strong>：密码是<strong>认证凭据</strong>（不需要还原），用哈希不用加密；而敏感数据（如身份证号）才需要可逆加密</li>
+</ol>
+<p><strong>类比</strong>：</p>
+<ul>
+<li>“SHA-256 像高速公路（快但不安全），KDF 像限速 20km&#x2F;h 的学校区域（慢但能保护安全）。对密码来说，’慢’不是缺点，是防御爆破的特性。”</li>
+</ul>
+<p><strong>踩坑示例</strong>：</p>
+<ul>
+<li>“我一开始以为’加密存密码’就安全了，后来才知道密码不需要还原（登录只需验证是否匹配），用 KDF 哈希比加密更安全（密钥泄露也无法批量解密）。”</li>
+</ul>
+<h3 id="题-2-参考答案（完整-10-条）"><a href="#题-2-参考答案（完整-10-条）" class="headerlink" title="题 2 参考答案（完整 10 条）"></a>题 2 参考答案（完整 10 条）</h3><ol>
+<li><p>❌ <strong>错误</strong>：以为 HTTPS 抓包看不到任何信息</p>
+<ul>
+<li>✅ <strong>纠正</strong>：能看到握手、证书、密文长度、协议选择，只是看不到明文内容</li>
+</ul>
+</li>
+<li><p>❌ <strong>错误</strong>：以为 known_hosts 是服务器端文件</p>
+<ul>
+<li>✅ <strong>纠正</strong>：known_hosts 在<strong>客户端</strong>，存”我信任哪些服务器”</li>
+</ul>
+</li>
+<li><p>❌ <strong>错误</strong>：用 SHA-256 直接存密码</p>
+<ul>
+<li>✅ <strong>纠正</strong>：应该用 KDF（bcrypt&#x2F;Argon2&#x2F;PBKDF2），单次验证慢 100-300ms</li>
+</ul>
+</li>
+<li><p>❌ <strong>错误</strong>：以为 IV 要像密钥一样保密</p>
+<ul>
+<li>✅ <strong>纠正</strong>：IV 可以公开（和密文一起存），但不能重复使用</li>
+</ul>
+</li>
+<li><p>❌ <strong>错误</strong>：把签名当成加密的一种</p>
+<ul>
+<li>✅ <strong>纠正</strong>：签名是防篡改+证明身份（用私钥签、公钥验），不一定保密</li>
+</ul>
+</li>
+<li><p>❌ <strong>错误</strong>：以为证书”有效”就是安全的</p>
+<ul>
+<li>✅ <strong>纠正</strong>：还要检查域名匹配、链完整、根 CA 受信任、未被撤销</li>
+</ul>
+</li>
+<li><p>❌ <strong>错误</strong>：用 <code>ssl.handshake</code> 过滤器没结果</p>
+<ul>
+<li>✅ <strong>纠正</strong>：现在应该用 <code>tls.handshake</code>（SSL 是老名字）</li>
+</ul>
+</li>
+<li><p>❌ <strong>错误</strong>：以为全局一个 salt 就够了</p>
+<ul>
+<li>✅ <strong>纠正</strong>：每个用户独立随机 salt，防止重复密码暴露</li>
+</ul>
+</li>
+<li><p>❌ <strong>错误</strong>：以为 HMAC 就是 SHA-256</p>
+<ul>
+<li>✅ <strong>纠正</strong>：HMAC 是”带密钥的哈希”，需要 secret 才能生成有效签名</li>
+</ul>
+</li>
+<li><p>❌ <strong>错误</strong>：以为密码加密存储就安全</p>
+<ul>
+<li>✅ <strong>纠正</strong>：密码是认证凭据（不需要还原），用 KDF 哈希而不是加密</li>
+</ul>
+</li>
+</ol>
+<h3 id="题-3-参考答案（TLS-1-3-握手流程图）"><a href="#题-3-参考答案（TLS-1-3-握手流程图）" class="headerlink" title="题 3 参考答案（TLS 1.3 握手流程图）"></a>题 3 参考答案（TLS 1.3 握手流程图）</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">客户端                                          服务器</span><br><span class="line">  │                                              │</span><br><span class="line">  │                                              │</span><br><span class="line">  ├──── (1) ClientHello ────────────────────────&gt;│</span><br><span class="line">  │     - 支持的 TLS 版本（1.3/1.2）             │</span><br><span class="line">  │     - 支持的加密套件列表                      │</span><br><span class="line">  │     - SNI（服务器名称）                       │</span><br><span class="line">  │     - 客户端随机数                           │</span><br><span class="line">  │                                              │</span><br><span class="line">  │&lt;──── (2) ServerHello ──────────────────────┤</span><br><span class="line">  │     - 选中的 TLS 版本（1.3）                 │</span><br><span class="line">  │     - 选中的加密套件（如 AES-128-GCM）       │</span><br><span class="line">  │     - 服务器随机数                           │</span><br><span class="line">  │                                              │</span><br><span class="line">  │&lt;──── (3) Certificate ───────────────────────┤</span><br><span class="line">  │     - 服务器证书链                           │</span><br><span class="line">  │     - Root CA → Intermediate CA → 网站证书   │</span><br><span class="line">  │                                              │</span><br><span class="line">  │&lt;──── (4) CertificateVerify ─────────────────┤</span><br><span class="line">  │     - 用服务器私钥对握手消息的签名           │</span><br><span class="line">  │                                              │</span><br><span class="line">  │&lt;──── (5) Finished ──────────────────────────┤</span><br><span class="line">  │     - 服务器握手完成消息（已加密）           │</span><br><span class="line">  │                                              │</span><br><span class="line">  ├──── (6) Finished ─────────────────────────&gt;│</span><br><span class="line">  │     - 客户端握手完成消息（已加密）           │</span><br><span class="line">  │                                              │</span><br><span class="line">  │&lt;════════ 加密的应用数据 ═══════════════════&gt;│</span><br><span class="line">  │     - HTTP 请求/响应全程加密                 │</span><br><span class="line">  │     - 用协商好的会话密钥（对称加密）         │</span><br><span class="line">  │                                              │</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键点</strong>：</p>
+<ul>
+<li>TLS 1.3 只需 1-RTT（一个往返）就能完成握手，比 TLS 1.2 更快</li>
+<li>Certificate 和 CertificateVerify 在 TLS 1.3 中是加密的（更安全）</li>
+<li>握手完成后，所有应用数据用对称加密（AES-GCM）</li>
+</ul>
+<h3 id="题-4-参考答案（密码重置流程）"><a href="#题-4-参考答案（密码重置流程）" class="headerlink" title="题 4 参考答案（密码重置流程）"></a>题 4 参考答案（密码重置流程）</h3><h4 id="安全的密码重置流程（5-步法）"><a href="#安全的密码重置流程（5-步法）" class="headerlink" title="安全的密码重置流程（5 步法）"></a>安全的密码重置流程（5 步法）</h4><ol>
+<li><p><strong>用户发起重置请求</strong></p>
+<ul>
+<li>输入注册邮箱&#x2F;手机号</li>
+<li>后端验证账号是否存在（<strong>不要</strong>告诉用户”账号不存在”，防止枚举攻击）</li>
+</ul>
+</li>
+<li><p><strong>生成重置令牌（Token）</strong></p>
+<ul>
+<li>生成随机令牌（如 <code>uuid.uuid4()</code> 或 <code>secrets.token_urlsafe(32)</code>）</li>
+<li>存储到数据库：<code>user_id</code>, <code>token_hash</code>（存哈希不存明文）, <code>expires_at</code>（15-30 分钟后过期）</li>
+</ul>
+</li>
+<li><p><strong>发送重置链接</strong></p>
+<ul>
+<li>通过邮件&#x2F;短信发送链接：<code>https://example.com/reset?token=abc123xyz</code></li>
+<li><strong>不要</strong>在链接中包含用户 ID 或邮箱（防止信息泄露）</li>
+</ul>
+</li>
+<li><p><strong>用户点击链接并设置新密码</strong></p>
+<ul>
+<li>验证 token 是否有效（未过期、未使用、哈希匹配）</li>
+<li>检查新密码强度（长度≥8、包含大小写字母+数字+特殊字符）</li>
+<li>用 KDF（bcrypt&#x2F;Argon2）哈希新密码并更新数据库</li>
+</ul>
+</li>
+<li><p><strong>废弃令牌并通知用户</strong></p>
+<ul>
+<li>标记 token 为已使用（防止重复使用）</li>
+<li>发送”密码已重置”通知邮件（如果不是本人操作，提供申诉链接）</li>
+<li>可选：让其他设备的会话失效（强制重新登录）</li>
+</ul>
+</li>
+</ol>
+<h4 id="防滥用措施"><a href="#防滥用措施" class="headerlink" title="防滥用措施"></a>防滥用措施</h4><ul>
+<li><strong>频率限制</strong>：同一邮箱&#x2F;IP 在 5 分钟内只能请求 3 次</li>
+<li><strong>验证码</strong>：重置请求时要求输入图形验证码或 reCAPTCHA</li>
+<li><strong>审计日志</strong>：记录所有重置请求（时间&#x2F;IP&#x2F;User-Agent），用于事后调查</li>
+<li><strong>异常检测</strong>：短时间内大量重置请求 → 告警并临时冻结该账号</li>
+</ul>
+<h2 id="学习成果示例填写（可照抄）"><a href="#学习成果示例填写（可照抄）" class="headerlink" title="学习成果示例填写（可照抄）"></a>学习成果示例填写（可照抄）</h2><h3 id="1-总述（示例）"><a href="#1-总述（示例）" class="headerlink" title="1) 总述（示例）"></a>1) 总述（示例）</h3><p>我完成了本周 4 个核心任务：</p>
+<ol>
+<li>用 Wireshark 抓取并分析了 HTTPS&#x2F;TLS 握手过程（ClientHello&#x2F;ServerHello&#x2F;Certificate）</li>
+<li>用 curl 验证了 GitHub 的证书链和 TLS 版本</li>
+<li>检查了本地 SSH 密钥文件并理解了 known_hosts vs authorized_keys 的区别</li>
+<li>运行了 PBKDF2 vs SHA-256 性能对比实验，直观感受了 KDF 的”慢”是防御特性</li>
+</ol>
+<p>整理了一份可复现的实验周报，包含截图、命令、输出和反思。</p>
+<h3 id="2-关键证据（示例）"><a href="#2-关键证据（示例）" class="headerlink" title="2) 关键证据（示例）"></a>2) 关键证据（示例）</h3><table>
+<thead>
+<tr>
+<th>任务</th>
+<th>截图文件名</th>
+<th>关键信息</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TLS ClientHello</td>
+<td><code>images/day014_clienthello.png</code></td>
+<td>TLS 1.3, SNI&#x3D;github.com, 支持的加密套件</td>
+</tr>
+<tr>
+<td>TLS ServerHello</td>
+<td><code>images/day014_serverhello.png</code></td>
+<td>选中 TLS_AES_128_GCM_SHA256</td>
+</tr>
+<tr>
+<td>TLS Certificate</td>
+<td><code>images/day014_certificate.png</code></td>
+<td>证书链：DigiCert Root → Intermediate → github.com</td>
+</tr>
+<tr>
+<td>curl 输出</td>
+<td><code>images/day014_curl.png</code></td>
+<td>SSL certificate verify ok, TLSv1.3</td>
+</tr>
+<tr>
+<td>SSH 文件</td>
+<td><code>images/day014_ssh.png</code></td>
+<td>id_ed25519, id_ed25519.pub, known_hosts</td>
+</tr>
+<tr>
+<td>PBKDF2 对比</td>
+<td><code>images/day014_pbkdf2.png</code></td>
+<td>PBKDF2 慢 5279 倍</td>
+</tr>
+</tbody></table>
+<h3 id="3-最重要的-10-行记录（示例）"><a href="#3-最重要的-10-行记录（示例）" class="headerlink" title="3) 最重要的 10 行记录（示例）"></a>3) 最重要的 10 行记录（示例）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">1. tls.handshake  <span class="comment"># Wireshark 过滤 TLS 握手</span></span><br><span class="line">2. tls.handshake.type == 1  <span class="comment"># 只看 ClientHello</span></span><br><span class="line">3. curl.exe -Iv https://github.com  <span class="comment"># 查看证书和 TLS 版本</span></span><br><span class="line">4. Get-ChildItem <span class="variable">$env</span>:USERPROFILE\.ssh  <span class="comment"># 列出 SSH 文件</span></span><br><span class="line">5. python -c <span class="string">&quot;import hashlib; hashlib.sha256(b&#x27;test&#x27;).hexdigest()&quot;</span>  <span class="comment"># 快速哈希</span></span><br><span class="line">6. TLS_AES_128_GCM_SHA256  <span class="comment"># TLS 1.3 常见加密套件</span></span><br><span class="line">7. CN=github.com  <span class="comment"># 证书主题</span></span><br><span class="line">8. SSL certificate verify ok  <span class="comment"># 证书验证成功</span></span><br><span class="line">9. PBKDF2 比 SHA-256 慢 5279 倍  <span class="comment"># KDF 性能对比</span></span><br><span class="line">10. $2b$12$...  <span class="comment"># bcrypt 哈希格式</span></span><br></pre></td></tr></table></figure>
+
+<h3 id="4-反思（示例）"><a href="#4-反思（示例）" class="headerlink" title="4) 反思（示例）"></a>4) 反思（示例）</h3><p><strong>我本周真正理解了</strong>：</p>
+<ul>
+<li>HTTPS 抓包虽然看不到明文，但能看到握手、证书、协议选择，对排错很有价值</li>
+<li>证书链验证不是”看见证书就行”，要检查域名&#x2F;有效期&#x2F;链完整&#x2F;根 CA 受信任</li>
+<li>known_hosts（客户端）存”我信任谁”，authorized_keys（服务器端）存”谁能登录我”</li>
+<li>密码存储不是”加密存”，而是”KDF 哈希 + salt”，因为密码是认证凭据不需要还原</li>
+<li>KDF 的”慢”不是缺点，是用来抗爆破的特性（单次 100ms 对用户无感，对攻击者致命）</li>
+</ul>
+<p><strong>我本周最大的坑是</strong>：</p>
+<ul>
+<li>一开始用 <code>ssl.handshake</code> 过滤器没结果，以为 Wireshark 坏了，后来才知道应该用 <code>tls.handshake</code></li>
+<li>以为 IV 要保密，其实 IV 可以公开但不能重复</li>
+<li>把签名当成加密，其实签名是防篡改+证明身份，不一定保密</li>
+</ul>
+<p><strong>我下周要避免的是</strong>：</p>
+<ul>
+<li>不要急着做任务，先理解原理再动手（比如先理解 TLS 握手流程，再去抓包）</li>
+<li>截图要包含完整信息（过滤器+数据包列表+详情面板），不要只截一部分</li>
+<li>遇到问题先看官方文档，不要瞎试（如 Wireshark 的 Display Filter Reference）</li>
+</ul>
+<h3 id="5-下周计划（示例）"><a href="#5-下周计划（示例）" class="headerlink" title="5) 下周计划（示例）"></a>5) 下周计划（示例）</h3><ol>
+<li>学习 Linux 文件权限（755&#x2F;644）和 sudo 配置</li>
+<li>继续深入 PowerShell 脚本自动化（日志分析、CSV 导出）</li>
+<li>搭建一个本地 Windows 测试环境练习事件日志分析</li>
+</ol>
+<p><strong>本周学习耗时</strong>：约 8 小时</p>
+<p><strong>掌握程度自评</strong>：</p>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 😃 完成了所有任务并理解原理</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Tigercoll 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+              <a href="/tags/%E5%AE%89%E5%85%A8/" rel="tag"># 安全</a>
+              <a href="/tags/%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" rel="tag"># 学习计划</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/4138cc96.html" rel="prev" title="Day013：安全协议与加密 - 加密应用与场景">
+                  <i class="fa fa-chevron-left"></i> Day013：安全协议与加密 - 加密应用与场景
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/3ca7da61.html" rel="next" title="Day015：操作系统与脚本 - Linux 安全基础">
+                  Day015：操作系统与脚本 - Linux 安全基础 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true,"react":{"opacity":0.7}}});</script></body>
+</html>

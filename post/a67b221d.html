@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-center-simple.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Day025：漏洞扫描与基线 - Web 中间件暴露面与加固 日期：2026-01-18 周次：第4周  学习目标今天你将掌握：  识别常见中间件的默认配置风险：Nginx&#x2F;Apache&#x2F;IIS 的目录列出、版本信息泄露、默认配置弱点 能给出基础加固建议：关闭目录列出、隐藏版本号、限制 HTTP 方法、配置安全响应头 能独立修改中间件配置：在合法靶场环境或测试环境中验证加固效果">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day025：漏洞扫描与基线 - Web 中间件暴露面与加固">
+<meta property="og:url" content="https://tigercoll.top/post/a67b221d.html">
+<meta property="og:site_name" content="Tigercoll&#39;s Blog">
+<meta property="og:description" content="Day025：漏洞扫描与基线 - Web 中间件暴露面与加固 日期：2026-01-18 周次：第4周  学习目标今天你将掌握：  识别常见中间件的默认配置风险：Nginx&#x2F;Apache&#x2F;IIS 的目录列出、版本信息泄露、默认配置弱点 能给出基础加固建议：关闭目录列出、隐藏版本号、限制 HTTP 方法、配置安全响应头 能独立修改中间件配置：在合法靶场环境或测试环境中验证加固效果">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-01-17T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-17T16:00:00.000Z">
+<meta property="article:author" content="Tigercoll">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="学习计划">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://tigercoll.top/post/a67b221d.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/a67b221d.html","path":"post/a67b221d.html","title":"Day025：漏洞扫描与基线 - Web 中间件暴露面与加固"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day025：漏洞扫描与基线 - Web 中间件暴露面与加固 | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Day025%EF%BC%9A%E6%BC%8F%E6%B4%9E%E6%89%AB%E6%8F%8F%E4%B8%8E%E5%9F%BA%E7%BA%BF-Web-%E4%B8%AD%E9%97%B4%E4%BB%B6%E6%9A%B4%E9%9C%B2%E9%9D%A2%E4%B8%8E%E5%8A%A0%E5%9B%BA"><span class="nav-number">1.</span> <span class="nav-text">Day025：漏洞扫描与基线 - Web 中间件暴露面与加固</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E7%9B%AE%E6%A0%87"><span class="nav-number">1.1.</span> <span class="nav-text">学习目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E5%86%85%E5%AE%B9"><span class="nav-number">1.2.</span> <span class="nav-text">学习内容</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-Web-%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%B8%B8%E8%A7%81%E6%9A%B4%E9%9C%B2%E9%9D%A2"><span class="nav-number">1.2.1.</span> <span class="nav-text">1️⃣ Web 中间件常见暴露面</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-%E7%9B%AE%E5%BD%95%E5%88%97%E5%87%BA%EF%BC%88Directory-Listing%EF%BC%89"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">1.1 目录列出（Directory Listing）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-%E7%89%88%E6%9C%AC%E4%BF%A1%E6%81%AF%E6%B3%84%E9%9C%B2%EF%BC%88Version-Disclosure%EF%BC%89"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">1.2 版本信息泄露（Version Disclosure）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-3-HTTP-%E6%96%B9%E6%B3%95%E9%99%90%E5%88%B6%EF%BC%88HTTP-Method-Restrictions%EF%BC%89"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">1.3 HTTP 方法限制（HTTP Method Restrictions）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-4-%E5%AE%89%E5%85%A8%E5%93%8D%E5%BA%94%E5%A4%B4%EF%BC%88Security-Response-Headers%EF%BC%89"><span class="nav-number">1.2.1.4.</span> <span class="nav-text">1.4 安全响应头（Security Response Headers）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-5-%E6%97%A5%E5%BF%97%E9%85%8D%E7%BD%AE%EF%BC%88Logging%EF%BC%89"><span class="nav-number">1.2.1.5.</span> <span class="nav-text">1.5 日志配置（Logging）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-%E5%90%84%E4%B8%AD%E9%97%B4%E4%BB%B6%E5%9F%BA%E7%A1%80%E5%8A%A0%E5%9B%BA%E9%85%8D%E7%BD%AE"><span class="nav-number">1.2.2.</span> <span class="nav-text">2️⃣ 各中间件基础加固配置</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-Nginx-%E5%AE%8C%E6%95%B4%E5%AE%89%E5%85%A8%E9%85%8D%E7%BD%AE%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">2.1 Nginx 完整安全配置示例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-Apache-%E5%AE%8C%E6%95%B4%E5%AE%89%E5%85%A8%E9%85%8D%E7%BD%AE%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">2.2 Apache 完整安全配置示例</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-3-IIS-%E5%AE%8C%E6%95%B4%E5%AE%89%E5%85%A8%E9%85%8D%E7%BD%AE%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">2.3 IIS 完整安全配置示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%EF%B8%8F%E2%83%A3-%E9%AA%8C%E8%AF%81%E5%8A%A0%E5%9B%BA%E6%95%88%E6%9E%9C"><span class="nav-number">1.2.3.</span> <span class="nav-text">3️⃣ 验证加固效果</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-%E4%BD%BF%E7%94%A8-curl-%E6%A3%80%E6%9F%A5%E5%93%8D%E5%BA%94%E5%A4%B4"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">3.1 使用 curl 检查响应头</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-%E6%B5%8B%E8%AF%95%E7%9B%AE%E5%BD%95%E5%88%97%E5%87%BA"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">3.2 测试目录列出</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-%E6%B5%8B%E8%AF%95-HTTP-%E6%96%B9%E6%B3%95%E9%99%90%E5%88%B6"><span class="nav-number">1.2.3.3.</span> <span class="nav-text">3.3 测试 HTTP 方法限制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-4-%E4%BD%BF%E7%94%A8%E6%B5%8F%E8%A7%88%E5%99%A8%E5%BC%80%E5%8F%91%E8%80%85%E5%B7%A5%E5%85%B7"><span class="nav-number">1.2.3.4.</span> <span class="nav-text">3.4 使用浏览器开发者工具</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E8%B7%B5%E4%BB%BB%E5%8A%A1%EF%BC%88%E5%90%88%E6%B3%95%E6%8E%88%E6%9D%83%E8%8C%83%E5%9B%B4%E5%86%85%EF%BC%89"><span class="nav-number">1.3.</span> <span class="nav-text">实践任务（合法授权范围内）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-1%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89%EF%BC%9A%E6%A3%80%E6%9F%A5%E5%BD%93%E5%89%8D%E9%85%8D%E7%BD%AE%E7%9A%84%E6%9A%B4%E9%9C%B2%E9%9D%A2"><span class="nav-number">1.3.1.</span> <span class="nav-text">任务 1（必做）：检查当前配置的暴露面</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-2%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89%EF%BC%9A%E9%85%8D%E7%BD%AE-Nginx-%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA"><span class="nav-number">1.3.2.</span> <span class="nav-text">任务 2（必做）：配置 Nginx 安全加固</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-3%EF%BC%88%E8%BF%9B%E9%98%B6%EF%BC%89%EF%BC%9A%E9%85%8D%E7%BD%AE-Apache-%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA"><span class="nav-number">1.3.3.</span> <span class="nav-text">任务 3（进阶）：配置 Apache 安全加固</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-4%EF%BC%88%E8%BF%9B%E9%98%B6%EF%BC%89%EF%BC%9AIIS-%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA"><span class="nav-number">1.3.4.</span> <span class="nav-text">任务 4（进阶）：IIS 安全加固</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-5%EF%BC%88%E5%AE%9E%E6%88%98%EF%BC%89%EF%BC%9A%E8%87%AA%E5%8A%A8%E5%8C%96%E5%9F%BA%E7%BA%BF%E6%A3%80%E6%9F%A5%E8%84%9A%E6%9C%AC"><span class="nav-number">1.3.5.</span> <span class="nav-text">任务 5（实战）：自动化基线检查脚本</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A9%E5%9B%BA%E7%BB%83%E4%B9%A0%EF%BC%88%E9%A2%98%E4%B8%8E%E5%A4%8D%E7%9B%98%EF%BC%89"><span class="nav-number">1.4.</span> <span class="nav-text">巩固练习（题与复盘）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-1%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BB%BA%E8%AE%AE%E9%9A%90%E8%97%8F%E7%89%88%E6%9C%AC%E4%BF%A1%E6%81%AF%EF%BC%9F"><span class="nav-number">1.4.1.</span> <span class="nav-text">练习 1：为什么建议隐藏版本信息？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-2%EF%BC%9AX-Frame-Options-%E5%A4%B4%E7%9A%84%E4%B8%89%E7%A7%8D%E5%80%BC%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="nav-number">1.4.2.</span> <span class="nav-text">练习 2：X-Frame-Options 头的三种值有什么区别？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-3%EF%BC%9A%E9%85%8D%E7%BD%AE-Content-Security-Policy%EF%BC%88CSP%EF%BC%89"><span class="nav-number">1.4.3.</span> <span class="nav-text">练习 3：配置 Content-Security-Policy（CSP）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-4%EF%BC%9AHTTP-%E7%8A%B6%E6%80%81%E7%A0%81%E4%B8%8E%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA"><span class="nav-number">1.4.4.</span> <span class="nav-text">练习 4：HTTP 状态码与安全加固</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E6%A0%87%E5%87%86%EF%BC%88%E8%BE%BE%E6%88%90%E5%88%A4%E5%AE%9A%EF%BC%89"><span class="nav-number">1.5.</span> <span class="nav-text">评估标准（达成判定）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A9%E5%9B%BA%E7%BB%83%E4%B9%A0%EF%BC%88%E9%A2%98%E4%B8%8E%E5%A4%8D%E7%9B%98%EF%BC%89-1"><span class="nav-number">1.6.</span> <span class="nav-text">巩固练习（题与复盘）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E6%A0%87%E5%87%86%EF%BC%88%E8%BE%BE%E6%88%90%E5%88%A4%E5%AE%9A%EF%BC%89-1"><span class="nav-number">1.7.</span> <span class="nav-text">评估标准（达成判定）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E8%BE%BE%E6%88%90%E6%83%85%E5%86%B5%EF%BC%88%E7%94%B1%E5%AD%A6%E4%B9%A0%E8%80%85%E5%A1%AB%E5%86%99%EF%BC%89"><span class="nav-number">1.8.</span> <span class="nav-text">学习成果达成情况（由学习者填写）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%AA%E5%9B%BE%E4%B8%8E%E8%AF%81%E6%8D%AE"><span class="nav-number">1.8.1.</span> <span class="nav-text">截图与证据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%91%BD%E4%BB%A4%E4%B8%8E%E8%BE%93%E5%87%BA%EF%BC%88%E7%B2%98%E8%B4%B4%E5%85%B3%E9%94%AE%E7%89%87%E6%AE%B5%EF%BC%89"><span class="nav-number">1.8.2.</span> <span class="nav-text">关键命令与输出（粘贴关键片段）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E4%B8%8E%E5%8F%8D%E6%80%9D"><span class="nav-number">1.8.3.</span> <span class="nav-text">结论与反思</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E4%B8%AD%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%88%E5%90%AB%E6%80%9D%E8%B7%AF%EF%BC%89"><span class="nav-number">1.9.</span> <span class="nav-text">集中参考答案（含思路）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-1-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E5%BB%BA%E8%AE%AE%E9%9A%90%E8%97%8F%E7%89%88%E6%9C%AC%E4%BF%A1%E6%81%AF%EF%BC%9F"><span class="nav-number">1.9.1.</span> <span class="nav-text">练习 1 参考答案：为什么建议隐藏版本信息？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-2-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%9AX-Frame-Options-%E5%A4%B4%E7%9A%84%E4%B8%89%E7%A7%8D%E5%80%BC%E6%9C%89%E4%BB%80%E4%B9%88%E5%8C%BA%E5%88%AB%EF%BC%9F"><span class="nav-number">1.9.2.</span> <span class="nav-text">练习 2 参考答案：X-Frame-Options 头的三种值有什么区别？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-3-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%9A%E9%85%8D%E7%BD%AE-Content-Security-Policy%EF%BC%88CSP%EF%BC%89"><span class="nav-number">1.9.3.</span> <span class="nav-text">练习 3 参考答案：配置 Content-Security-Policy（CSP）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-4-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%9AHTTP-%E7%8A%B6%E6%80%81%E7%A0%81%E4%B8%8E%E5%AE%89%E5%85%A8%E5%8A%A0%E5%9B%BA"><span class="nav-number">1.9.4.</span> <span class="nav-text">练习 4 参考答案：HTTP 状态码与安全加固</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E7%A4%BA%E4%BE%8B%E5%A1%AB%E5%86%99%EF%BC%88%E5%8F%AF%E7%85%A7%E6%8A%84%EF%BC%89"><span class="nav-number">1.10.</span> <span class="nav-text">学习成果示例填写（可照抄）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%AA%E5%9B%BE%E4%B8%8E%E8%AF%81%E6%8D%AE%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.10.1.</span> <span class="nav-text">截图与证据（示例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%91%BD%E4%BB%A4%E4%B8%8E%E8%BE%93%E5%87%BA%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.10.2.</span> <span class="nav-text">关键命令与输出（示例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E4%B8%8E%E5%8F%8D%E6%80%9D%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.10.3.</span> <span class="nav-text">结论与反思（示例）</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">75</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Tigercoll" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/a67b221d.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day025：漏洞扫描与基线 - Web 中间件暴露面与加固 | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day025：漏洞扫描与基线 - Web 中间件暴露面与加固
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-01-18 00:00:00" itemprop="dateCreated datePublished" datetime="2026-01-18T00:00:00+08:00">2026-01-18</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Day025：漏洞扫描与基线-Web-中间件暴露面与加固"><a href="#Day025：漏洞扫描与基线-Web-中间件暴露面与加固" class="headerlink" title="Day025：漏洞扫描与基线 - Web 中间件暴露面与加固"></a>Day025：漏洞扫描与基线 - Web 中间件暴露面与加固</h1><ul>
+<li>日期：2026-01-18</li>
+<li>周次：第4周</li>
+</ul>
+<h2 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h2><p>今天你将掌握：</p>
+<ul>
+<li><strong>识别常见中间件的默认配置风险</strong>：Nginx&#x2F;Apache&#x2F;IIS 的目录列出、版本信息泄露、默认配置弱点</li>
+<li><strong>能给出基础加固建议</strong>：关闭目录列出、隐藏版本号、限制 HTTP 方法、配置安全响应头</li>
+<li><strong>能独立修改中间件配置</strong>：在合法靶场环境或测试环境中验证加固效果</li>
+<li><strong>理解常见 Web 漏洞与配置的关系</strong>：如敏感信息泄露、路径遍历、未授权访问</li>
+</ul>
+<hr>
+<span id="more"></span>
+
+<h2 id="学习内容"><a href="#学习内容" class="headerlink" title="学习内容"></a>学习内容</h2><h3 id="1️⃣-Web-中间件常见暴露面"><a href="#1️⃣-Web-中间件常见暴露面" class="headerlink" title="1️⃣ Web 中间件常见暴露面"></a>1️⃣ Web 中间件常见暴露面</h3><h4 id="1-1-目录列出（Directory-Listing）"><a href="#1-1-目录列出（Directory-Listing）" class="headerlink" title="1.1 目录列出（Directory Listing）"></a>1.1 目录列出（Directory Listing）</h4><p><strong>风险说明</strong>：</p>
+<p>当目录列出功能开启时，攻击者可以直接浏览网站目录结构，可能发现：</p>
+<ul>
+<li>备份文件（<code>.bak</code>、<code>.sql</code>、<code>.zip</code>）</li>
+<li>配置文件（<code>config.php</code>、<code>database.yml</code>）</li>
+<li>敏感目录（<code>admin</code>、<code>uploads</code>、<code>logs</code>）</li>
+<li>源代码文件</li>
+</ul>
+<p><strong>各中间件配置对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>中间件</th>
+<th>默认行为</th>
+<th>配置文件</th>
+<th>关闭命令</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Nginx</strong></td>
+<td>默认关闭</td>
+<td><code>nginx.conf</code> &#x2F; 站点配置</td>
+<td><code>autoindex off;</code></td>
+</tr>
+<tr>
+<td><strong>Apache</strong></td>
+<td>默认开启</td>
+<td><code>httpd.conf</code> &#x2F; <code>.htaccess</code></td>
+<td><code>Options -Indexes</code></td>
+</tr>
+<tr>
+<td><strong>IIS</strong></td>
+<td>需手动开启</td>
+<td><code>web.config</code> &#x2F; IIS 管理器</td>
+<td><code>&lt;directoryBrowse enabled=&quot;false&quot; /&gt;</code></td>
+</tr>
+</tbody></table>
+<p><strong>实际危害案例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">http://example.com/uploads/</span><br><span class="line">├── backup_202501.zip        # 完整网站备份</span><br><span class="line">├── database_dump.sql         # 数据库导出文件</span><br><span class="line">└── old_files/                # 旧版本源代码</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="1-2-版本信息泄露（Version-Disclosure）"><a href="#1-2-版本信息泄露（Version-Disclosure）" class="headerlink" title="1.2 版本信息泄露（Version Disclosure）"></a>1.2 版本信息泄露（Version Disclosure）</h4><p><strong>风险说明</strong>：</p>
+<p>暴露中间件版本号可以帮助攻击者：</p>
+<ul>
+<li>搜索已知 CVE 漏洞</li>
+<li>定制特定版本的攻击 payload</li>
+<li>评估目标系统维护状况</li>
+</ul>
+<p><strong>检测方法</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 使用 curl 查看响应头</span></span><br><span class="line">curl -I http://example.com</span><br><span class="line"></span><br><span class="line"><span class="comment"># 典型暴露示例（不安全）</span></span><br><span class="line">Server: nginx/1.18.0</span><br><span class="line">Server: Apache/2.4.41 (Ubuntu)</span><br><span class="line">X-Powered-By: PHP/8.1.2</span><br></pre></td></tr></table></figure>
+
+<p><strong>各中间件隐藏版本配置</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>中间件</th>
+<th>配置项</th>
+<th>配置示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Nginx</strong></td>
+<td><code>server_tokens</code></td>
+<td><code>server_tokens off;</code></td>
+</tr>
+<tr>
+<td><strong>Apache</strong></td>
+<td><code>ServerTokens</code></td>
+<td><code>ServerTokens Prod</code></td>
+</tr>
+<tr>
+<td><strong>Apache</strong></td>
+<td><code>ServerSignature</code></td>
+<td><code>ServerSignature Off</code></td>
+</tr>
+<tr>
+<td><strong>IIS</strong></td>
+<td>自定义响应头</td>
+<td><code>Remove-WebManagedHandler</code> &#x2F; 修改 URL Rewrite</td>
+</tr>
+</tbody></table>
+<p><strong>Nginx 隐藏版本示例</strong>：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># nginx.conf http 区块</span></span><br><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="attribute">server_tokens</span> <span class="literal">off</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 额外：隐藏 X-Powered-By 头</span></span><br><span class="line">    <span class="attribute">proxy_hide_header</span> X-Powered-By;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="1-3-HTTP-方法限制（HTTP-Method-Restrictions）"><a href="#1-3-HTTP-方法限制（HTTP-Method-Restrictions）" class="headerlink" title="1.3 HTTP 方法限制（HTTP Method Restrictions）"></a>1.3 HTTP 方法限制（HTTP Method Restrictions）</h4><p><strong>常见 HTTP 方法与风险</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>方法</th>
+<th>用途</th>
+<th>公开访问风险</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>GET</strong></td>
+<td>获取资源</td>
+<td>✅ 允许</td>
+</tr>
+<tr>
+<td><strong>POST</strong></td>
+<td>提交数据</td>
+<td>✅ 允许</td>
+</tr>
+<tr>
+<td><strong>HEAD</strong></td>
+<td>获取响应头</td>
+<td>⚠️ 信息泄露</td>
+</tr>
+<tr>
+<td><strong>OPTIONS</strong></td>
+<td>查询可用方法</td>
+<td>⚠️ 暴露服务端能力</td>
+</tr>
+<tr>
+<td><strong>PUT&#x2F;DELETE</strong></td>
+<td>上传&#x2F;删除文件</td>
+<td>🚨 文件操作漏洞</td>
+</tr>
+<tr>
+<td><strong>TRACE</strong></td>
+<td>回显请求（用于调试）</td>
+<td>🚨 跨站追踪攻击（XST）</td>
+</tr>
+<tr>
+<td><strong>PATCH</strong></td>
+<td>部分更新资源</td>
+<td>⚠️ 需要认证</td>
+</tr>
+</tbody></table>
+<p><strong>配置限制方法</strong>：</p>
+<p><strong>Nginx</strong>：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">    <span class="comment"># 只允许 GET POST HEAD</span></span><br><span class="line">    <span class="attribute">if</span> (<span class="variable">$request_method</span> !<span class="regexp">~ ^(GET|POST|HEAD)$</span> ) &#123;</span><br><span class="line">        <span class="attribute">return</span> <span class="number">405</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 禁止 TRACE</span></span><br><span class="line">    <span class="attribute">if</span> (<span class="variable">$request_method</span> = TRACE ) &#123;</span><br><span class="line">        <span class="attribute">return</span> <span class="number">403</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Apache</strong>：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 禁止 TRACE 和 TRACK</span></span><br><span class="line"><span class="attribute">TraceEnable</span> <span class="literal">Off</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 限制允许的方法</span></span><br><span class="line"><span class="section">&lt;LimitExcept GET POST HEAD&gt;</span></span><br><span class="line">    <span class="attribute">Require</span> <span class="literal">all</span> denied</span><br><span class="line"><span class="section">&lt;/LimitExcept&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>IIS</strong>：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">system.webServer</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">handlers</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">remove</span> <span class="attr">name</span>=<span class="string">&quot;TRACEVerbHandler&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">remove</span> <span class="attr">name</span>=<span class="string">&quot;OPTIONSVerbHandler&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">handlers</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">system.webServer</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="1-4-安全响应头（Security-Response-Headers）"><a href="#1-4-安全响应头（Security-Response-Headers）" class="headerlink" title="1.4 安全响应头（Security Response Headers）"></a>1.4 安全响应头（Security Response Headers）</h4><p><strong>核心安全头部清单</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>头部</th>
+<th>作用</th>
+<th>推荐值</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>X-Frame-Options</strong></td>
+<td>防止点击劫持</td>
+<td><code>DENY</code> 或 <code>SAMEORIGIN</code></td>
+</tr>
+<tr>
+<td><strong>X-Content-Type-Options</strong></td>
+<td>防止 MIME 嗅探</td>
+<td><code>nosniff</code></td>
+</tr>
+<tr>
+<td><strong>X-XSS-Protection</strong></td>
+<td>XSS 过滤器（旧版浏览器）</td>
+<td><code>1; mode=block</code></td>
+</tr>
+<tr>
+<td><strong>Content-Security-Policy</strong></td>
+<td>内容安全策略</td>
+<td>自定义白名单</td>
+</tr>
+<tr>
+<td><strong>Strict-Transport-Security</strong></td>
+<td>强制 HTTPS</td>
+<td><code>max-age=31536000</code></td>
+</tr>
+<tr>
+<td><strong>Referrer-Policy</strong></td>
+<td>控制 Referer 信息</td>
+<td><code>strict-origin-when-cross-origin</code></td>
+</tr>
+</tbody></table>
+<p><strong>配置示例</strong>：</p>
+<p><strong>Nginx</strong>：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">add_header</span> X-Frame-Options <span class="string">&quot;SAMEORIGIN&quot;</span> always;</span><br><span class="line"><span class="attribute">add_header</span> X-Content-Type-Options <span class="string">&quot;nosniff&quot;</span> always;</span><br><span class="line"><span class="attribute">add_header</span> X-XSS-Protection <span class="string">&quot;1; mode=block&quot;</span> always;</span><br><span class="line"><span class="attribute">add_header</span> Referrer-Policy <span class="string">&quot;strict-origin-when-cross-origin&quot;</span> always;</span><br><span class="line"><span class="attribute">add_header</span> Content-Security-Policy <span class="string">&quot;default-src &#x27;self&#x27;; script-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;;&quot;</span> always;</span><br></pre></td></tr></table></figure>
+
+<p><strong>Apache</strong>：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">&lt;IfModule mod_headers.c&gt;</span></span><br><span class="line">    <span class="attribute">Header</span> always set X-Frame-Options <span class="string">&quot;SAMEORIGIN&quot;</span></span><br><span class="line">    <span class="attribute">Header</span> always set X-Content-Type-Options <span class="string">&quot;nosniff&quot;</span></span><br><span class="line">    <span class="attribute">Header</span> always set X-XSS-Protection <span class="string">&quot;1; mode=block&quot;</span></span><br><span class="line">    <span class="attribute">Header</span> always set Referrer-Policy <span class="string">&quot;strict-origin-when-cross-origin&quot;</span></span><br><span class="line"><span class="section">&lt;/IfModule&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="1-5-日志配置（Logging）"><a href="#1-5-日志配置（Logging）" class="headerlink" title="1.5 日志配置（Logging）"></a>1.5 日志配置（Logging）</h4><p><strong>日志类型与用途</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>日志类型</th>
+<th>记录内容</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>访问日志</strong></td>
+<td>请求时间、IP、URL、状态码</td>
+<td>流量分析、异常检测</td>
+</tr>
+<tr>
+<td><strong>错误日志</strong></td>
+<td>错误详情、堆栈跟踪</td>
+<td>故障排查、攻击识别</td>
+</tr>
+<tr>
+<td><strong>安全日志</strong></td>
+<td>认证失败、拒绝访问</td>
+<td>安全事件溯源</td>
+</tr>
+</tbody></table>
+<p><strong>Nginx 日志配置</strong>：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="comment"># 自定义访问日志格式（包含更多安全相关信息）</span></span><br><span class="line">    <span class="attribute">log_format</span> security <span class="string">&#x27;<span class="variable">$remote_addr</span> - <span class="variable">$remote_user</span> [<span class="variable">$time_local</span>] &#x27;</span></span><br><span class="line">                       <span class="string">&#x27;&quot;<span class="variable">$request</span>&quot; <span class="variable">$status</span> <span class="variable">$body_bytes_sent</span> &#x27;</span></span><br><span class="line">                       <span class="string">&#x27;&quot;<span class="variable">$http_referer</span>&quot; &quot;<span class="variable">$http_user_agent</span>&quot; &#x27;</span></span><br><span class="line">                       <span class="string">&#x27;<span class="variable">$request_time</span> <span class="variable">$upstream_response_time</span>&#x27;</span>;</span><br><span class="line"></span><br><span class="line">    <span class="attribute">access_log</span> /var/log/nginx/access.log security;</span><br><span class="line">    <span class="attribute">error_log</span> /var/log/nginx/<span class="literal">error</span>.log <span class="literal">warn</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2️⃣-各中间件基础加固配置"><a href="#2️⃣-各中间件基础加固配置" class="headerlink" title="2️⃣ 各中间件基础加固配置"></a>2️⃣ 各中间件基础加固配置</h3><h4 id="2-1-Nginx-完整安全配置示例"><a href="#2-1-Nginx-完整安全配置示例" class="headerlink" title="2.1 Nginx 完整安全配置示例"></a>2.1 Nginx 完整安全配置示例</h4><figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># /etc/nginx/nginx.conf 安全配置</span></span><br><span class="line"><span class="attribute">user</span> www-data;</span><br><span class="line"><span class="attribute">worker_processes</span> auto;</span><br><span class="line"><span class="attribute">pid</span> /run/nginx.pid;</span><br><span class="line"></span><br><span class="line"><span class="section">events</span> &#123;</span><br><span class="line">    <span class="attribute">worker_connections</span> <span class="number">1024</span>;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="comment"># 1. 隐藏版本号</span></span><br><span class="line">    <span class="attribute">server_tokens</span> <span class="literal">off</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 2. 客户端请求体大小限制（防止大文件上传攻击）</span></span><br><span class="line">    <span class="attribute">client_max_body_size</span> <span class="number">10M</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 3. 超时设置</span></span><br><span class="line">    <span class="attribute">client_body_timeout</span> <span class="number">12</span>;</span><br><span class="line">    <span class="attribute">client_header_timeout</span> <span class="number">12</span>;</span><br><span class="line">    <span class="attribute">keepalive_timeout</span> <span class="number">15</span>;</span><br><span class="line">    <span class="attribute">send_timeout</span> <span class="number">10</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 4. 安全响应头</span></span><br><span class="line">    <span class="attribute">add_header</span> X-Frame-Options <span class="string">&quot;SAMEORIGIN&quot;</span> always;</span><br><span class="line">    <span class="attribute">add_header</span> X-Content-Type-Options <span class="string">&quot;nosniff&quot;</span> always;</span><br><span class="line">    <span class="attribute">add_header</span> X-XSS-Protection <span class="string">&quot;1; mode=block&quot;</span> always;</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 5. 日志配置</span></span><br><span class="line">    <span class="attribute">log_format</span> security <span class="string">&#x27;<span class="variable">$remote_addr</span> - <span class="variable">$remote_user</span> [<span class="variable">$time_local</span>] &#x27;</span></span><br><span class="line">                       <span class="string">&#x27;&quot;<span class="variable">$request</span>&quot; <span class="variable">$status</span> <span class="variable">$body_bytes_sent</span> &#x27;</span></span><br><span class="line">                       <span class="string">&#x27;&quot;<span class="variable">$http_referer</span>&quot; &quot;<span class="variable">$http_user_agent</span>&quot;&#x27;</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="attribute">access_log</span> /var/log/nginx/access.log security;</span><br><span class="line">    <span class="attribute">error_log</span> /var/log/nginx/<span class="literal">error</span>.log <span class="literal">warn</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 6. 禁止不安全的 HTTP 方法</span></span><br><span class="line">    <span class="attribute">if</span> (<span class="variable">$request_method</span> !<span class="regexp">~ ^(GET|POST|HEAD)$</span> ) &#123;</span><br><span class="line">        <span class="attribute">return</span> <span class="number">405</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 7. 限制请求速率（防止 DDoS）</span></span><br><span class="line">    <span class="attribute">limit_req_zone</span> <span class="variable">$binary_remote_addr</span> zone=one:<span class="number">10m</span> rate=10r/s;</span><br><span class="line">    </span><br><span class="line">    <span class="section">server</span> &#123;</span><br><span class="line">        <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">        <span class="attribute">server_name</span> example.com;</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 关闭目录列出</span></span><br><span class="line">        <span class="attribute">autoindex</span> <span class="literal">off</span>;</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 限制请求速率</span></span><br><span class="line">        <span class="attribute">limit_req</span> zone=one burst=<span class="number">20</span> nodelay;</span><br><span class="line">        </span><br><span class="line">        <span class="attribute">root</span> /var/www/html;</span><br><span class="line">        <span class="attribute">index</span> index.html index.php;</span><br><span class="line">        </span><br><span class="line">        <span class="section">location</span> <span class="regexp">~ /\.</span> &#123;</span><br><span class="line">            <span class="attribute">deny</span> all;  <span class="comment"># 隐藏隐藏文件</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="2-2-Apache-完整安全配置示例"><a href="#2-2-Apache-完整安全配置示例" class="headerlink" title="2.2 Apache 完整安全配置示例"></a>2.2 Apache 完整安全配置示例</h4><figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># /etc/apache2/apache2.conf 安全配置</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 1. 隐藏版本信息</span></span><br><span class="line"><span class="attribute">ServerTokens</span> Prod</span><br><span class="line"><span class="attribute">ServerSignature</span> <span class="literal">Off</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 禁用 TRACE 方法</span></span><br><span class="line"><span class="attribute">TraceEnable</span> <span class="literal">Off</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 关闭目录列出</span></span><br><span class="line"><span class="section">&lt;Directory /var/www/html&gt;</span></span><br><span class="line">    <span class="attribute">Options</span> -Indexes +FollowSymLinks</span><br><span class="line">    <span class="attribute">AllowOverride</span> None</span><br><span class="line">    <span class="attribute">Require</span> <span class="literal">all</span> granted</span><br><span class="line"><span class="section">&lt;/Directory&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 4. 限制请求大小（防止 DoS）</span></span><br><span class="line"><span class="attribute">LimitRequestBody</span> <span class="number">10485760</span></span><br><span class="line"><span class="attribute">LimitRequestFields</span> <span class="number">100</span></span><br><span class="line"><span class="attribute">LimitRequestFieldSize</span> <span class="number">8190</span></span><br><span class="line"><span class="attribute">LimitRequestLine</span> <span class="number">8190</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 5. 请求超时</span></span><br><span class="line"><span class="attribute">RequestReadTimeout</span> header=<span class="number">20</span>-<span class="number">40</span>,MinRate=<span class="number">500</span> body=<span class="number">20</span>,MinRate=<span class="number">500</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 6. 安全响应头</span></span><br><span class="line"><span class="section">&lt;IfModule mod_headers.c&gt;</span></span><br><span class="line">    <span class="attribute">Header</span> always set X-Frame-Options <span class="string">&quot;SAMEORIGIN&quot;</span></span><br><span class="line">    <span class="attribute">Header</span> always set X-Content-Type-Options <span class="string">&quot;nosniff&quot;</span></span><br><span class="line">    <span class="attribute">Header</span> always set X-XSS-Protection <span class="string">&quot;1; mode=block&quot;</span></span><br><span class="line"><span class="section">&lt;/IfModule&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 7. 日志配置</span></span><br><span class="line"><span class="attribute">LogFormat</span> <span class="string">&quot;%h %l %u %t \&quot;%r\&quot; %&gt;s %b \&quot;%&#123;Referer&#125;i\&quot; \&quot;%&#123;User-Agent&#125;i\&quot;&quot;</span> combined</span><br><span class="line"><span class="attribute">CustomLog</span> <span class="variable">$&#123;APACHE_LOG_DIR&#125;</span>/access.log combined</span><br><span class="line"><span class="attribute">ErrorLog</span> <span class="variable">$&#123;APACHE_LOG_DIR&#125;</span>/error.log</span><br><span class="line"></span><br><span class="line"><span class="comment"># 8. 防止点击劫持</span></span><br><span class="line"><span class="section">&lt;IfModule mod_rewrite.c&gt;</span></span><br><span class="line">    <span class="attribute">RewriteEngine</span> <span class="literal">On</span></span><br><span class="line">    <span class="attribute">RewriteCond</span> <span class="variable">%&#123;HTTP_REFERER&#125;</span> !^$</span><br><span class="line">    <span class="attribute">RewriteCond</span> <span class="variable">%&#123;HTTP_REFERER&#125;</span> !^https?://yourdomain\.com<span class="meta"> [NC]</span></span><br><span class="line">    <span class="attribute">RewriteRule</span> .* -<span class="meta"> [F]</span></span><br><span class="line"><span class="section">&lt;/IfModule&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="2-3-IIS-完整安全配置示例"><a href="#2-3-IIS-完整安全配置示例" class="headerlink" title="2.3 IIS 完整安全配置示例"></a>2.3 IIS 完整安全配置示例</h4><p><strong>web.config 文件配置</strong>：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;UTF-8&quot;</span>?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">system.webServer</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 1. 关闭目录浏览 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">directoryBrowse</span> <span class="attr">enabled</span>=<span class="string">&quot;false&quot;</span> /&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">&lt;!-- 2. 禁用不安全的 HTTP 方法 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">handlers</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">remove</span> <span class="attr">name</span>=<span class="string">&quot;TRACEVerbHandler&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">remove</span> <span class="attr">name</span>=<span class="string">&quot;OPTIONSVerbHandler&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">handlers</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">&lt;!-- 3. 请求过滤 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">security</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">requestFiltering</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 限制最大请求内容长度 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">requestLimits</span> <span class="attr">maxAllowedContentLength</span>=<span class="string">&quot;10485760&quot;</span> /&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 限制 URL 最大长度 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">requestLimits</span> <span class="attr">maxUrl</span>=<span class="string">&quot;4096&quot;</span> <span class="attr">maxQueryString</span>=<span class="string">&quot;2048&quot;</span> /&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 阻止特定文件扩展名 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">fileExtensions</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">add</span> <span class="attr">fileExtension</span>=<span class="string">&quot;.bak&quot;</span> <span class="attr">allowed</span>=<span class="string">&quot;false&quot;</span> /&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">add</span> <span class="attr">fileExtension</span>=<span class="string">&quot;.log&quot;</span> <span class="attr">allowed</span>=<span class="string">&quot;false&quot;</span> /&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">add</span> <span class="attr">fileExtension</span>=<span class="string">&quot;.sql&quot;</span> <span class="attr">allowed</span>=<span class="string">&quot;false&quot;</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">fileExtensions</span>&gt;</span></span><br><span class="line">        <span class="comment">&lt;!-- 阻止特定 URL 序列 --&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">denyUrlSequences</span>&gt;</span></span><br><span class="line">          <span class="tag">&lt;<span class="name">add</span> <span class="attr">sequence</span>=<span class="string">&quot;..&quot;</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="name">denyUrlSequences</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">requestFiltering</span>&gt;</span></span><br><span class="line">      </span><br><span class="line">      <span class="comment">&lt;!-- 4. IP 限制（可选） --&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">ipSecurity</span> <span class="attr">allowUnlisted</span>=<span class="string">&quot;true&quot;</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">clear</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">add</span> <span class="attr">ipAddress</span>=<span class="string">&quot;192.168.1.0&quot;</span> <span class="attr">subnetMask</span>=<span class="string">&quot;255.255.255.0&quot;</span> <span class="attr">allowed</span>=<span class="string">&quot;true&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">ipSecurity</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">security</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">&lt;!-- 5. HTTP 响应头 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">httpProtocol</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">customHeaders</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">add</span> <span class="attr">name</span>=<span class="string">&quot;X-Frame-Options&quot;</span> <span class="attr">value</span>=<span class="string">&quot;SAMEORIGIN&quot;</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">add</span> <span class="attr">name</span>=<span class="string">&quot;X-Content-Type-Options&quot;</span> <span class="attr">value</span>=<span class="string">&quot;nosniff&quot;</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">add</span> <span class="attr">name</span>=<span class="string">&quot;X-XSS-Protection&quot;</span> <span class="attr">value</span>=<span class="string">&quot;1; mode=block&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">customHeaders</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">httpProtocol</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">&lt;!-- 6. 错误页面（隐藏详细错误信息） --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">httpErrors</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">remove</span> <span class="attr">statusCode</span>=<span class="string">&quot;500&quot;</span> <span class="attr">subStatusCode</span>=<span class="string">&quot;-1&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">remove</span> <span class="attr">statusCode</span>=<span class="string">&quot;404&quot;</span> <span class="attr">subStatusCode</span>=<span class="string">&quot;-1&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">error</span> <span class="attr">statusCode</span>=<span class="string">&quot;404&quot;</span> <span class="attr">path</span>=<span class="string">&quot;/404.html&quot;</span> <span class="attr">responseMode</span>=<span class="string">&quot;File&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">error</span> <span class="attr">statusCode</span>=<span class="string">&quot;500&quot;</span> <span class="attr">path</span>=<span class="string">&quot;/500.html&quot;</span> <span class="attr">responseMode</span>=<span class="string">&quot;File&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">httpErrors</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">&lt;!-- 7. 日志配置 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">logFile</span> <span class="attr">logExtFileFlags</span>=<span class="string">&quot;Date,Time,ClientIP,UserName,SiteName,ComputerName,ServerIP,Method,UriStem,UriQuery,HttpStatus,Win32Status,BytesSent,BytesRecv,TimeTaken,ServerPort,UserAgent,Cookie,Referer,ProtocolVersion,Host,HttpSubStatus&quot;</span> /&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">system.webServer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="3️⃣-验证加固效果"><a href="#3️⃣-验证加固效果" class="headerlink" title="3️⃣ 验证加固效果"></a>3️⃣ 验证加固效果</h3><h4 id="3-1-使用-curl-检查响应头"><a href="#3-1-使用-curl-检查响应头" class="headerlink" title="3.1 使用 curl 检查响应头"></a>3.1 使用 curl 检查响应头</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 检查 Server 头（应隐藏版本信息）</span></span><br><span class="line">curl -I http://localhost:8080</span><br><span class="line"></span><br><span class="line"><span class="comment"># 预期结果（安全）</span></span><br><span class="line">Server: nginx</span><br><span class="line"></span><br><span class="line"><span class="comment"># 不安全结果</span></span><br><span class="line">Server: nginx/1.18.0 (Ubuntu)</span><br><span class="line"></span><br><span class="line"><span class="comment"># 检查安全响应头</span></span><br><span class="line">curl -I http://localhost:8080 2&gt;&amp;1 | grep -i <span class="string">&quot;x-&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 预期结果</span></span><br><span class="line">X-Frame-Options: SAMEORIGIN</span><br><span class="line">X-Content-Type-Options: nosniff</span><br><span class="line">X-XSS-Protection: 1; mode=block</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-2-测试目录列出"><a href="#3-2-测试目录列出" class="headerlink" title="3.2 测试目录列出"></a>3.2 测试目录列出</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 访问无 index 文件的目录</span></span><br><span class="line">curl http://localhost:8080/uploads/</span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果返回目录列表（不安全）</span></span><br><span class="line">Index of /uploads/</span><br><span class="line">...</span><br><span class="line">backup.zip</span><br><span class="line">config.php</span><br><span class="line"></span><br><span class="line"><span class="comment"># 预期结果（安全）</span></span><br><span class="line">403 Forbidden</span><br><span class="line">或</span><br><span class="line">404 Not Found</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-3-测试-HTTP-方法限制"><a href="#3-3-测试-HTTP-方法限制" class="headerlink" title="3.3 测试 HTTP 方法限制"></a>3.3 测试 HTTP 方法限制</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 测试 PUT 方法（应被拒绝）</span></span><br><span class="line">curl -X PUT http://localhost:8080/test.txt -d <span class="string">&quot;hello&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 预期结果</span></span><br><span class="line">405 Method Not Allowed</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试 TRACE 方法（应被拒绝）</span></span><br><span class="line">curl -X TRACE http://localhost:8080/ -v</span><br><span class="line"></span><br><span class="line"><span class="comment"># 预期结果</span></span><br><span class="line">403 Forbidden</span><br></pre></td></tr></table></figure>
+
+<h4 id="3-4-使用浏览器开发者工具"><a href="#3-4-使用浏览器开发者工具" class="headerlink" title="3.4 使用浏览器开发者工具"></a>3.4 使用浏览器开发者工具</h4><ol>
+<li>打开开发者工具（F12）</li>
+<li>切换到 Network 标签</li>
+<li>刷新页面，点击任意请求</li>
+<li>查看 Response Headers 标签</li>
+<li>确认安全头部已正确添加</li>
+</ol>
+<hr>
+<h2 id="实践任务（合法授权范围内）"><a href="#实践任务（合法授权范围内）" class="headerlink" title="实践任务（合法授权范围内）"></a>实践任务（合法授权范围内）</h2><blockquote>
+<p><strong>注意</strong>：以下任务请在你自己的测试环境、虚拟机或授权靶场中执行。不要在生产环境中随意修改配置。</p>
+</blockquote>
+<hr>
+<h3 id="任务-1（必做）：检查当前配置的暴露面"><a href="#任务-1（必做）：检查当前配置的暴露面" class="headerlink" title="任务 1（必做）：检查当前配置的暴露面"></a>任务 1（必做）：检查当前配置的暴露面</h3><p><strong>目标</strong>：扫描你的测试 Web 服务器，识别默认配置风险。</p>
+<p><strong>步骤</strong>：</p>
+<ol>
+<li><strong>扫描目录列出风险</strong></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Linux/Mac</span></span><br><span class="line">curl http://localhost/uploads/</span><br><span class="line">curl http://localhost/backup/</span><br><span class="line"></span><br><span class="line"><span class="comment"># Windows PowerShell</span></span><br><span class="line">curl http://localhost/uploads/</span><br><span class="line">curl http://localhost/backup/</span><br></pre></td></tr></table></figure>
+
+<p>记录结果：是否存在目录列出？如果存在，有哪些敏感文件可见？</p>
+<ol start="2">
+<li><strong>检查版本信息泄露</strong></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">curl -I http://localhost/</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看响应头中的 Server 和 X-Powered-By</span></span><br></pre></td></tr></table></figure>
+
+<p>记录结果：</p>
+<ul>
+<li>Server 头显示什么信息？</li>
+<li>X-Powered-By 头是否存在？</li>
+</ul>
+<ol start="3">
+<li><strong>测试 HTTP 方法</strong></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 测试 TRACE 方法</span></span><br><span class="line">curl -X TRACE http://localhost/ -v</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试 OPTIONS 方法</span></span><br><span class="line">curl -X OPTIONS http://localhost/ -v</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试 PUT 方法</span></span><br><span class="line">curl -X PUT http://localhost/test.txt -d <span class="string">&quot;hello world&quot;</span> -v</span><br></pre></td></tr></table></figure>
+
+<p>记录结果：</p>
+<ul>
+<li>哪些方法被允许？</li>
+<li>哪些方法应该被禁止？</li>
+</ul>
+<hr>
+<h3 id="任务-2（必做）：配置-Nginx-安全加固"><a href="#任务-2（必做）：配置-Nginx-安全加固" class="headerlink" title="任务 2（必做）：配置 Nginx 安全加固"></a>任务 2（必做）：配置 Nginx 安全加固</h3><p><strong>前置条件</strong>：本地或虚拟机上已安装 Nginx</p>
+<p><strong>步骤 1：备份原始配置</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo <span class="built_in">cp</span> /etc/nginx/nginx.conf /etc/nginx/nginx.conf.backup</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 2：修改配置文件</strong></p>
+<p>编辑 <code>/etc/nginx/nginx.conf</code>，添加以下安全配置：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">http</span> &#123;</span><br><span class="line">    <span class="comment"># 1. 隐藏版本号</span></span><br><span class="line">    <span class="attribute">server_tokens</span> <span class="literal">off</span>;</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 2. 关闭目录列出（在 server 块中）</span></span><br><span class="line">    <span class="comment"># autoindex off;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 3. 禁止不安全的 HTTP 方法</span></span><br><span class="line">    <span class="attribute">if</span> (<span class="variable">$request_method</span> !<span class="regexp">~ ^(GET|POST|HEAD)$</span> ) &#123;</span><br><span class="line">        <span class="attribute">return</span> <span class="number">405</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 4. 添加安全响应头</span></span><br><span class="line">    <span class="attribute">add_header</span> X-Frame-Options <span class="string">&quot;SAMEORIGIN&quot;</span> always;</span><br><span class="line">    <span class="attribute">add_header</span> X-Content-Type-Options <span class="string">&quot;nosniff&quot;</span> always;</span><br><span class="line">    <span class="attribute">add_header</span> X-XSS-Protection <span class="string">&quot;1; mode=block&quot;</span> always;</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># ... 其他配置保持不变</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 3：重启 Nginx</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 测试配置文件语法</span></span><br><span class="line">sudo nginx -t</span><br><span class="line"></span><br><span class="line"><span class="comment"># 重启服务</span></span><br><span class="line">sudo systemctl restart nginx</span><br><span class="line"></span><br><span class="line"><span class="comment"># 或 Windows</span></span><br><span class="line">nginx -s reload</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 4：验证加固效果</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 再次检查 Server 头</span></span><br><span class="line">curl -I http://localhost/</span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 测试禁用的 HTTP 方法</span></span><br><span class="line">curl -X TRACE http://localhost/</span><br><span class="line">curl -X PUT http://localhost/test.txt -d <span class="string">&quot;test&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 使用浏览器开发者工具查看安全响应头</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>对比表</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>检查项</th>
+<th>加固前</th>
+<th>加固后</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Server 头</td>
+<td><code>nginx/1.18.0</code></td>
+<td><code>nginx</code></td>
+<td>✅ 隐藏版本号</td>
+</tr>
+<tr>
+<td>目录列出</td>
+<td>显示文件列表</td>
+<td>403 Forbidden</td>
+<td>✅ 已禁用</td>
+</tr>
+<tr>
+<td>TRACE 方法</td>
+<td>允许</td>
+<td>405 Method Not Allowed</td>
+<td>✅ 已禁止</td>
+</tr>
+<tr>
+<td>PUT 方法</td>
+<td>允许</td>
+<td>405 Method Not Allowed</td>
+<td>✅ 已禁止</td>
+</tr>
+<tr>
+<td>X-Frame-Options</td>
+<td>无</td>
+<td>SAMEORIGIN</td>
+<td>✅ 已添加</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="任务-3（进阶）：配置-Apache-安全加固"><a href="#任务-3（进阶）：配置-Apache-安全加固" class="headerlink" title="任务 3（进阶）：配置 Apache 安全加固"></a>任务 3（进阶）：配置 Apache 安全加固</h3><p><strong>前置条件</strong>：本地或虚拟机上已安装 Apache</p>
+<p><strong>步骤 1：备份配置</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo <span class="built_in">cp</span> /etc/apache2/apache2.conf /etc/apache2/apache2.conf.backup</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 2：修改配置</strong></p>
+<p>编辑 <code>/etc/apache2/apache2.conf</code> 或站点配置文件：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 1. 隐藏版本信息</span></span><br><span class="line"><span class="attribute">ServerTokens</span> Prod</span><br><span class="line"><span class="attribute">ServerSignature</span> <span class="literal">Off</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 2. 禁用 TRACE 方法</span></span><br><span class="line"><span class="attribute">TraceEnable</span> <span class="literal">Off</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 3. 关闭目录列出</span></span><br><span class="line"><span class="section">&lt;Directory /var/www/html&gt;</span></span><br><span class="line">    <span class="attribute">Options</span> -Indexes +FollowSymLinks</span><br><span class="line">    <span class="comment"># ...</span></span><br><span class="line"><span class="section">&lt;/Directory&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 4. 限制允许的 HTTP 方法</span></span><br><span class="line"><span class="section">&lt;LimitExcept GET POST HEAD&gt;</span></span><br><span class="line">    <span class="attribute">Require</span> <span class="literal">all</span> denied</span><br><span class="line"><span class="section">&lt;/LimitExcept&gt;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 5. 添加安全响应头</span></span><br><span class="line"><span class="section">&lt;IfModule mod_headers.c&gt;</span></span><br><span class="line">    <span class="attribute">Header</span> always set X-Frame-Options <span class="string">&quot;SAMEORIGIN&quot;</span></span><br><span class="line">    <span class="attribute">Header</span> always set X-Content-Type-Options <span class="string">&quot;nosniff&quot;</span></span><br><span class="line">    <span class="attribute">Header</span> always set X-XSS-Protection <span class="string">&quot;1; mode=block&quot;</span></span><br><span class="line"><span class="section">&lt;/IfModule&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 3：启用必要模块并重启</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 启用 headers 模块</span></span><br><span class="line">sudo a2enmod headers</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试配置</span></span><br><span class="line">sudo apache2ctl configtest</span><br><span class="line"></span><br><span class="line"><span class="comment"># 重启服务</span></span><br><span class="line">sudo systemctl restart apache2</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 4：验证加固效果</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 检查 Server 头</span></span><br><span class="line">curl -I http://localhost/</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试禁用的方法</span></span><br><span class="line">curl -X TRACE http://localhost/</span><br><span class="line">curl -X OPTIONS http://localhost/</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="任务-4（进阶）：IIS-安全加固"><a href="#任务-4（进阶）：IIS-安全加固" class="headerlink" title="任务 4（进阶）：IIS 安全加固"></a>任务 4（进阶）：IIS 安全加固</h3><p><strong>前置条件</strong>：Windows Server 或 Windows 10&#x2F;11 上已安装 IIS</p>
+<p><strong>步骤 1：打开 IIS 管理器</strong></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">inetmgr</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 2：配置 web.config</strong></p>
+<p>在你的网站根目录创建或编辑 <code>web.config</code>：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">&lt;?xml version=<span class="string">&quot;1.0&quot;</span> encoding=<span class="string">&quot;UTF-8&quot;</span>?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">configuration</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">system.webServer</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 关闭目录浏览 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">directoryBrowse</span> <span class="attr">enabled</span>=<span class="string">&quot;false&quot;</span> /&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">&lt;!-- 禁用不安全的 HTTP 方法 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">handlers</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">remove</span> <span class="attr">name</span>=<span class="string">&quot;TRACEVerbHandler&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">remove</span> <span class="attr">name</span>=<span class="string">&quot;OPTIONSVerbHandler&quot;</span> /&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">handlers</span>&gt;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment">&lt;!-- 安全响应头 --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">httpProtocol</span>&gt;</span></span><br><span class="line">      <span class="tag">&lt;<span class="name">customHeaders</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">add</span> <span class="attr">name</span>=<span class="string">&quot;X-Frame-Options&quot;</span> <span class="attr">value</span>=<span class="string">&quot;SAMEORIGIN&quot;</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">add</span> <span class="attr">name</span>=<span class="string">&quot;X-Content-Type-Options&quot;</span> <span class="attr">value</span>=<span class="string">&quot;nosniff&quot;</span> /&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">add</span> <span class="attr">name</span>=<span class="string">&quot;X-XSS-Protection&quot;</span> <span class="attr">value</span>=<span class="string">&quot;1; mode=block&quot;</span> /&gt;</span></span><br><span class="line">      <span class="tag">&lt;/<span class="name">customHeaders</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">httpProtocol</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">system.webServer</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">configuration</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 3：验证加固效果</strong></p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 检查响应头</span></span><br><span class="line"><span class="built_in">curl</span> <span class="literal">-I</span> http://localhost/</span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试禁用的方法</span></span><br><span class="line"><span class="built_in">curl</span> <span class="literal">-X</span> TRACE http://localhost/ <span class="literal">-v</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="任务-5（实战）：自动化基线检查脚本"><a href="#任务-5（实战）：自动化基线检查脚本" class="headerlink" title="任务 5（实战）：自动化基线检查脚本"></a>任务 5（实战）：自动化基线检查脚本</h3><p><strong>目标</strong>：编写 Python 脚本自动检查 Web 服务器安全配置。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">Web 服务器安全基线检查脚本</span></span><br><span class="line"><span class="string">检查项目：版本信息、安全响应头、HTTP 方法、目录列出</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="keyword">import</span> requests</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">from</span> urllib.parse <span class="keyword">import</span> urljoin</span><br><span class="line"></span><br><span class="line"><span class="keyword">class</span> <span class="title class_">WebSecurityChecker</span>:</span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, base_url</span>):</span><br><span class="line">        self.base_url = base_url.rstrip(<span class="string">&#x27;/&#x27;</span>)</span><br><span class="line">        self.issues = []</span><br><span class="line">        self.passed = []</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">check_version_disclosure</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="string">&quot;&quot;&quot;检查版本信息泄露&quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            resp = requests.head(self.base_url, timeout=<span class="number">5</span>)</span><br><span class="line">            server = resp.headers.get(<span class="string">&#x27;Server&#x27;</span>, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">            x_powered = resp.headers.get(<span class="string">&#x27;X-Powered-By&#x27;</span>, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">            </span><br><span class="line">            <span class="comment"># 检查 Server 头是否包含版本号</span></span><br><span class="line">            <span class="keyword">if</span> <span class="built_in">any</span>(char.isdigit() <span class="keyword">for</span> char <span class="keyword">in</span> server):</span><br><span class="line">                self.issues.append(<span class="string">f&quot;版本信息泄露: Server 头暴露版本 - &#x27;<span class="subst">&#123;server&#125;</span>&#x27;&quot;</span>)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                self.passed.append(<span class="string">f&quot;版本信息: Server 头已隐藏版本号 - &#x27;<span class="subst">&#123;server&#125;</span>&#x27;&quot;</span>)</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">if</span> x_powered:</span><br><span class="line">                self.issues.append(<span class="string">f&quot;技术栈泄露: X-Powered-By 头 - &#x27;<span class="subst">&#123;x_powered&#125;</span>&#x27;&quot;</span>)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                self.passed.append(<span class="string">&quot;技术栈: 未暴露 X-Powered-By 头&quot;</span>)</span><br><span class="line">                </span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            self.issues.append(<span class="string">f&quot;版本检查失败: <span class="subst">&#123;e&#125;</span>&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">check_security_headers</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="string">&quot;&quot;&quot;检查安全响应头&quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            resp = requests.head(self.base_url, timeout=<span class="number">5</span>)</span><br><span class="line">            </span><br><span class="line">            headers = &#123;</span><br><span class="line">                <span class="string">&#x27;X-Frame-Options&#x27;</span>: <span class="string">&#x27;点击劫持防护&#x27;</span>,</span><br><span class="line">                <span class="string">&#x27;X-Content-Type-Options&#x27;</span>: <span class="string">&#x27;MIME 嗅探防护&#x27;</span>,</span><br><span class="line">                <span class="string">&#x27;X-XSS-Protection&#x27;</span>: <span class="string">&#x27;XSS 过滤器&#x27;</span>,</span><br><span class="line">                <span class="string">&#x27;Content-Security-Policy&#x27;</span>: <span class="string">&#x27;内容安全策略&#x27;</span>,</span><br><span class="line">            &#125;</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">for</span> header, desc <span class="keyword">in</span> headers.items():</span><br><span class="line">                <span class="keyword">if</span> header <span class="keyword">in</span> resp.headers:</span><br><span class="line">                    self.passed.append(<span class="string">f&quot;安全头: <span class="subst">&#123;header&#125;</span> (<span class="subst">&#123;desc&#125;</span>) - 已配置&quot;</span>)</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    self.issues.append(<span class="string">f&quot;安全头缺失: <span class="subst">&#123;header&#125;</span> (<span class="subst">&#123;desc&#125;</span>)&quot;</span>)</span><br><span class="line">                    </span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            self.issues.append(<span class="string">f&quot;安全头检查失败: <span class="subst">&#123;e&#125;</span>&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">check_http_methods</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="string">&quot;&quot;&quot;检查不安全的 HTTP 方法&quot;&quot;&quot;</span></span><br><span class="line">        dangerous_methods = [<span class="string">&#x27;TRACE&#x27;</span>, <span class="string">&#x27;OPTIONS&#x27;</span>, <span class="string">&#x27;PUT&#x27;</span>, <span class="string">&#x27;DELETE&#x27;</span>]</span><br><span class="line">        </span><br><span class="line">        <span class="keyword">for</span> method <span class="keyword">in</span> dangerous_methods:</span><br><span class="line">            <span class="keyword">try</span>:</span><br><span class="line">                resp = requests.request(method, self.base_url, timeout=<span class="number">5</span>)</span><br><span class="line">                <span class="keyword">if</span> resp.status_code <span class="keyword">not</span> <span class="keyword">in</span> [<span class="number">405</span>, <span class="number">501</span>]:</span><br><span class="line">                    self.issues.append(<span class="string">f&quot;危险方法: <span class="subst">&#123;method&#125;</span> 被允许 (状态码: <span class="subst">&#123;resp.status_code&#125;</span>)&quot;</span>)</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    self.passed.append(<span class="string">f&quot;危险方法: <span class="subst">&#123;method&#125;</span> 已禁用&quot;</span>)</span><br><span class="line">            <span class="keyword">except</span> Exception:</span><br><span class="line">                <span class="keyword">pass</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">check_directory_listing</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="string">&quot;&quot;&quot;检查目录列出&quot;&quot;&quot;</span></span><br><span class="line">        <span class="keyword">try</span>:</span><br><span class="line">            <span class="comment"># 尝试访问常见目录</span></span><br><span class="line">            test_paths = [<span class="string">&#x27;/uploads/&#x27;</span>, <span class="string">&#x27;/images/&#x27;</span>, <span class="string">&#x27;/backup/&#x27;</span>, <span class="string">&#x27;/tmp/&#x27;</span>]</span><br><span class="line">            </span><br><span class="line">            <span class="keyword">for</span> path <span class="keyword">in</span> test_paths:</span><br><span class="line">                url = urljoin(self.base_url, path)</span><br><span class="line">                <span class="keyword">try</span>:</span><br><span class="line">                    resp = requests.get(url, timeout=<span class="number">5</span>)</span><br><span class="line">                    <span class="comment"># 简单判断：检查响应是否包含目录列表特征</span></span><br><span class="line">                    <span class="keyword">if</span> <span class="string">&#x27;Index of&#x27;</span> <span class="keyword">in</span> resp.text <span class="keyword">or</span> <span class="string">&#x27;Parent Directory&#x27;</span> <span class="keyword">in</span> resp.text:</span><br><span class="line">                        self.issues.append(<span class="string">f&quot;目录列出: <span class="subst">&#123;path&#125;</span> 可列出&quot;</span>)</span><br><span class="line">                <span class="keyword">except</span>:</span><br><span class="line">                    <span class="keyword">pass</span></span><br><span class="line">        <span class="keyword">except</span> Exception <span class="keyword">as</span> e:</span><br><span class="line">            self.issues.append(<span class="string">f&quot;目录列出检查失败: <span class="subst">&#123;e&#125;</span>&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">generate_report</span>(<span class="params">self</span>):</span><br><span class="line">        <span class="string">&quot;&quot;&quot;生成检查报告&quot;&quot;&quot;</span></span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;=&quot;</span> * <span class="number">60</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;Web 服务器安全基线检查报告&quot;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;目标: <span class="subst">&#123;self.base_url&#125;</span>&quot;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;=&quot;</span> * <span class="number">60</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;\n✅ 通过项 (<span class="subst">&#123;<span class="built_in">len</span>(self.passed)&#125;</span>)&quot;</span>)</span><br><span class="line">        <span class="keyword">for</span> item <span class="keyword">in</span> self.passed:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;  + <span class="subst">&#123;item&#125;</span>&quot;</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;\n⚠️  问题项 (<span class="subst">&#123;<span class="built_in">len</span>(self.issues)&#125;</span>)&quot;</span>)</span><br><span class="line">        <span class="keyword">for</span> item <span class="keyword">in</span> self.issues:</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;  - <span class="subst">&#123;item&#125;</span>&quot;</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;\n&quot;</span> + <span class="string">&quot;=&quot;</span> * <span class="number">60</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">f&quot;安全评分: <span class="subst">&#123;<span class="built_in">len</span>(self.passed) / (<span class="built_in">len</span>(self.passed) + <span class="built_in">len</span>(self.issues)) * <span class="number">100</span>:<span class="number">.1</span>f&#125;</span>%&quot;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;=&quot;</span> * <span class="number">60</span>)</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(sys.argv) &lt; <span class="number">2</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;用法: python check_web_security.py &lt;URL&gt;&quot;</span>)</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;示例: python check_web_security.py http://localhost:8080&quot;</span>)</span><br><span class="line">        sys.exit(<span class="number">1</span>)</span><br><span class="line">    </span><br><span class="line">    url = sys.argv[<span class="number">1</span>]</span><br><span class="line">    checker = WebSecurityChecker(url)</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&quot;正在检查 Web 服务器安全配置...\n&quot;</span>)</span><br><span class="line">    checker.check_version_disclosure()</span><br><span class="line">    checker.check_security_headers()</span><br><span class="line">    checker.check_http_methods()</span><br><span class="line">    checker.check_directory_listing()</span><br><span class="line">    </span><br><span class="line">    checker.generate_report()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<p><strong>运行脚本</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 安装依赖</span></span><br><span class="line">pip install requests</span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行检查</span></span><br><span class="line">python check_web_security.py http://localhost:8080</span><br><span class="line"></span><br><span class="line"><span class="comment"># 预期输出示例</span></span><br><span class="line">============================================================</span><br><span class="line">Web 服务器安全基线检查报告</span><br><span class="line">目标: http://localhost:8080</span><br><span class="line">============================================================</span><br><span class="line"></span><br><span class="line">✅ 通过项 (4)</span><br><span class="line">  + 版本信息: Server 头已隐藏版本号 - <span class="string">&#x27;nginx&#x27;</span></span><br><span class="line">  + 安全头: X-Frame-Options (点击劫持防护) - 已配置</span><br><span class="line">  + 安全头: X-Content-Type-Options (MIME 嗅探防护) - 已配置</span><br><span class="line">  + 危险方法: TRACE 已禁用</span><br><span class="line"></span><br><span class="line">⚠️  问题项 (3)</span><br><span class="line">  - 安全头缺失: X-XSS-Protection (XSS 过滤器)</span><br><span class="line">  - 安全头缺失: Content-Security-Policy (内容安全策略)</span><br><span class="line">  - 目录列出: /uploads/ 可列出</span><br><span class="line"></span><br><span class="line">============================================================</span><br><span class="line">安全评分: 57.1%</span><br><span class="line">============================================================</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="巩固练习（题与复盘）"><a href="#巩固练习（题与复盘）" class="headerlink" title="巩固练习（题与复盘）"></a>巩固练习（题与复盘）</h2><hr>
+<h3 id="练习-1：为什么建议隐藏版本信息？"><a href="#练习-1：为什么建议隐藏版本信息？" class="headerlink" title="练习 1：为什么建议隐藏版本信息？"></a>练习 1：为什么建议隐藏版本信息？</h3><p><strong>思路提示</strong>：</p>
+<ul>
+<li>攻击者如何利用版本信息？</li>
+<li>隐藏版本信息能完全防止攻击吗？</li>
+<li>什么是”深度防御”（Defense in Depth）？</li>
+</ul>
+<hr>
+<h3 id="练习-2：X-Frame-Options-头的三种值有什么区别？"><a href="#练习-2：X-Frame-Options-头的三种值有什么区别？" class="headerlink" title="练习 2：X-Frame-Options 头的三种值有什么区别？"></a>练习 2：X-Frame-Options 头的三种值有什么区别？</h3><p><strong>提示值</strong>：</p>
+<ul>
+<li><code>DENY</code></li>
+<li><code>SAMEORIGIN</code></li>
+<li><code>ALLOW-FROM uri</code></li>
+</ul>
+<p><strong>思路提示</strong>：</p>
+<ul>
+<li>点击劫持（Clickjacking）攻击的原理</li>
+<li>每种值的允许&#x2F;拒绝规则</li>
+<li>CSP 的 <code>frame-ancestors</code> 如何替代 <code>ALLOW-FROM</code></li>
+</ul>
+<hr>
+<h3 id="练习-3：配置-Content-Security-Policy（CSP）"><a href="#练习-3：配置-Content-Security-Policy（CSP）" class="headerlink" title="练习 3：配置 Content-Security-Policy（CSP）"></a>练习 3：配置 Content-Security-Policy（CSP）</h3><p><strong>任务</strong>：为一个允许加载 Google Fonts 的网站编写 CSP 头部。</p>
+<p><strong>要求</strong>：</p>
+<ul>
+<li>默认只允许同源资源</li>
+<li>允许加载 fonts.googleapis.com 和 fonts.gstatic.com</li>
+<li>禁止内联脚本（<code>unsafe-inline</code>）</li>
+<li>允许内联样式（<code>unsafe-inline</code>）</li>
+</ul>
+<p><strong>思路提示</strong>：</p>
+<ul>
+<li>CSP 指令格式：<code>default-src</code>, <code>script-src</code>, <code>style-src</code>, <code>font-src</code></li>
+<li>多个域名用空格分隔</li>
+<li>使用 Report-Only 模式先测试</li>
+</ul>
+<hr>
+<h3 id="练习-4：HTTP-状态码与安全加固"><a href="#练习-4：HTTP-状态码与安全加固" class="headerlink" title="练习 4：HTTP 状态码与安全加固"></a>练习 4：HTTP 状态码与安全加固</h3><p><strong>问题</strong>：以下状态码在加固后应该返回什么？</p>
+<table>
+<thead>
+<tr>
+<th>HTTP 方法</th>
+<th>预期状态码</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GET</td>
+<td>200 OK</td>
+<td>✅ 允许</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>200 OK</td>
+<td>✅ 允许</td>
+</tr>
+<tr>
+<td>TRACE</td>
+<td>?</td>
+<td>❌ 应禁止</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>?</td>
+<td>❌ 应禁止</td>
+</tr>
+<tr>
+<td>OPTIONS</td>
+<td>?</td>
+<td>⚠️ 限制</td>
+</tr>
+</tbody></table>
+<p><strong>思路提示</strong>：</p>
+<ul>
+<li>405 Method Not Allowed：方法不被允许</li>
+<li>403 Forbidden：禁止访问</li>
+<li>501 Not Implemented：未实现（服务端不支持该方法）</li>
+</ul>
+<hr>
+<h2 id="评估标准（达成判定）"><a href="#评估标准（达成判定）" class="headerlink" title="评估标准（达成判定）"></a>评估标准（达成判定）</h2><ul>
+<li>✅ 能识别 Web 中间件的三种主要暴露面（目录列出、版本信息、不安全方法）</li>
+<li>✅ 能独立修改 Nginx&#x2F;Apache 配置并重启服务</li>
+<li>✅ 能使用 curl 验证加固效果</li>
+<li>✅ 能解释 5 种以上安全响应头的作用</li>
+<li>✅ 能编写自动化脚本检查 Web 服务器基线</li>
+</ul>
+<hr>
+<h2 id="巩固练习（题与复盘）-1"><a href="#巩固练习（题与复盘）-1" class="headerlink" title="巩固练习（题与复盘）"></a>巩固练习（题与复盘）</h2><ul>
+<li>题目：为何建议隐藏版本信息？</li>
+<li>练习：给出一个安全的基础配置示例</li>
+</ul>
+<h2 id="评估标准（达成判定）-1"><a href="#评估标准（达成判定）-1" class="headerlink" title="评估标准（达成判定）"></a>评估标准（达成判定）</h2><ul>
+<li>配置文件与验证截图齐备</li>
+<li>✅ 能说明加固项的影响</li>
+</ul>
+<h2 id="学习成果达成情况（由学习者填写）"><a href="#学习成果达成情况（由学习者填写）" class="headerlink" title="学习成果达成情况（由学习者填写）"></a>学习成果达成情况（由学习者填写）</h2><hr>
+<h3 id="截图与证据"><a href="#截图与证据" class="headerlink" title="截图与证据"></a>截图与证据</h3><ul>
+<li><input disabled="" type="checkbox"> 加固前的 curl 响应头截图（Server 头暴露版本信息）</li>
+<li><input disabled="" type="checkbox"> 加固后的 curl 响应头截图（Server 头已隐藏）</li>
+<li><input disabled="" type="checkbox"> 目录列出测试截图（加固前&#x2F;后对比）</li>
+<li><input disabled="" type="checkbox"> HTTP 方法测试截图（TRACE&#x2F;PUT 返回 405）</li>
+<li><input disabled="" type="checkbox"> 浏览器开发者工具查看安全响应头截图</li>
+<li><input disabled="" type="checkbox"> 自动化检查脚本运行输出截图</li>
+</ul>
+<hr>
+<h3 id="关键命令与输出（粘贴关键片段）"><a href="#关键命令与输出（粘贴关键片段）" class="headerlink" title="关键命令与输出（粘贴关键片段）"></a>关键命令与输出（粘贴关键片段）</h3><p><strong>加固前 Server 头</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ curl -I http://localhost/</span><br><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: nginx/1.18.0 (Ubuntu)</span><br><span class="line">Date: Fri, 17 Jan 2026 10:30:00 GMT</span><br><span class="line">Content-Type: text/html</span><br></pre></td></tr></table></figure>
+
+<p><strong>加固后 Server 头</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">$ curl -I http://localhost/</span><br><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: nginx</span><br><span class="line">Date: Fri, 17 Jan 2026 10:35:00 GMT</span><br><span class="line">Content-Type: text/html</span><br><span class="line">X-Frame-Options: SAMEORIGIN</span><br><span class="line">X-Content-Type-Options: nosniff</span><br><span class="line">X-XSS-Protection: 1; mode=block</span><br></pre></td></tr></table></figure>
+
+<p><strong>目录列出测试</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 加固前</span></span><br><span class="line">$ curl http://localhost/uploads/</span><br><span class="line">Index of /uploads/</span><br><span class="line">..</span><br><span class="line">backup.zip</span><br><span class="line">config.php</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加固后</span></span><br><span class="line">$ curl http://localhost/uploads/</span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;<span class="built_in">head</span>&gt;&lt;title&gt;403 Forbidden&lt;/title&gt;&lt;/head&gt;</span><br><span class="line">&lt;body&gt;</span><br><span class="line">&lt;center&gt;&lt;h1&gt;403 Forbidden&lt;/h1&gt;&lt;/center&gt;</span><br><span class="line">&lt;/body&gt;</span><br><span class="line">&lt;/html&gt;</span><br></pre></td></tr></table></figure>
+
+<p><strong>HTTP 方法测试</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">$ curl -X TRACE http://localhost/ -v</span><br><span class="line">...</span><br><span class="line">&lt; HTTP/1.1 405 Method Not Allowed</span><br><span class="line">&lt; Server: nginx</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">$ curl -X PUT http://localhost/test.txt -d <span class="string">&quot;hello&quot;</span></span><br><span class="line">&lt;html&gt;</span><br><span class="line">&lt;<span class="built_in">head</span>&gt;&lt;title&gt;405 Not Allowed&lt;/title&gt;&lt;/head&gt;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="结论与反思"><a href="#结论与反思" class="headerlink" title="结论与反思"></a>结论与反思</h3><p><strong>我今天搞清楚了</strong>：</p>
+<ul>
+<li>Web 中间件的默认配置存在多种安全风险（目录列出、版本泄露、不安全方法）</li>
+<li>通过简单的配置修改可以显著降低攻击面</li>
+<li>安全响应头（X-Frame-Options、X-Content-Type-Options 等）可以防御常见 Web 攻击</li>
+<li>自动化脚本可以快速检查配置是否符合基线要求</li>
+</ul>
+<p><strong>我差点搞混的是</strong>：</p>
+<ul>
+<li>以为 <code>server_tokens off</code> 完全隐藏 Server 头，实际上只隐藏版本号</li>
+<li>混淆了 Apache 的 <code>Options -Indexes</code> 和 Nginx 的 <code>autoindex off</code> 语法</li>
+<li>最初不理解 X-Frame-Options 的 DENY 和 SAMEORIGIN 的区别</li>
+</ul>
+<p><strong>明天我要继续补的是</strong>：</p>
+<ul>
+<li>学习 WAF（Web 应用防火墙）的基础配置（Day026）</li>
+<li>了解 SQL 注入、XSS 等常见 Web 漏洞的防护（Day027-028）</li>
+<li>实战使用安全扫描工具（Nikto、Wappalyzer 等）</li>
+</ul>
+<p><strong>本次学习耗时</strong>：约 3 小时</p>
+<p><strong>掌握程度自评</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 😕 理解了基本概念，但配置不熟练</li>
+<li><input disabled="" type="checkbox"> 🙂 完成了基础配置任务</li>
+<li><input disabled="" type="checkbox"> 😃 完成了所有任务并理解原理</li>
+<li><input disabled="" type="checkbox"> 🤩 编写了自动化检查脚本并优化了配置</li>
+</ul>
+<hr>
+<h2 id="集中参考答案（含思路）"><a href="#集中参考答案（含思路）" class="headerlink" title="集中参考答案（含思路）"></a>集中参考答案（含思路）</h2><hr>
+<h3 id="练习-1-参考答案：为什么建议隐藏版本信息？"><a href="#练习-1-参考答案：为什么建议隐藏版本信息？" class="headerlink" title="练习 1 参考答案：为什么建议隐藏版本信息？"></a>练习 1 参考答案：为什么建议隐藏版本信息？</h3><p><strong>攻击者如何利用版本信息</strong>：</p>
+<ol>
+<li><p><strong>精确匹配已知漏洞</strong>：</p>
+<ul>
+<li>在 NVD 或 Exploit-DB 中搜索特定版本的 CVE</li>
+<li>例如：<code>nginx/1.18.0</code> → 搜索 <code>CVE-2021-23017</code></li>
+</ul>
+</li>
+<li><p><strong>定制攻击 Payload</strong>：</p>
+<ul>
+<li>不同版本的漏洞利用方式可能不同</li>
+<li>已知版本号可以显著提高攻击成功率</li>
+</ul>
+</li>
+<li><p><strong>评估维护状况</strong>：</p>
+<ul>
+<li>版本过旧说明系统长期未更新</li>
+<li>可能同时存在多个未修复漏洞</li>
+</ul>
+</li>
+</ol>
+<p><strong>隐藏版本信息的局限性</strong>：</p>
+<ul>
+<li><p><strong>指纹识别仍然可能</strong>：</p>
+<ul>
+<li>通过 HTTP 响应特征、错误页面、行为差异推断版本</li>
+<li>例如：Nginx 不同版本的 404 页面略有差异</li>
+</ul>
+</li>
+<li><p><strong>不是完全的防护</strong>：</p>
+<ul>
+<li>如果存在漏洞，攻击者可能通过探测发现</li>
+<li>隐藏版本属于”轻度”防御措施</li>
+</ul>
+</li>
+</ul>
+<p><strong>深度防御（Defense in Depth）理念</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">多层防御策略</span><br><span class="line">├─ 第一层：隐藏版本信息（降低被针对性攻击的概率）</span><br><span class="line">├─ 第二层：及时更新补丁（修复已知漏洞）</span><br><span class="line">├─ 第三层：WAF/IPS（拦截恶意请求）</span><br><span class="line">├─ 第四层：网络隔离（限制访问来源）</span><br><span class="line">└─ 第五层：监控告警（及时发现异常）</span><br></pre></td></tr></table></figure>
+
+<p><strong>结论</strong>：隐藏版本信息是良好的安全实践，但不能替代及时更新和补丁管理。</p>
+<hr>
+<h3 id="练习-2-参考答案：X-Frame-Options-头的三种值有什么区别？"><a href="#练习-2-参考答案：X-Frame-Options-头的三种值有什么区别？" class="headerlink" title="练习 2 参考答案：X-Frame-Options 头的三种值有什么区别？"></a>练习 2 参考答案：X-Frame-Options 头的三种值有什么区别？</h3><p><strong>点击劫持（Clickjacking）攻击原理</strong>：</p>
+<p>攻击者将目标网站嵌入透明 iframe，诱导用户点击看似无害的按钮，实际执行了敏感操作（如转账、授权）。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">攻击者页面</span><br><span class="line">┌─────────────────────────────┐</span><br><span class="line">│  🎁 点击领取免费礼品！      │</span><br><span class="line">│  ┌───────────────────────┐  │</span><br><span class="line">│  │  iframe (透明)        │  │</span><br><span class="line">│  │  [ 确认转账 ]        │  │</span><br><span class="line">│  └───────────────────────┘  │</span><br><span class="line">└─────────────────────────────┘</span><br><span class="line">用户点击&quot;领取礼品&quot; → 实际点击&quot;确认转账&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>X-Frame-Options 三种值对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>值</th>
+<th>规则</th>
+<th>适用场景</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>DENY</strong></td>
+<td>禁止任何域名嵌入</td>
+<td>高安全性需求（如银行登录页）</td>
+<td><code>&lt;iframe src=&quot;https://bank.com&quot;&gt;</code> 被拒绝</td>
+</tr>
+<tr>
+<td><strong>SAMEORIGIN</strong></td>
+<td>只允许同源域名嵌入</td>
+<td>需要在站内使用 iframe 的场景</td>
+<td><code>example.com</code> 可嵌入 <code>example.com</code></td>
+</tr>
+<tr>
+<td><strong>ALLOW-FROM uri</strong></td>
+<td>允许指定域名嵌入（已废弃）</td>
+<td>跨域嵌入需求（旧版浏览器）</td>
+<td>允许 <code>trusted.com</code> 嵌入</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>：</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># DENY 示例</span><br><span class="line"><span class="attribute">X-Frame-Options</span><span class="punctuation">: </span>DENY</span><br><span class="line"># 结果：所有 iframe 嵌入都被阻止</span><br><span class="line"></span><br><span class="line"># SAMEORIGIN 示例</span><br><span class="line"><span class="attribute">X-Frame-Options</span><span class="punctuation">: </span>SAMEORIGIN</span><br><span class="line"># 结果：仅 example.com 可嵌入 example.com 的页面</span><br><span class="line"># example.com 嵌入 other.com 被阻止</span><br><span class="line"></span><br><span class="line"># ALLOW-FROM 示例（已废弃）</span><br><span class="line"><span class="attribute">X-Frame-Options</span><span class="punctuation">: </span>ALLOW-FROM https://trusted.com</span><br><span class="line"># 结果：仅 trusted.com 可嵌入此页面</span><br></pre></td></tr></table></figure>
+
+<p><strong>ALLOW-FROM 已废弃的原因</strong>：</p>
+<ul>
+<li>浏览器支持不一致（Firefox、Safari 不支持）</li>
+<li>CSP 的 <code>frame-ancestors</code> 提供更强大的控制</li>
+</ul>
+<p><strong>CSP 的 <code>frame-ancestors</code> 替代方案</strong>：</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># CSP 示例</span><br><span class="line"><span class="attribute">Content-Security-Policy</span><span class="punctuation">: </span>frame-ancestors &#x27;self&#x27; https://trusted.com;</span><br><span class="line"></span><br><span class="line"># 等价于</span><br><span class="line"># 允许同源 + trusted.com 嵌入</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="练习-3-参考答案：配置-Content-Security-Policy（CSP）"><a href="#练习-3-参考答案：配置-Content-Security-Policy（CSP）" class="headerlink" title="练习 3 参考答案：配置 Content-Security-Policy（CSP）"></a>练习 3 参考答案：配置 Content-Security-Policy（CSP）</h3><p><strong>CSP 头部配置</strong>：</p>
+<figure class="highlight http"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attribute">Content-Security-Policy</span><span class="punctuation">: </span>default-src &#x27;self&#x27;;</span><br><span class="line">                              script-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;;</span><br><span class="line">                              style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; fonts.googleapis.com fonts.gstatic.com;</span><br><span class="line">                              font-src fonts.googleapis.com fonts.gstatic.com;</span><br></pre></td></tr></table></figure>
+
+<p><strong>逐项解释</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>指令</th>
+<th>值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>default-src</strong></td>
+<td><code>&#39;self&#39;</code></td>
+<td>默认只允许同源资源</td>
+</tr>
+<tr>
+<td><strong>script-src</strong></td>
+<td><code>&#39;self&#39; &#39;unsafe-inline&#39;</code></td>
+<td>允许同源脚本 + 内联脚本</td>
+</tr>
+<tr>
+<td><strong>style-src</strong></td>
+<td><code>&#39;self&#39; &#39;unsafe-inline&#39; fonts.googleapis.com fonts.gstatic.com</code></td>
+<td>允许同源样式 + 内联样式 + Google Fonts</td>
+</tr>
+<tr>
+<td><strong>font-src</strong></td>
+<td><code>fonts.googleapis.com fonts.gstatic.com</code></td>
+<td>允许从 Google Fonts 加载字体</td>
+</tr>
+</tbody></table>
+<p><strong>完整示例</strong>（Nginx 配置）：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="section">server</span> &#123;</span><br><span class="line">    <span class="attribute">listen</span> <span class="number">80</span>;</span><br><span class="line">    <span class="attribute">server_name</span> example.com;</span><br><span class="line">    </span><br><span class="line">    <span class="section">location</span> / &#123;</span><br><span class="line">        <span class="attribute">add_header</span> Content-Security-Policy <span class="string">&quot;</span></span><br><span class="line"><span class="string">            default-src &#x27;self&#x27;;</span></span><br><span class="line"><span class="string">            script-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;;</span></span><br><span class="line"><span class="string">            style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; fonts.googleapis.com fonts.gstatic.com;</span></span><br><span class="line"><span class="string">            font-src fonts.googleapis.com fonts.gstatic.com;</span></span><br><span class="line"><span class="string">            img-src &#x27;self&#x27; data:;</span></span><br><span class="line"><span class="string">        &quot;</span> always;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>使用 Report-Only 模式测试</strong>：</p>
+<figure class="highlight nginx"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 先测试策略，不实际阻止</span></span><br><span class="line"><span class="attribute">add_header</span> Content-Security-Policy-Report-Only <span class="string">&quot;</span></span><br><span class="line"><span class="string">    default-src &#x27;self&#x27;;</span></span><br><span class="line"><span class="string">    script-src &#x27;self&#x27; &#x27;unsafe-inline&#x27;;</span></span><br><span class="line"><span class="string">    style-src &#x27;self&#x27; &#x27;unsafe-inline&#x27; fonts.googleapis.com fonts.gstatic.com;</span></span><br><span class="line"><span class="string">    font-src fonts.googleapis.com fonts.gstatic.com;</span></span><br><span class="line"><span class="string">&quot;</span> always;</span><br><span class="line"></span><br><span class="line"><span class="comment"># 报告接收端点</span></span><br><span class="line"><span class="attribute">add_header</span> Report-To <span class="string">&#x27;&#123;&quot;group&quot;:&quot;csp-endpoint&quot;,&quot;max_age&quot;:10886400,&quot;endpoints&quot;:[&#123;&quot;url&quot;:&quot;https://example.com/csp-report&quot;&#125;]&#125;&#x27;</span> always;</span><br></pre></td></tr></table></figure>
+
+<p><strong>CSP 生成工具</strong>：</p>
+<ul>
+<li>Mozilla CSP Evaluator: <a target="_blank" rel="noopener" href="https://csp-evaluator.withgoogle.com/">https://csp-evaluator.withgoogle.com/</a></li>
+<li>Report URI: <a target="_blank" rel="noopener" href="https://report-uri.com/">https://report-uri.com/</a></li>
+</ul>
+<hr>
+<h3 id="练习-4-参考答案：HTTP-状态码与安全加固"><a href="#练习-4-参考答案：HTTP-状态码与安全加固" class="headerlink" title="练习 4 参考答案：HTTP 状态码与安全加固"></a>练习 4 参考答案：HTTP 状态码与安全加固</h3><p><strong>预期状态码表</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>HTTP 方法</th>
+<th>预期状态码</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>GET</td>
+<td>200 OK</td>
+<td>✅ 允许正常访问</td>
+</tr>
+<tr>
+<td>POST</td>
+<td>200 OK</td>
+<td>✅ 允许提交数据</td>
+</tr>
+<tr>
+<td>HEAD</td>
+<td>200 OK</td>
+<td>✅ 允许获取响应头</td>
+</tr>
+<tr>
+<td>TRACE</td>
+<td>405 Method Not Allowed</td>
+<td>❌ 应禁止（跨站追踪攻击）</td>
+</tr>
+<tr>
+<td>PUT</td>
+<td>405 Method Not Allowed</td>
+<td>❌ 应禁止（文件上传漏洞）</td>
+</tr>
+<tr>
+<td>DELETE</td>
+<td>405 Method Not Allowed</td>
+<td>❌ 应禁止（文件删除漏洞）</td>
+</tr>
+<tr>
+<td>OPTIONS</td>
+<td>501 Not Implemented</td>
+<td>⚠️ 限制（或返回 405）</td>
+</tr>
+<tr>
+<td>PATCH</td>
+<td>405 Method Not Allowed</td>
+<td>❌ 应禁止（需认证）</td>
+</tr>
+</tbody></table>
+<p><strong>状态码说明</strong>：</p>
+<ul>
+<li><p><strong>405 Method Not Allowed</strong>：</p>
+<ul>
+<li>服务器识别请求方法，但不允许使用</li>
+<li>常用于明确禁止某些方法</li>
+<li>响应头包含 <code>Allow</code> 字段，列出允许的方法</li>
+</ul>
+</li>
+<li><p><strong>403 Forbidden</strong>：</p>
+<ul>
+<li>服务器理解请求，但拒绝执行</li>
+<li>常用于权限不足</li>
+<li>可用于禁止某些方法，但 405 更明确</li>
+</ul>
+</li>
+<li><p><strong>501 Not Implemented</strong>：</p>
+<ul>
+<li>服务器不支持请求方法</li>
+<li>表示服务端根本不实现该方法</li>
+<li>常用于 OPTIONS（禁用时）</li>
+</ul>
+</li>
+</ul>
+<p><strong>验证示例</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 405 响应示例</span></span><br><span class="line">$ curl -X PUT http://localhost/test.txt -v</span><br><span class="line">...</span><br><span class="line">&lt; HTTP/1.1 405 Method Not Allowed</span><br><span class="line">&lt; Server: nginx</span><br><span class="line">&lt; Allow: GET, POST, HEAD</span><br><span class="line">&lt; Content-Length: 178</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line"><span class="comment"># 501 响应示例</span></span><br><span class="line">$ curl -X OPTIONS http://localhost/ -v</span><br><span class="line">...</span><br><span class="line">&lt; HTTP/1.1 501 Not Implemented</span><br><span class="line">&lt; Server: nginx</span><br><span class="line">&lt; Content-Length: 153</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+
+<p><strong>推荐做法</strong>：</p>
+<ol>
+<li>使用 <strong>405</strong> 明确告知客户端哪些方法被允许</li>
+<li>在 <code>Allow</code> 响应头中列出允许的方法</li>
+<li>在服务器配置中显式允许&#x2F;禁止方法，而非依赖默认行为</li>
+</ol>
+<p><strong>Apache 配置示例</strong>：</p>
+<figure class="highlight apache"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 明确允许的方法</span></span><br><span class="line"><span class="section">&lt;LimitExcept GET POST HEAD&gt;</span></span><br><span class="line">    <span class="attribute">Require</span> <span class="literal">all</span> denied</span><br><span class="line"><span class="section">&lt;/LimitExcept&gt;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="学习成果示例填写（可照抄）"><a href="#学习成果示例填写（可照抄）" class="headerlink" title="学习成果示例填写（可照抄）"></a>学习成果示例填写（可照抄）</h2><blockquote>
+<p>可将”示例”内容替换为你自己的时间与截图文件名。</p>
+</blockquote>
+<hr>
+<h3 id="截图与证据（示例）"><a href="#截图与证据（示例）" class="headerlink" title="截图与证据（示例）"></a>截图与证据（示例）</h3><ul>
+<li>任务 1：<code>images/day025_before_headers.png</code>（加固前的响应头）</li>
+<li>任务 1：<code>images/day025_after_headers.png</code>（加固后的响应头）</li>
+<li>任务 2：<code>images/day025_nginx_config.png</code>（Nginx 配置文件）</li>
+<li>任务 5：<code>images/day025_script_output.png</code>（自动化检查脚本输出）</li>
+</ul>
+<hr>
+<h3 id="关键命令与输出（示例）"><a href="#关键命令与输出（示例）" class="headerlink" title="关键命令与输出（示例）"></a>关键命令与输出（示例）</h3><p><strong>Nginx 加固前后对比</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 加固前</span></span><br><span class="line">$ curl -I http://localhost:8080/</span><br><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: nginx/1.18.0 (Ubuntu)</span><br><span class="line">Date: Fri, 17 Jan 2026 14:30:00 GMT</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Connection: keep-alive</span><br><span class="line"></span><br><span class="line"><span class="comment"># 加固后</span></span><br><span class="line">$ curl -I http://localhost:8080/</span><br><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: nginx</span><br><span class="line">Date: Fri, 17 Jan 2026 14:45:00 GMT</span><br><span class="line">Content-Type: text/html</span><br><span class="line">Connection: keep-alive</span><br><span class="line">X-Frame-Options: SAMEORIGIN</span><br><span class="line">X-Content-Type-Options: nosniff</span><br><span class="line">X-XSS-Protection: 1; mode=block</span><br></pre></td></tr></table></figure>
+
+<p><strong>自动化检查脚本输出</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">============================================================</span><br><span class="line">Web 服务器安全基线检查报告</span><br><span class="line">目标: http://localhost:8080</span><br><span class="line">============================================================</span><br><span class="line"></span><br><span class="line">✅ 通过项 (6)</span><br><span class="line">  + 版本信息: Server 头已隐藏版本号 - &#x27;nginx&#x27;</span><br><span class="line">  + 安全头: X-Frame-Options (点击劫持防护) - 已配置</span><br><span class="line">  + 安全头: X-Content-Type-Options (MIME 嗅探防护) - 已配置</span><br><span class="line">  + 安全头: X-XSS-Protection (XSS 过滤器) - 已配置</span><br><span class="line">  + 危险方法: TRACE 已禁用</span><br><span class="line">  + 危险方法: PUT 已禁用</span><br><span class="line"></span><br><span class="line">⚠️  问题项 (1)</span><br><span class="line">  - 安全头缺失: Content-Security-Policy (内容安全策略)</span><br><span class="line"></span><br><span class="line">============================================================</span><br><span class="line">安全评分: 85.7%</span><br><span class="line">============================================================</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="结论与反思（示例）"><a href="#结论与反思（示例）" class="headerlink" title="结论与反思（示例）"></a>结论与反思（示例）</h3><p><strong>我今天搞清楚了</strong>：</p>
+<ul>
+<li>Web 中间件的默认配置存在多种安全风险，需要主动加固</li>
+<li>隐藏版本信息、关闭目录列出、限制 HTTP 方法是基础加固项</li>
+<li>安全响应头（X-Frame-Options、X-Content-Type-Options、CSP）可以防御常见 Web 攻击</li>
+<li>可以用 Python 编写自动化脚本快速检查配置合规性</li>
+</ul>
+<p><strong>我差点搞混的是</strong>：</p>
+<ul>
+<li>以为 <code>X-Frame-Options: ALLOW-FROM</code> 是推荐方式，实际上已被废弃</li>
+<li>混淆了 Nginx 的 <code>autoindex off</code> 和 Apache 的 <code>Options -Indexes</code> 语法</li>
+<li>最初不理解 CSP 的 <code>script-src &#39;unsafe-inline&#39;</code> 是降低安全性，但为了兼容性不得已</li>
+</ul>
+<p><strong>明天我要继续补的是</strong>：</p>
+<ul>
+<li>学习 WAF（Web 应用防火墙）的基础概念与配置（Day026）</li>
+<li>了解 SQL 注入、XSS 等常见 Web 漏洞的攻击与防御（Day027-028）</li>
+<li>实战使用安全扫描工具（Nikto、Wappalyzer、Nuclei）</li>
+</ul>
+<p><strong>本次学习耗时</strong>：约 3.5 小时</p>
+<p><strong>掌握程度自评</strong>：</p>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 😃 完成了所有任务并理解原理</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Tigercoll 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+              <a href="/tags/%E5%AE%89%E5%85%A8/" rel="tag"># 安全</a>
+              <a href="/tags/%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" rel="tag"># 学习计划</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/87578fee.html" rel="prev" title="Day024：漏洞扫描与基线 - 系统基线与审计">
+                  <i class="fa fa-chevron-left"></i> Day024：漏洞扫描与基线 - 系统基线与审计
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/99362a3b.html" rel="next" title="Day026：漏洞扫描与基线 - 自动化基线检查与报告">
+                  Day026：漏洞扫描与基线 - 自动化基线检查与报告 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true,"react":{"opacity":0.7}}});</script></body>
+</html>

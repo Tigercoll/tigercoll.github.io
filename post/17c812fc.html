@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-center-simple.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Day007：网络与协议基础 - Wireshark 入门与综合分析 日期：2025-12-31 周次：第 1 周  学习目标 熟练使用过滤器（显示&#x2F;捕获），能快速定位目标流量 能在一次抓包里串起来：DNS → TCP 三次握手 → HTTP 请求&#x2F;响应 学会做“分析证据”：标注、书签、导出截图与最终报告">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day007：网络与协议基础 - Wireshark 入门与综合分析">
+<meta property="og:url" content="https://tigercoll.top/post/17c812fc.html">
+<meta property="og:site_name" content="Tigercoll&#39;s Blog">
+<meta property="og:description" content="Day007：网络与协议基础 - Wireshark 入门与综合分析 日期：2025-12-31 周次：第 1 周  学习目标 熟练使用过滤器（显示&#x2F;捕获），能快速定位目标流量 能在一次抓包里串起来：DNS → TCP 三次握手 → HTTP 请求&#x2F;响应 学会做“分析证据”：标注、书签、导出截图与最终报告">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-12-30T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-12-30T16:00:00.000Z">
+<meta property="article:author" content="Tigercoll">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="学习计划">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://tigercoll.top/post/17c812fc.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/17c812fc.html","path":"post/17c812fc.html","title":"Day007：网络与协议基础 - Wireshark 入门与综合分析"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day007：网络与协议基础 - Wireshark 入门与综合分析 | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Day007%EF%BC%9A%E7%BD%91%E7%BB%9C%E4%B8%8E%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80-Wireshark-%E5%85%A5%E9%97%A8%E4%B8%8E%E7%BB%BC%E5%90%88%E5%88%86%E6%9E%90"><span class="nav-number">1.</span> <span class="nav-text">Day007：网络与协议基础 - Wireshark 入门与综合分析</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E7%9B%AE%E6%A0%87"><span class="nav-number">1.1.</span> <span class="nav-text">学习目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E5%86%85%E5%AE%B9"><span class="nav-number">1.2.</span> <span class="nav-text">学习内容</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-%E5%BF%85%E9%A1%BB%E5%85%88%E5%88%86%E6%B8%85%EF%BC%9A%E6%8D%95%E8%8E%B7%E8%BF%87%E6%BB%A4%E5%99%A8-vs-%E6%98%BE%E7%A4%BA%E8%BF%87%E6%BB%A4%E5%99%A8"><span class="nav-number">1.2.1.</span> <span class="nav-text">1️⃣ 必须先分清：捕获过滤器 vs 显示过滤器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-%E6%98%BE%E7%A4%BA%E8%BF%87%E6%BB%A4%E5%99%A8%EF%BC%88Display-Filter%EF%BC%89%E5%B8%B8%E7%94%A8%E6%B8%85%E5%8D%95"><span class="nav-number">1.2.2.</span> <span class="nav-text">2️⃣ 显示过滤器（Display Filter）常用清单</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%8D%8F%E8%AE%AE-x2F-%E7%AB%AF%E5%8F%A3"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">协议&#x2F;端口</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#IP-x2F-%E4%B8%BB%E6%9C%BA%E5%AE%9A%E4%BD%8D"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">IP&#x2F;主机定位</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#TCP-%E5%85%B3%E9%94%AE%E5%AE%9A%E4%BD%8D"><span class="nav-number">1.2.2.3.</span> <span class="nav-text">TCP 关键定位</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#HTTP-%E5%85%B3%E9%94%AE%E5%AD%97%E6%AE%B5%EF%BC%88%E6%9C%89%E6%97%B6%E9%9D%9E%E5%B8%B8%E5%A5%BD%E7%94%A8%EF%BC%89"><span class="nav-number">1.2.2.4.</span> <span class="nav-text">HTTP 关键字段（有时非常好用）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%EF%B8%8F%E2%83%A3-%E5%88%86%E6%9E%90%E8%A7%86%E8%A7%92%EF%BC%9A%E4%BB%8E%E2%80%9C%E7%8E%B0%E8%B1%A1%E2%80%9D%E5%88%B0%E2%80%9C%E8%AF%81%E6%8D%AE%E2%80%9D"><span class="nav-number">1.2.3.</span> <span class="nav-text">3️⃣ 分析视角：从“现象”到“证据”</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E8%B7%B5%E4%BB%BB%E5%8A%A1%EF%BC%88%E5%90%88%E6%B3%95%E6%8E%88%E6%9D%83%E8%8C%83%E5%9B%B4%E5%86%85%EF%BC%89"><span class="nav-number">1.3.</span> <span class="nav-text">实践任务（合法授权范围内）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-1%EF%BC%9A%E5%87%86%E5%A4%87%E5%8F%AF%E6%8E%A7%E6%B5%81%E9%87%8F%E6%BA%90%EF%BC%88%E6%9C%AC%E5%9C%B0-HTTP-%E6%9C%8D%E5%8A%A1%EF%BC%89"><span class="nav-number">1.3.1.</span> <span class="nav-text">任务 1：准备可控流量源（本地 HTTP 服务）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-2%EF%BC%9A%E8%A7%A6%E5%8F%91%E4%B8%80%E6%AC%A1%E2%80%9CDNS-TCP-HTTP%E2%80%9D%E7%9A%84%E8%AE%BF%E9%97%AE"><span class="nav-number">1.3.2.</span> <span class="nav-text">任务 2：触发一次“DNS + TCP + HTTP”的访问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-3%EF%BC%9A%E6%8A%93%E5%8C%85%E4%B8%8E%E8%BF%87%E6%BB%A4%EF%BC%88%E6%8E%A8%E8%8D%90%E6%B5%81%E7%A8%8B%EF%BC%89"><span class="nav-number">1.3.3.</span> <span class="nav-text">任务 3：抓包与过滤（推荐流程）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%89%8B%E5%8A%A8%E5%AE%9E%E7%8E%B0%E8%A6%81%E7%82%B9%EF%BC%88%E4%B8%8D%E4%BD%BF%E7%94%A8%E4%BB%BB%E4%BD%95%E8%84%9A%E6%9C%AC%EF%BC%89"><span class="nav-number">1.3.4.</span> <span class="nav-text">手动实现要点（不使用任何脚本）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-1%EF%BC%9A%E5%85%88%E5%87%86%E5%A4%87%E4%B8%80%E4%B8%AA%E7%A8%B3%E5%AE%9A%E7%9A%84-HTTP-%E7%9B%AE%E6%A0%87%EF%BC%88%E6%9C%AC%E5%9C%B0%EF%BC%89"><span class="nav-number">1.3.4.1.</span> <span class="nav-text">Step 1：先准备一个稳定的 HTTP 目标（本地）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-2%EF%BC%9A%E5%86%8D%E8%A7%A6%E5%8F%91%E4%B8%80%E6%AC%A1%E2%80%9C%E5%9F%9F%E5%90%8D%E8%AE%BF%E9%97%AE%E2%80%9D%EF%BC%88%E6%9B%B4%E5%AE%B9%E6%98%93%E7%9C%8B%E5%88%B0-DNS%EF%BC%89"><span class="nav-number">1.3.4.2.</span> <span class="nav-text">Step 2：再触发一次“域名访问”（更容易看到 DNS）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-3%EF%BC%9AWireshark-%E7%94%A8%E8%BF%87%E6%BB%A4%E5%99%A8%E5%88%86%E6%AE%B5%E6%88%AA%E8%AF%81%E6%8D%AE"><span class="nav-number">1.3.4.3.</span> <span class="nav-text">Step 3：Wireshark 用过滤器分段截证据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Step-4%EF%BC%9A%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98%EF%BC%88%E7%9C%8B%E4%B8%8D%E5%88%B0-DNS-x2F-HTTP-%E6%97%B6%E6%80%8E%E4%B9%88%E5%81%9A%EF%BC%89"><span class="nav-number">1.3.4.4.</span> <span class="nav-text">Step 4：常见问题（看不到 DNS&#x2F;HTTP 时怎么做）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-4%EF%BC%9A%E6%A0%87%E6%B3%A8-x2F-%E4%B9%A6%E7%AD%BE-x2F-%E5%AF%BC%E5%87%BA"><span class="nav-number">1.3.5.</span> <span class="nav-text">任务 4：标注&#x2F;书签&#x2F;导出</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A9%E5%9B%BA%E7%BB%83%E4%B9%A0%EF%BC%88%E9%A2%98%E4%B8%8E%E5%A4%8D%E7%9B%98%EF%BC%89"><span class="nav-number">1.4.</span> <span class="nav-text">巩固练习（题与复盘）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-1%EF%BC%9A%E4%B8%BA%E5%B8%B8%E8%A7%81%E5%88%86%E6%9E%90%E5%9C%BA%E6%99%AF%E7%BC%96%E5%86%99-5-%E6%9D%A1%E8%BF%87%E6%BB%A4%E8%A1%A8%E8%BE%BE%E5%BC%8F"><span class="nav-number">1.4.1.</span> <span class="nav-text">练习 1：为常见分析场景编写 5 条过滤表达式</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-2%EF%BC%9A%E8%A7%A3%E9%87%8A%E4%B8%80%E6%AC%A1%E5%BC%82%E5%B8%B8%E9%87%8D%E4%BC%A0%E4%B8%8E%E8%B6%85%E6%97%B6%E7%9A%84%E5%8F%AF%E8%83%BD%E5%8E%9F%E5%9B%A0"><span class="nav-number">1.4.2.</span> <span class="nav-text">练习 2：解释一次异常重传与超时的可能原因</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E6%A0%87%E5%87%86%EF%BC%88%E8%BE%BE%E6%88%90%E5%88%A4%E5%AE%9A%EF%BC%89"><span class="nav-number">1.5.</span> <span class="nav-text">评估标准（达成判定）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E8%BE%BE%E6%88%90%E6%83%85%E5%86%B5%EF%BC%88%E7%94%B1%E5%AD%A6%E4%B9%A0%E8%80%85%E5%A1%AB%E5%86%99%EF%BC%89"><span class="nav-number">1.6.</span> <span class="nav-text">学习成果达成情况（由学习者填写）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%AA%E5%9B%BE%E4%B8%8E%E8%AF%81%E6%8D%AE"><span class="nav-number">1.6.1.</span> <span class="nav-text">截图与证据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8A%A5%E5%91%8A%E6%AD%A3%E6%96%87%EF%BC%88%E6%8E%A8%E8%8D%90%E7%BB%93%E6%9E%84%EF%BC%8C%E7%9B%B4%E6%8E%A5%E7%85%A7%E6%8A%84%E5%A1%AB%E7%A9%BA%EF%BC%89"><span class="nav-number">1.6.2.</span> <span class="nav-text">报告正文（推荐结构，直接照抄填空）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%91%BD%E4%BB%A4%E4%B8%8E%E8%BE%93%E5%87%BA"><span class="nav-number">1.6.3.</span> <span class="nav-text">关键命令与输出</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0-HTTP-%E6%9C%8D%E5%8A%A1%E5%90%AF%E5%8A%A8%E5%91%BD%E4%BB%A4%EF%BC%9A"><span class="nav-number">1.7.</span> <span class="nav-text">本地 HTTP 服务启动命令：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%A7%A6%E5%8F%91%E8%AE%BF%E9%97%AE%E7%9A%84%E5%91%BD%E4%BB%A4%EF%BC%88%E5%8F%AF%E9%80%89%EF%BC%89%EF%BC%9A"><span class="nav-number">1.8.</span> <span class="nav-text">触发访问的命令（可选）：</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E4%B8%8E%E5%8F%8D%E6%80%9D"><span class="nav-number">1.8.1.</span> <span class="nav-text">结论与反思</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">75</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Tigercoll" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/17c812fc.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day007：网络与协议基础 - Wireshark 入门与综合分析 | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day007：网络与协议基础 - Wireshark 入门与综合分析
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-12-31 00:00:00" itemprop="dateCreated datePublished" datetime="2025-12-31T00:00:00+08:00">2025-12-31</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Day007：网络与协议基础-Wireshark-入门与综合分析"><a href="#Day007：网络与协议基础-Wireshark-入门与综合分析" class="headerlink" title="Day007：网络与协议基础 - Wireshark 入门与综合分析"></a>Day007：网络与协议基础 - Wireshark 入门与综合分析</h1><ul>
+<li>日期：2025-12-31</li>
+<li>周次：第 1 周</li>
+</ul>
+<h2 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h2><ul>
+<li>熟练使用过滤器（显示&#x2F;捕获），能快速定位目标流量</li>
+<li>能在一次抓包里串起来：DNS → TCP 三次握手 → HTTP 请求&#x2F;响应</li>
+<li>学会做“分析证据”：标注、书签、导出截图与最终报告</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="学习内容"><a href="#学习内容" class="headerlink" title="学习内容"></a>学习内容</h2><h3 id="1️⃣-必须先分清：捕获过滤器-vs-显示过滤器"><a href="#1️⃣-必须先分清：捕获过滤器-vs-显示过滤器" class="headerlink" title="1️⃣ 必须先分清：捕获过滤器 vs 显示过滤器"></a>1️⃣ 必须先分清：捕获过滤器 vs 显示过滤器</h3><ul>
+<li><strong>捕获过滤器（Capture Filter）</strong>：在“抓包时”就把不需要的包丢掉（语法更像 BPF）。<ul>
+<li>优点：文件更小、噪声更少</li>
+<li>缺点：抓不到就没了，无法回补</li>
+</ul>
+</li>
+<li><strong>显示过滤器（Display Filter）</strong>：抓完以后再筛选展示（Wireshark 最强、最常用）。<ul>
+<li>优点：灵活、可反复调整</li>
+<li>缺点：抓包时噪声可能多</li>
+</ul>
+</li>
+</ul>
+<p>学习阶段建议：<strong>少用捕获过滤器，多用显示过滤器</strong>。</p>
+<h3 id="2️⃣-显示过滤器（Display-Filter）常用清单"><a href="#2️⃣-显示过滤器（Display-Filter）常用清单" class="headerlink" title="2️⃣ 显示过滤器（Display Filter）常用清单"></a>2️⃣ 显示过滤器（Display Filter）常用清单</h3><h4 id="协议-x2F-端口"><a href="#协议-x2F-端口" class="headerlink" title="协议&#x2F;端口"></a>协议&#x2F;端口</h4><ul>
+<li><code>dns</code></li>
+<li><code>http</code></li>
+<li><code>tcp</code></li>
+<li><code>tcp.port == 80</code></li>
+<li><code>udp.port == 53</code></li>
+</ul>
+<h4 id="IP-x2F-主机定位"><a href="#IP-x2F-主机定位" class="headerlink" title="IP&#x2F;主机定位"></a>IP&#x2F;主机定位</h4><ul>
+<li><code>ip.addr == 192.168.1.10</code>（某主机参与的所有流量）</li>
+<li><code>ip.src == 192.168.1.10</code> &#x2F; <code>ip.dst == 192.168.1.10</code></li>
+</ul>
+<h4 id="TCP-关键定位"><a href="#TCP-关键定位" class="headerlink" title="TCP 关键定位"></a>TCP 关键定位</h4><ul>
+<li>三次握手：<ul>
+<li><code>tcp.flags.syn == 1 &amp;&amp; tcp.flags.ack == 0</code></li>
+<li><code>tcp.flags.syn == 1 &amp;&amp; tcp.flags.ack == 1</code></li>
+<li><code>tcp.flags.ack == 1 &amp;&amp; tcp.len == 0</code></li>
+</ul>
+</li>
+<li>重传&#x2F;乱序（排障常用）：<ul>
+<li><code>tcp.analysis.retransmission</code></li>
+<li><code>tcp.analysis.out_of_order</code></li>
+<li><code>tcp.analysis.lost_segment</code></li>
+</ul>
+</li>
+<li>快速看是否有 RST：<ul>
+<li><code>tcp.flags.reset == 1</code></li>
+</ul>
+</li>
+</ul>
+<h4 id="HTTP-关键字段（有时非常好用）"><a href="#HTTP-关键字段（有时非常好用）" class="headerlink" title="HTTP 关键字段（有时非常好用）"></a>HTTP 关键字段（有时非常好用）</h4><ul>
+<li><code>http.request.method == &quot;GET&quot;</code></li>
+<li><code>http.request.method == &quot;POST&quot;</code></li>
+<li><code>http.host contains &quot;example&quot;</code></li>
+<li><code>http.response.code == 301 || http.response.code == 302</code></li>
+</ul>
+<h3 id="3️⃣-分析视角：从“现象”到“证据”"><a href="#3️⃣-分析视角：从“现象”到“证据”" class="headerlink" title="3️⃣ 分析视角：从“现象”到“证据”"></a>3️⃣ 分析视角：从“现象”到“证据”</h3><p>建议你按这个链路写报告：</p>
+<ol>
+<li>目标是什么？（访问哪个域名&#x2F;服务）</li>
+<li>DNS 解析有没有成功？（Query 类型、RCODE、Answer、TTL）</li>
+<li>TCP 连接有没有建立？（三次握手、是否重传、RTT 体感）</li>
+<li>应用层请求是否正常？（HTTP 方法、路径、状态码、关键头）</li>
+<li>异常的话，落在哪一层？（DNS&#x2F;TCP&#x2F;HTTP）</li>
+</ol>
+<h2 id="实践任务（合法授权范围内）"><a href="#实践任务（合法授权范围内）" class="headerlink" title="实践任务（合法授权范围内）"></a>实践任务（合法授权范围内）</h2><blockquote>
+<p>目标：产出一份“能复现、能对照、能解释”的综合抓包报告。</p>
+</blockquote>
+<h3 id="任务-1：准备可控流量源（本地-HTTP-服务）"><a href="#任务-1：准备可控流量源（本地-HTTP-服务）" class="headerlink" title="任务 1：准备可控流量源（本地 HTTP 服务）"></a>任务 1：准备可控流量源（本地 HTTP 服务）</h3><p>在 Windows 上推荐用 Python 的 <code>http.server</code>：</p>
+<ol>
+<li>新建目录：<code>D:\projects\Network Security\lab-wireshark</code></li>
+<li>放一个 <code>index.html</code>（写任意内容，比如“Day007 Lab”）</li>
+<li>在该目录启动服务（任选一种）：<ul>
+<li><code>python -m http.server 8000</code></li>
+<li><code>py -m http.server 8000</code></li>
+</ul>
+</li>
+</ol>
+<h3 id="任务-2：触发一次“DNS-TCP-HTTP”的访问"><a href="#任务-2：触发一次“DNS-TCP-HTTP”的访问" class="headerlink" title="任务 2：触发一次“DNS + TCP + HTTP”的访问"></a>任务 2：触发一次“DNS + TCP + HTTP”的访问</h3><p>你需要一次访问里同时出现 DNS、TCP 握手、HTTP。</p>
+<p>推荐做法（更稳定看到 DNS）：</p>
+<ol>
+<li>访问一个域名（触发 DNS）：例如在浏览器访问 <code>http://example.com/</code> 或 <code>http://www.bing.com/</code></li>
+<li>访问本地服务（触发 TCP + HTTP）：<code>http://127.0.0.1:8000/</code></li>
+</ol>
+<blockquote>
+<p>如果你想在一次访问里同时看到 DNS+HTTP：尽量访问“域名形式”的 HTTP（例如 <code>http://example.com/</code>），不要只访问 IP。</p>
+</blockquote>
+<h3 id="任务-3：抓包与过滤（推荐流程）"><a href="#任务-3：抓包与过滤（推荐流程）" class="headerlink" title="任务 3：抓包与过滤（推荐流程）"></a>任务 3：抓包与过滤（推荐流程）</h3><ol>
+<li>打开 Wireshark，选择你的活动网卡</li>
+<li>开始抓包</li>
+<li>执行上面的访问动作（至少一次域名 HTTP + 一次本地 HTTP）</li>
+<li>停止抓包</li>
+<li>用显示过滤器分段分析并截图：</li>
+</ol>
+<ul>
+<li>DNS：<code>dns</code></li>
+<li>TCP 握手：<code>tcp.flags.syn == 1 || tcp.flags.fin == 1 || tcp.flags.reset == 1</code></li>
+<li>HTTP：<code>http</code></li>
+</ul>
+<h3 id="手动实现要点（不使用任何脚本）"><a href="#手动实现要点（不使用任何脚本）" class="headerlink" title="手动实现要点（不使用任何脚本）"></a>手动实现要点（不使用任何脚本）</h3><blockquote>
+<p>目标：你能“亲手触发”并在 Wireshark 里找到 <strong>DNS → TCP 三次握手 → HTTP 请求&#x2F;响应</strong> 这条证据链。</p>
+</blockquote>
+<h4 id="Step-1：先准备一个稳定的-HTTP-目标（本地）"><a href="#Step-1：先准备一个稳定的-HTTP-目标（本地）" class="headerlink" title="Step 1：先准备一个稳定的 HTTP 目标（本地）"></a>Step 1：先准备一个稳定的 HTTP 目标（本地）</h4><p>请先完成“任务 1”的本地服务启动，然后用浏览器访问：</p>
+<ul>
+<li><code>http://127.0.0.1:8000/</code></li>
+</ul>
+<p>这一步几乎必定能抓到 HTTP（避免外网网站跳 HTTPS 导致看不到明文 HTTP）。</p>
+<h4 id="Step-2：再触发一次“域名访问”（更容易看到-DNS）"><a href="#Step-2：再触发一次“域名访问”（更容易看到-DNS）" class="headerlink" title="Step 2：再触发一次“域名访问”（更容易看到 DNS）"></a>Step 2：再触发一次“域名访问”（更容易看到 DNS）</h4><p>任选一种：</p>
+<ul>
+<li>浏览器打开：<code>http://example.com/</code></li>
+<li>或者先 <code>nslookup example.com</code> 再访问 <code>http://example.com/</code></li>
+</ul>
+<h4 id="Step-3：Wireshark-用过滤器分段截证据"><a href="#Step-3：Wireshark-用过滤器分段截证据" class="headerlink" title="Step 3：Wireshark 用过滤器分段截证据"></a>Step 3：Wireshark 用过滤器分段截证据</h4><p>你最终至少要保存&#x2F;截图这 3 类证据：</p>
+<ol>
+<li>DNS 证据</li>
+</ol>
+<ul>
+<li>过滤器：<code>dns</code></li>
+<li>截图要求：能看到 Query Name&#x2F;Type、RCODE、Answer 和 TTL（如果有）</li>
+</ul>
+<ol start="2">
+<li>TCP 三次握手证据</li>
+</ol>
+<ul>
+<li>过滤器（更聚焦）：<ul>
+<li><code>tcp.flags.syn == 1 || tcp.flags.ack == 1</code></li>
+</ul>
+</li>
+<li>或者用你已写的“握手&#x2F;关闭&#x2F;RST”过滤器：<ul>
+<li><code>tcp.flags.syn == 1 || tcp.flags.fin == 1 || tcp.flags.reset == 1</code></li>
+</ul>
+</li>
+</ul>
+<ol start="3">
+<li>HTTP 请求&#x2F;响应证据</li>
+</ol>
+<ul>
+<li>过滤器：<code>http</code></li>
+<li>截图要求：能看到 Request-Line、Host（请求头）、Status-Code、Content-Type（响应头）</li>
+</ul>
+<h4 id="Step-4：常见问题（看不到-DNS-x2F-HTTP-时怎么做）"><a href="#Step-4：常见问题（看不到-DNS-x2F-HTTP-时怎么做）" class="headerlink" title="Step 4：常见问题（看不到 DNS&#x2F;HTTP 时怎么做）"></a>Step 4：常见问题（看不到 DNS&#x2F;HTTP 时怎么做）</h4><ul>
+<li>看不到 DNS：可能命中缓存了。<ul>
+<li>解决：换一个没访问过的域名；或执行 <code>ipconfig /flushdns</code> 后再访问一次（可选）。</li>
+</ul>
+</li>
+<li>看不到明文 HTTP：很多网站会 301&#x2F;302 跳到 HTTPS。<ul>
+<li>解决：用本地 <code>127.0.0.1:8000</code> 的 HTTP 输出截图；DNS 证据仍可来自域名解析。</li>
+</ul>
+</li>
+</ul>
+<h3 id="任务-4：标注-x2F-书签-x2F-导出"><a href="#任务-4：标注-x2F-书签-x2F-导出" class="headerlink" title="任务 4：标注&#x2F;书签&#x2F;导出"></a>任务 4：标注&#x2F;书签&#x2F;导出</h3><p>在 Wireshark 里对关键包做：</p>
+<ul>
+<li><strong>Comment&#x2F;注释</strong>：写下“这是 DNS Query&#x2F;这是 SYN&#x2F;这是 200 OK…”</li>
+<li><strong>Mark Packet（标记包）</strong>：把关键包标出来</li>
+</ul>
+<p>导出产物：</p>
+<ul>
+<li>保存抓包文件（建议命名）：<code>Day007_dns_tcp_http.pcapng</code></li>
+<li>关键截图（至少 3 张）：DNS、SYN&#x2F;SYN-ACK&#x2F;ACK、HTTP 请求&#x2F;响应</li>
+</ul>
+<h2 id="巩固练习（题与复盘）"><a href="#巩固练习（题与复盘）" class="headerlink" title="巩固练习（题与复盘）"></a>巩固练习（题与复盘）</h2><h3 id="练习-1：为常见分析场景编写-5-条过滤表达式"><a href="#练习-1：为常见分析场景编写-5-条过滤表达式" class="headerlink" title="练习 1：为常见分析场景编写 5 条过滤表达式"></a>练习 1：为常见分析场景编写 5 条过滤表达式</h3><p>参考场景（从中挑 5 个写出过滤器，并解释为什么这么写）：</p>
+<ol>
+<li>只看 DNS</li>
+<li>只看访问 <code>127.0.0.1:8000</code> 的 TCP 流量</li>
+<li>只看 TCP 三次握手相关包</li>
+<li>只看 HTTP 302 的响应</li>
+<li>只看某个 IP 的所有流量</li>
+<li>只看重传</li>
+</ol>
+<h3 id="练习-2：解释一次异常重传与超时的可能原因"><a href="#练习-2：解释一次异常重传与超时的可能原因" class="headerlink" title="练习 2：解释一次异常重传与超时的可能原因"></a>练习 2：解释一次异常重传与超时的可能原因</h3><p>从至少 3 个角度回答：</p>
+<ul>
+<li>信号&#x2F;链路质量：丢包、Wi-Fi 不稳定</li>
+<li>端到端负载：服务器繁忙、窗口太小</li>
+<li>路由&#x2F;策略：防火墙丢包、QoS 限速</li>
+</ul>
+<h2 id="评估标准（达成判定）"><a href="#评估标准（达成判定）" class="headerlink" title="评估标准（达成判定）"></a>评估标准（达成判定）</h2><ul>
+<li>能独立完成：抓包 → 过滤 → 定位关键包 → 标注&#x2F;截图</li>
+<li>报告中能清晰串起：DNS 解析证据 + TCP 握手证据 + HTTP 请求&#x2F;响应证据</li>
+<li>至少写出 5 条显示过滤器，并能解释用途</li>
+</ul>
+<h2 id="学习成果达成情况（由学习者填写）"><a href="#学习成果达成情况（由学习者填写）" class="headerlink" title="学习成果达成情况（由学习者填写）"></a>学习成果达成情况（由学习者填写）</h2><h3 id="截图与证据"><a href="#截图与证据" class="headerlink" title="截图与证据"></a>截图与证据</h3><ul>
+<li>抓包文件：<ul>
+<li><code>Day007_dns_tcp_http.pcapng</code>（保存位置：）</li>
+</ul>
+</li>
+<li>截图（至少 3 张）：<ol>
+<li>DNS Query&#x2F;Response（能看到 Query 类型 + RCODE + Answer&#x2F;TTL）</li>
+<li>TCP 三次握手（SYN &#x2F; SYN-ACK &#x2F; ACK）</li>
+<li>HTTP 请求&#x2F;响应（Request-Line + Status-Code + 关键头部）</li>
+</ol>
+</li>
+</ul>
+<h3 id="报告正文（推荐结构，直接照抄填空）"><a href="#报告正文（推荐结构，直接照抄填空）" class="headerlink" title="报告正文（推荐结构，直接照抄填空）"></a>报告正文（推荐结构，直接照抄填空）</h3><ol>
+<li>目标与环境</li>
+</ol>
+<ul>
+<li>目标域名&#x2F;URL：</li>
+<li>本机 IP：</li>
+<li>抓包网卡：</li>
+</ul>
+<ol start="2">
+<li>DNS 解析</li>
+</ol>
+<ul>
+<li>Query Name &#x2F; Type：</li>
+<li>RCODE：</li>
+<li>Answer（IP&#x2F;记录）：</li>
+<li>TTL：</li>
+</ul>
+<ol start="3">
+<li>TCP 建连</li>
+</ol>
+<ul>
+<li>Client Port → Server Port：</li>
+<li>三次握手证据（Frame No.）：</li>
+<li>是否有重传&#x2F;乱序：</li>
+</ul>
+<ol start="4">
+<li>HTTP 交互</li>
+</ol>
+<ul>
+<li>方法与路径：</li>
+<li>状态码：</li>
+<li>关键请求头（Host&#x2F;User-Agent&#x2F;Accept&#x2F;Cookie）：</li>
+<li>关键响应头（Content-Type&#x2F;Set-Cookie&#x2F;Location）：</li>
+</ul>
+<ol start="5">
+<li>结论</li>
+</ol>
+<ul>
+<li>本次访问是否成功：</li>
+<li>如果失败，失败发生在（DNS&#x2F;TCP&#x2F;HTTP）哪一层：</li>
+</ul>
+<h3 id="关键命令与输出"><a href="#关键命令与输出" class="headerlink" title="关键命令与输出"></a>关键命令与输出</h3><ul>
+<li><h2 id="本地-HTTP-服务启动命令："><a href="#本地-HTTP-服务启动命令：" class="headerlink" title="本地 HTTP 服务启动命令："></a>本地 HTTP 服务启动命令：</h2></li>
+<li><h2 id="触发访问的命令（可选）："><a href="#触发访问的命令（可选）：" class="headerlink" title="触发访问的命令（可选）："></a>触发访问的命令（可选）：</h2></li>
+<li>你常用的 5 条显示过滤器：<br>http 或 tcp 或 udp：<br>作用：按协议过滤，显示所有 HTTP、TCP 或 UDP 协议的流量.<br>示例：输入 http，显示所有 HTTP 协议包.<br>ip.addr &#x3D;&#x3D; 192.168.1.100：<br>作用：显示源或目的 IP 地址为指定 IP 的所有包.<br>示例：只看和 192.168.1.100 相关的通信.<br>tcp.port &#x3D;&#x3D; 80 或 udp.port &#x3D;&#x3D; 53：<br>作用：过滤指定端口号的 TCP 或 UDP 流量.<br>示例：tcp.port &#x3D;&#x3D; 80 查看 Web (HTTP) 流量，udp.port &#x3D;&#x3D; 53 查看 DNS 流量.<br>dns：<br>作用：专门显示 DNS（域名系统）协议的流量.<br>示例：快速查看域名解析请求和响应.<br>tcp.port &#x3D;&#x3D; 80 &amp;&amp; http (组合过滤)<br>作用：使用逻辑运算符 &amp;&amp; (与) 或 || (或) 组合条件.<br>示例：只显示端口 80 上的 HTTP 流量.</li>
+</ul>
+<h3 id="结论与反思"><a href="#结论与反思" class="headerlink" title="结论与反思"></a>结论与反思</h3><ul>
+<li>今天最有效的一个过滤器（为什么）：</li>
+<li>今天最花时间的一步（怎么改进）：</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Tigercoll 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+              <a href="/tags/%E5%AE%89%E5%85%A8/" rel="tag"># 安全</a>
+              <a href="/tags/%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" rel="tag"># 学习计划</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/d8a842e9.html" rel="prev" title="Day006：网络与协议基础 - HTTP 基础">
+                  <i class="fa fa-chevron-left"></i> Day006：网络与协议基础 - HTTP 基础
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/f7258881.html" rel="next" title="Day008：安全协议与加密 - TLS 概念与握手">
+                  Day008：安全协议与加密 - TLS 概念与握手 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true,"react":{"opacity":0.7}}});</script></body>
+</html>

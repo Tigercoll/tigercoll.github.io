@@ -1,0 +1,1453 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-center-simple.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Day029：日志与可观测性 - 日志类型与字段规范 日期：2026-01-22 周次：第5周  学习目标今天你将掌握日志管理的基础知识：  识别日志类型：系统日志、应用日志、安全日志、访问日志的区别与用途 理解关键字段：时间戳、主机名、用户、事件类型、上下文信息的作用 掌握规范化意义：理解日志规范化的好处（分析、搜索、合规） 设计日志字段：能为不同场景设计合理的日志字段结构 输出统一格式：能将不">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day029：日志与可观测性 - 日志类型与字段规范">
+<meta property="og:url" content="https://tigercoll.top/post/8abede0b.html">
+<meta property="og:site_name" content="Tigercoll&#39;s Blog">
+<meta property="og:description" content="Day029：日志与可观测性 - 日志类型与字段规范 日期：2026-01-22 周次：第5周  学习目标今天你将掌握日志管理的基础知识：  识别日志类型：系统日志、应用日志、安全日志、访问日志的区别与用途 理解关键字段：时间戳、主机名、用户、事件类型、上下文信息的作用 掌握规范化意义：理解日志规范化的好处（分析、搜索、合规） 设计日志字段：能为不同场景设计合理的日志字段结构 输出统一格式：能将不">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-01-21T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-21T16:00:00.000Z">
+<meta property="article:author" content="Tigercoll">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="学习计划">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://tigercoll.top/post/8abede0b.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/8abede0b.html","path":"post/8abede0b.html","title":"Day029：日志与可观测性 - 日志类型与字段规范"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day029：日志与可观测性 - 日志类型与字段规范 | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Day029%EF%BC%9A%E6%97%A5%E5%BF%97%E4%B8%8E%E5%8F%AF%E8%A7%82%E6%B5%8B%E6%80%A7-%E6%97%A5%E5%BF%97%E7%B1%BB%E5%9E%8B%E4%B8%8E%E5%AD%97%E6%AE%B5%E8%A7%84%E8%8C%83"><span class="nav-number">1.</span> <span class="nav-text">Day029：日志与可观测性 - 日志类型与字段规范</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E7%9B%AE%E6%A0%87"><span class="nav-number">1.1.</span> <span class="nav-text">学习目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E5%86%85%E5%AE%B9"><span class="nav-number">1.2.</span> <span class="nav-text">学习内容</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-%E6%97%A5%E5%BF%97%E5%88%86%E7%B1%BB%E4%B8%8E%E7%94%A8%E9%80%94"><span class="nav-number">1.2.1.</span> <span class="nav-text">1️⃣ 日志分类与用途</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-1-%E6%97%A5%E5%BF%97%E7%B1%BB%E5%9E%8B%E6%80%BB%E8%A7%88"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">1.1 日志类型总览</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#1-2-%E5%90%84%E7%B1%BB%E5%9E%8B%E6%97%A5%E5%BF%97%E8%AF%A6%E8%A7%A3"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">1.2 各类型日志详解</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-%E6%97%A5%E5%BF%97%E5%85%B3%E9%94%AE%E5%AD%97%E6%AE%B5"><span class="nav-number">1.2.2.</span> <span class="nav-text">2️⃣ 日志关键字段</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#2-1-%E6%A0%B8%E5%BF%83%E5%AD%97%E6%AE%B5%E8%AF%B4%E6%98%8E"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">2.1 核心字段说明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-2-%E6%97%B6%E9%97%B4%E6%88%B3%E6%A0%BC%E5%BC%8F%E8%A7%84%E8%8C%83"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">2.2 时间戳格式规范</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%EF%B8%8F%E2%83%A3-%E6%97%A5%E5%BF%97%E8%A7%84%E8%8C%83%E5%8C%96%E4%B8%8E%E6%A0%87%E5%87%86%E5%8C%96"><span class="nav-number">1.2.3.</span> <span class="nav-text">3️⃣ 日志规范化与标准化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#3-1-%E4%B8%BA%E4%BD%95%E9%9C%80%E8%A6%81%E6%97%A5%E5%BF%97%E8%A7%84%E8%8C%83%E5%8C%96%EF%BC%9F"><span class="nav-number">1.2.3.1.</span> <span class="nav-text">3.1 为何需要日志规范化？</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-2-%E6%97%A5%E5%BF%97%E7%BA%A7%E5%88%AB%E8%A7%84%E8%8C%83"><span class="nav-number">1.2.3.2.</span> <span class="nav-text">3.2 日志级别规范</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-3-%E7%BB%9F%E4%B8%80%E6%97%A5%E5%BF%97%E6%A0%BC%E5%BC%8F%EF%BC%88JSON%EF%BC%89%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.2.3.3.</span> <span class="nav-text">3.3 统一日志格式（JSON）示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%EF%B8%8F%E2%83%A3-%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E4%B8%8E%E6%A0%87%E5%87%86%E5%8C%96"><span class="nav-number">1.2.4.</span> <span class="nav-text">4️⃣ 日志采集与标准化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#4-1-%E5%B8%B8%E7%94%A8%E6%97%A5%E5%BF%97%E9%87%87%E9%9B%86%E5%B7%A5%E5%85%B7"><span class="nav-number">1.2.4.1.</span> <span class="nav-text">4.1 常用日志采集工具</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-2-%E6%97%A5%E5%BF%97%E6%A0%87%E5%87%86%E5%8C%96%E6%B5%81%E7%A8%8B"><span class="nav-number">1.2.4.2.</span> <span class="nav-text">4.2 日志标准化流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-3-%E5%AD%97%E6%AE%B5%E6%98%A0%E5%B0%84%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.2.4.3.</span> <span class="nav-text">4.3 字段映射示例</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%EF%B8%8F%E2%83%A3-%E5%90%88%E8%A7%84%E8%A6%81%E6%B1%82%E4%B8%8E%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5"><span class="nav-number">1.2.5.</span> <span class="nav-text">5️⃣ 合规要求与最佳实践</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#5-1-%E5%90%88%E8%A7%84%E8%A6%81%E6%B1%82"><span class="nav-number">1.2.5.1.</span> <span class="nav-text">5.1 合规要求</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-2-%E6%97%A5%E5%BF%97%E6%9C%80%E4%BD%B3%E5%AE%9E%E8%B7%B5"><span class="nav-number">1.2.5.2.</span> <span class="nav-text">5.2 日志最佳实践</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6%EF%B8%8F%E2%83%A3-%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90%E6%A1%88%E4%BE%8B"><span class="nav-number">1.2.6.</span> <span class="nav-text">6️⃣ 日志分析案例</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#6-1-%E5%88%86%E6%9E%90%E5%9C%BA%E6%99%AF-1%EF%BC%9A%E6%9A%B4%E5%8A%9B%E7%A0%B4%E8%A7%A3%E6%A3%80%E6%B5%8B"><span class="nav-number">1.2.6.1.</span> <span class="nav-text">6.1 分析场景 1：暴力破解检测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-2-%E5%88%86%E6%9E%90%E5%9C%BA%E6%99%AF-2%EF%BC%9A%E5%BC%82%E5%B8%B8%E6%B5%81%E9%87%8F%E6%A3%80%E6%B5%8B"><span class="nav-number">1.2.6.2.</span> <span class="nav-text">6.2 分析场景 2：异常流量检测</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E8%B7%B5%E4%BB%BB%E5%8A%A1%EF%BC%88%E5%90%88%E6%B3%95%E6%8E%88%E6%9D%83%E8%8C%83%E5%9B%B4%E5%86%85%EF%BC%89"><span class="nav-number">1.3.</span> <span class="nav-text">实践任务（合法授权范围内）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-1%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89%EF%BC%9A%E5%88%86%E6%9E%90%E6%9C%AC%E5%9C%B0%E6%97%A5%E5%BF%97"><span class="nav-number">1.3.1.</span> <span class="nav-text">任务 1（必做）：分析本地日志</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-2%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89%EF%BC%9A%E8%AE%BE%E8%AE%A1%E6%97%A5%E5%BF%97%E8%A7%84%E8%8C%83"><span class="nav-number">1.3.2.</span> <span class="nav-text">任务 2（必做）：设计日志规范</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A4%E8%AF%81%E6%97%A5%E5%BF%97"><span class="nav-number">1.4.</span> <span class="nav-text">认证日志</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B"><span class="nav-number">1.4.1.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%99%E8%AF%AF%E6%97%A5%E5%BF%97"><span class="nav-number">1.5.</span> <span class="nav-text">错误日志</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-1"><span class="nav-number">1.5.1.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-4%EF%BC%88%E8%BF%9B%E9%98%B6%EF%BC%89%EF%BC%9A%E7%94%9F%E6%88%90-CSV-%E6%A0%BC%E5%BC%8F"><span class="nav-number">1.5.2.</span> <span class="nav-text">任务 4（进阶）：生成 CSV 格式</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A9%E5%9B%BA%E7%BB%83%E4%B9%A0%EF%BC%88%E9%A2%98%E4%B8%8E%E5%A4%8D%E7%9B%98%EF%BC%89"><span class="nav-number">1.6.</span> <span class="nav-text">巩固练习（题与复盘）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-1%EF%BC%9A%E4%B8%BA%E4%BD%95%E9%9C%80%E8%A6%81%E7%BB%9F%E4%B8%80%E5%AD%97%E6%AE%B5%EF%BC%9F"><span class="nav-number">1.6.1.</span> <span class="nav-text">练习 1：为何需要统一字段？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-2%EF%BC%9A%E8%AE%BE%E8%AE%A1%E4%B8%80%E4%BB%BD%E6%97%A5%E5%BF%97%E8%A7%84%E8%8C%83%E8%8D%89%E6%A1%88"><span class="nav-number">1.6.2.</span> <span class="nav-text">练习 2：设计一份日志规范草案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-3%EF%BC%9A%E6%97%A5%E5%BF%97%E6%95%8F%E6%84%9F%E4%BF%A1%E6%81%AF%E8%84%B1%E6%95%8F"><span class="nav-number">1.6.3.</span> <span class="nav-text">练习 3：日志敏感信息脱敏</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-4%EF%BC%9A%E8%AE%BE%E8%AE%A1%E6%97%A5%E5%BF%97%E8%BD%AE%E8%BD%AC%E7%AD%96%E7%95%A5"><span class="nav-number">1.6.4.</span> <span class="nav-text">练习 4：设计日志轮转策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E6%A0%87%E5%87%86%EF%BC%88%E8%BE%BE%E6%88%90%E5%88%A4%E5%AE%9A%EF%BC%89"><span class="nav-number">1.7.</span> <span class="nav-text">评估标准（达成判定）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E8%BE%BE%E6%88%90%E6%83%85%E5%86%B5%EF%BC%88%E7%94%B1%E5%AD%A6%E4%B9%A0%E8%80%85%E5%A1%AB%E5%86%99%EF%BC%89"><span class="nav-number">1.8.</span> <span class="nav-text">学习成果达成情况（由学习者填写）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%AA%E5%9B%BE%E4%B8%8E%E8%AF%81%E6%8D%AE"><span class="nav-number">1.8.1.</span> <span class="nav-text">截图与证据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%91%BD%E4%BB%A4%E4%B8%8E%E8%BE%93%E5%87%BA%EF%BC%88%E7%B2%98%E8%B4%B4%E5%85%B3%E9%94%AE%E7%89%87%E6%AE%B5%EF%BC%89"><span class="nav-number">1.8.2.</span> <span class="nav-text">关键命令与输出（粘贴关键片段）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E4%B8%8E%E5%8F%8D%E6%80%9D"><span class="nav-number">1.8.3.</span> <span class="nav-text">结论与反思</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E4%B8%AD%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%88%E5%90%AB%E6%80%9D%E8%B7%AF%EF%BC%89"><span class="nav-number">1.9.</span> <span class="nav-text">集中参考答案（含思路）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-1-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%9A%E4%B8%BA%E4%BD%95%E9%9C%80%E8%A6%81%E7%BB%9F%E4%B8%80%E5%AD%97%E6%AE%B5%EF%BC%9F"><span class="nav-number">1.9.1.</span> <span class="nav-text">练习 1 参考答案：为何需要统一字段？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-2-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%9A%E8%AE%BE%E8%AE%A1%E4%B8%80%E4%BB%BD%E6%97%A5%E5%BF%97%E8%A7%84%E8%8C%83%E8%8D%89%E6%A1%88"><span class="nav-number">1.9.2.</span> <span class="nav-text">练习 2 参考答案：设计一份日志规范草案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A2%E5%8D%95%E6%94%AF%E4%BB%98%E6%97%A5%E5%BF%97"><span class="nav-number">1.10.</span> <span class="nav-text">订单支付日志</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-2"><span class="nav-number">1.10.1.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AE%A2%E5%8D%95%E5%8F%91%E8%B4%A7%E6%97%A5%E5%BF%97"><span class="nav-number">1.11.</span> <span class="nav-text">订单发货日志</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-3"><span class="nav-number">1.11.1.</span> <span class="nav-text">示例</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%94%99%E8%AF%AF%E6%97%A5%E5%BF%97-1"><span class="nav-number">1.12.</span> <span class="nav-text">错误日志</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%A4%BA%E4%BE%8B-4"><span class="nav-number">1.12.1.</span> <span class="nav-text">示例</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-4-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%9A%E8%AE%BE%E8%AE%A1%E6%97%A5%E5%BF%97%E8%BD%AE%E8%BD%AC%E7%AD%96%E7%95%A5"><span class="nav-number">1.12.2.</span> <span class="nav-text">练习 4 参考答案：设计日志轮转策略</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E7%A4%BA%E4%BE%8B%E5%A1%AB%E5%86%99%EF%BC%88%E5%8F%AF%E7%85%A7%E6%8A%84%EF%BC%89"><span class="nav-number">1.13.</span> <span class="nav-text">学习成果示例填写（可照抄）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%AA%E5%9B%BE%E4%B8%8E%E8%AF%81%E6%8D%AE%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.13.1.</span> <span class="nav-text">截图与证据（示例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%91%BD%E4%BB%A4%E4%B8%8E%E8%BE%93%E5%87%BA%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.13.2.</span> <span class="nav-text">关键命令与输出（示例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E4%B8%8E%E5%8F%8D%E6%80%9D%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.13.3.</span> <span class="nav-text">结论与反思（示例）</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">75</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Tigercoll" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/8abede0b.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day029：日志与可观测性 - 日志类型与字段规范 | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day029：日志与可观测性 - 日志类型与字段规范
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-01-22 00:00:00" itemprop="dateCreated datePublished" datetime="2026-01-22T00:00:00+08:00">2026-01-22</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Day029：日志与可观测性-日志类型与字段规范"><a href="#Day029：日志与可观测性-日志类型与字段规范" class="headerlink" title="Day029：日志与可观测性 - 日志类型与字段规范"></a>Day029：日志与可观测性 - 日志类型与字段规范</h1><ul>
+<li>日期：2026-01-22</li>
+<li>周次：第5周</li>
+</ul>
+<h2 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h2><p>今天你将掌握日志管理的基础知识：</p>
+<ul>
+<li><strong>识别日志类型</strong>：系统日志、应用日志、安全日志、访问日志的区别与用途</li>
+<li><strong>理解关键字段</strong>：时间戳、主机名、用户、事件类型、上下文信息的作用</li>
+<li><strong>掌握规范化意义</strong>：理解日志规范化的好处（分析、搜索、合规）</li>
+<li><strong>设计日志字段</strong>：能为不同场景设计合理的日志字段结构</li>
+<li><strong>输出统一格式</strong>：能将不同来源的日志转换为统一格式（JSON&#x2F;CSV）</li>
+</ul>
+<hr>
+<span id="more"></span>
+
+<h2 id="学习内容"><a href="#学习内容" class="headerlink" title="学习内容"></a>学习内容</h2><h3 id="1️⃣-日志分类与用途"><a href="#1️⃣-日志分类与用途" class="headerlink" title="1️⃣ 日志分类与用途"></a>1️⃣ 日志分类与用途</h3><h4 id="1-1-日志类型总览"><a href="#1-1-日志类型总览" class="headerlink" title="1.1 日志类型总览"></a>1.1 日志类型总览</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">日志分类体系</span><br><span class="line">│</span><br><span class="line">├─ 系统日志</span><br><span class="line">│  ├─ 内核日志</span><br><span class="line">│  ├─ 系统服务日志</span><br><span class="line">│  └─ 硬件日志</span><br><span class="line">│</span><br><span class="line">├─ 应用日志</span><br><span class="line">│  ├─ Web 服务器日志（Nginx/Apache）</span><br><span class="line">│  ├─ 应用程序日志（Python/Java/Node.js）</span><br><span class="line">│  ├─ 数据库日志（MySQL/PostgreSQL）</span><br><span class="line">│  └─ 中间件日志（Redis/MQ）</span><br><span class="line">│</span><br><span class="line">├─ 安全日志</span><br><span class="line">│  ├─ 认证日志（登录/登出）</span><br><span class="line">│  ├─ 授权日志（权限变更）</span><br><span class="line">│  ├─ 审计日志（操作记录）</span><br><span class="line">│  └─ 威胁日志（攻击检测）</span><br><span class="line">│</span><br><span class="line">└─ 访问日志</span><br><span class="line">   ├─ HTTP 访问日志</span><br><span class="line">   ├─ API 调用日志</span><br><span class="line">   └─ 用户行为日志</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="1-2-各类型日志详解"><a href="#1-2-各类型日志详解" class="headerlink" title="1.2 各类型日志详解"></a>1.2 各类型日志详解</h4><p><strong>1. 系统日志</strong></p>
+<table>
+<thead>
+<tr>
+<th>日志类型</th>
+<th>路径（Linux）</th>
+<th>路径（Windows）</th>
+<th>典型字段</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>内核日志</td>
+<td><code>/var/log/kern.log</code></td>
+<td>事件查看器 → 系统</td>
+<td>timestamp, level, message</td>
+</tr>
+<tr>
+<td>系统日志</td>
+<td><code>/var/log/syslog</code></td>
+<td>事件查看器 → 系统</td>
+<td>timestamp, facility, level, message</td>
+</tr>
+<tr>
+<td>服务日志</td>
+<td><code>/var/log/</code></td>
+<td>Event Log</td>
+<td>timestamp, service, status, message</td>
+</tr>
+</tbody></table>
+<p><strong>示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Jan 22 10:30:00 server01 systemd[1]: Started nginx.service</span><br><span class="line">Jan 22 10:30:01 server01 kernel: [UFW BLOCK] IN=eth0 SRC=192.168.1.100</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>2. 应用日志</strong></p>
+<p><strong>Web 服务器访问日志（Nginx&#x2F;Apache）</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">192.168.1.10 - - [22/Jan/2026:10:30:00 +0800] &quot;GET /api/users HTTP/1.1&quot; 200 1234 &quot;-&quot; &quot;Mozilla/5.0&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>应用程序日志（结构化）</strong>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;timestamp&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2026-01-22T10:30:00.123Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;level&quot;</span><span class="punctuation">:</span> <span class="string">&quot;INFO&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;service&quot;</span><span class="punctuation">:</span> <span class="string">&quot;user-service&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;trace_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;abc123&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;user_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;user001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;action&quot;</span><span class="punctuation">:</span> <span class="string">&quot;login&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;ip&quot;</span><span class="punctuation">:</span> <span class="string">&quot;192.168.1.10&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;status&quot;</span><span class="punctuation">:</span> <span class="string">&quot;success&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>数据库日志（MySQL）</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">2026-01-22T10:30:00.123456Z 123 [Note] Access denied for user &#x27;root&#x27;@&#x27;192.168.1.10&#x27;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>3. 安全日志</strong></p>
+<p><strong>认证日志</strong>（Linux <code>/var/log/auth.log</code>）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Jan 22 10:30:00 server01 sshd[12345]: Accepted password for user01 from 192.168.1.10 port 54321 ssh2</span><br><span class="line">Jan 22 10:30:05 server01 sshd[12346]: Failed password for admin from 192.168.1.11 port 54322 ssh2</span><br></pre></td></tr></table></figure>
+
+<p><strong>安全事件日志</strong>（Windows Event ID 4625）：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">账户登录失败</span><br><span class="line">事件 ID: 4625</span><br><span class="line">用户名: Administrator</span><br><span class="line">源 IP: 192.168.1.100</span><br><span class="line">失败原因: 错误密码</span><br><span class="line">时间: 2026-01-22 10:30:00</span><br></pre></td></tr></table></figure>
+
+<hr>
+<p><strong>4. 访问日志</strong></p>
+<p><strong>HTTP 访问日志（组合日志格式）</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">192.168.1.10 - user01 [22/Jan/2026:10:30:00 +0800] &quot;GET /api/data HTTP/1.1&quot; 200 5678 &quot;https://example.com&quot; &quot;Mozilla/5.0&quot; 0.123</span><br></pre></td></tr></table></figure>
+
+<p><strong>API 调用日志</strong>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;timestamp&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2026-01-22T10:30:00.123Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;method&quot;</span><span class="punctuation">:</span> <span class="string">&quot;POST&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;path&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/api/orders&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;status_code&quot;</span><span class="punctuation">:</span> <span class="number">201</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;user_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;user001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;request_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;req_abc123&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;duration_ms&quot;</span><span class="punctuation">:</span> <span class="number">123</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;ip&quot;</span><span class="punctuation">:</span> <span class="string">&quot;192.168.1.10&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2️⃣-日志关键字段"><a href="#2️⃣-日志关键字段" class="headerlink" title="2️⃣ 日志关键字段"></a>2️⃣ 日志关键字段</h3><h4 id="2-1-核心字段说明"><a href="#2-1-核心字段说明" class="headerlink" title="2.1 核心字段说明"></a>2.1 核心字段说明</h4><table>
+<thead>
+<tr>
+<th>字段类别</th>
+<th>字段名</th>
+<th>类型</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>时间相关</strong></td>
+<td>timestamp</td>
+<td>datetime</td>
+<td>事件发生时间</td>
+<td>2026-01-22T10:30:00.123Z</td>
+</tr>
+<tr>
+<td></td>
+<td>duration_ms</td>
+<td>int</td>
+<td>请求持续时间（毫秒）</td>
+<td>123</td>
+</tr>
+<tr>
+<td><strong>主机相关</strong></td>
+<td>hostname</td>
+<td>string</td>
+<td>主机名</td>
+<td>server01.example.com</td>
+</tr>
+<tr>
+<td></td>
+<td>ip_address</td>
+<td>string</td>
+<td>IP 地址</td>
+<td>192.168.1.10</td>
+</tr>
+<tr>
+<td></td>
+<td>port</td>
+<td>int</td>
+<td>端口号</td>
+<td>443</td>
+</tr>
+<tr>
+<td><strong>用户相关</strong></td>
+<td>user_id</td>
+<td>string</td>
+<td>用户 ID</td>
+<td>user001</td>
+</tr>
+<tr>
+<td></td>
+<td>username</td>
+<td>string</td>
+<td>用户名</td>
+<td>admin</td>
+</tr>
+<tr>
+<td></td>
+<td>session_id</td>
+<td>string</td>
+<td>会话 ID</td>
+<td>sess_abc123</td>
+</tr>
+<tr>
+<td><strong>请求相关</strong></td>
+<td>method</td>
+<td>string</td>
+<td>HTTP 方法</td>
+<td>GET, POST, PUT, DELETE</td>
+</tr>
+<tr>
+<td></td>
+<td>path</td>
+<td>string</td>
+<td>请求路径</td>
+<td>&#x2F;api&#x2F;users</td>
+</tr>
+<tr>
+<td></td>
+<td>query_string</td>
+<td>string</td>
+<td>查询参数</td>
+<td>?page&#x3D;1&amp;limit&#x3D;10</td>
+</tr>
+<tr>
+<td></td>
+<td>user_agent</td>
+<td>string</td>
+<td>用户代理</td>
+<td>Mozilla&#x2F;5.0…</td>
+</tr>
+<tr>
+<td></td>
+<td>referer</td>
+<td>string</td>
+<td>来源页面</td>
+<td><a target="_blank" rel="noopener" href="https://example.com/">https://example.com</a></td>
+</tr>
+<tr>
+<td><strong>响应相关</strong></td>
+<td>status_code</td>
+<td>int</td>
+<td>HTTP 状态码</td>
+<td>200, 404, 500</td>
+</tr>
+<tr>
+<td></td>
+<td>response_size</td>
+<td>int</td>
+<td>响应大小（字节）</td>
+<td>1234</td>
+</tr>
+<tr>
+<td><strong>事件相关</strong></td>
+<td>event_type</td>
+<td>string</td>
+<td>事件类型</td>
+<td>login, logout, error</td>
+</tr>
+<tr>
+<td></td>
+<td>event_id</td>
+<td>string</td>
+<td>事件 ID</td>
+<td>evt_abc123</td>
+</tr>
+<tr>
+<td></td>
+<td>level</td>
+<td>string</td>
+<td>日志级别</td>
+<td>DEBUG, INFO, WARNING, ERROR</td>
+</tr>
+<tr>
+<td></td>
+<td>message</td>
+<td>string</td>
+<td>日志消息</td>
+<td>用户登录成功</td>
+</tr>
+<tr>
+<td><strong>上下文相关</strong></td>
+<td>trace_id</td>
+<td>string</td>
+<td>追踪 ID</td>
+<td>trace_abc123</td>
+</tr>
+<tr>
+<td></td>
+<td>tags</td>
+<td>array</td>
+<td>标签</td>
+<td>[“web”, “api”, “orders”]</td>
+</tr>
+<tr>
+<td></td>
+<td>metadata</td>
+<td>object</td>
+<td>元数据</td>
+<td>{“version”: “1.0.0”}</td>
+</tr>
+</tbody></table>
+<hr>
+<h4 id="2-2-时间戳格式规范"><a href="#2-2-时间戳格式规范" class="headerlink" title="2.2 时间戳格式规范"></a>2.2 时间戳格式规范</h4><table>
+<thead>
+<tr>
+<th>格式</th>
+<th>标准</th>
+<th>示例</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>ISO 8601</strong></td>
+<td>国际标准</td>
+<td>2026-01-22T10:30:00.123Z</td>
+<td>机器可读、时区明确</td>
+<td>人类可读性略差</td>
+</tr>
+<tr>
+<td><strong>Unix 时间戳</strong></td>
+<td>Unix 标准</td>
+<td>1737515400.123</td>
+<td>精确、易于计算</td>
+<td>不可读</td>
+</tr>
+<tr>
+<td><strong>Apache 格式</strong></td>
+<td>Web 标准</td>
+<td>22&#x2F;Jan&#x2F;2026:10:30:00 +0800</td>
+<td>Web 服务器通用</td>
+<td>不易解析</td>
+</tr>
+</tbody></table>
+<p><strong>推荐格式</strong>：ISO 8601 (UTC)</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;timestamp&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2026-01-22T10:30:00.123Z&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="3️⃣-日志规范化与标准化"><a href="#3️⃣-日志规范化与标准化" class="headerlink" title="3️⃣ 日志规范化与标准化"></a>3️⃣ 日志规范化与标准化</h3><h4 id="3-1-为何需要日志规范化？"><a href="#3-1-为何需要日志规范化？" class="headerlink" title="3.1 为何需要日志规范化？"></a>3.1 为何需要日志规范化？</h4><p><strong>不规范的问题</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">问题 1: 时间格式不统一</span><br><span class="line">→ 2026-01-22 10:30:00</span><br><span class="line">→ 01/22/2026 10:30:00 AM</span><br><span class="line">→ Jan 22, 2026 10:30 AM</span><br><span class="line"></span><br><span class="line">问题 2: 字段名称不统一</span><br><span class="line">→ user_id, userId, User_ID</span><br><span class="line">→ ip, IP, ip_address, client_ip</span><br><span class="line"></span><br><span class="line">问题 3: 日志级别不统一</span><br><span class="line">→ INFO, info, Information</span><br><span class="line">→ ERROR, error, Error, CRITICAL</span><br></pre></td></tr></table></figure>
+
+<p><strong>规范化的好处</strong>：</p>
+<ol>
+<li><strong>统一分析</strong>：所有日志可用同一工具分析</li>
+<li><strong>快速检索</strong>：字段名一致，搜索更高效</li>
+<li><strong>自动化处理</strong>：机器可解析，易于自动化</li>
+<li><strong>合规要求</strong>：满足审计和监管要求</li>
+<li><strong>降低成本</strong>：减少格式转换和清洗工作</li>
+</ol>
+<hr>
+<h4 id="3-2-日志级别规范"><a href="#3-2-日志级别规范" class="headerlink" title="3.2 日志级别规范"></a>3.2 日志级别规范</h4><table>
+<thead>
+<tr>
+<th>级别</th>
+<th>用途</th>
+<th>示例场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>TRACE</strong></td>
+<td>最详细的调试信息</td>
+<td>函数调用、变量值</td>
+</tr>
+<tr>
+<td><strong>DEBUG</strong></td>
+<td>调试信息</td>
+<td>数据库查询、中间状态</td>
+</tr>
+<tr>
+<td><strong>INFO</strong></td>
+<td>一般信息</td>
+<td>用户登录、服务启动</td>
+</tr>
+<tr>
+<td><strong>WARNING</strong></td>
+<td>警告信息</td>
+<td>配置项缺失、降级使用</td>
+</tr>
+<tr>
+<td><strong>ERROR</strong></td>
+<td>错误信息</td>
+<td>异常抛出、请求失败</td>
+</tr>
+<tr>
+<td><strong>CRITICAL</strong></td>
+<td>严重错误</td>
+<td>服务宕机、数据丢失</td>
+</tr>
+</tbody></table>
+<p><strong>推荐映射</strong>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 标准日志级别</span></span><br><span class="line">LOG_LEVELS = &#123;</span><br><span class="line">    <span class="string">&quot;TRACE&quot;</span>: <span class="number">0</span>,</span><br><span class="line">    <span class="string">&quot;DEBUG&quot;</span>: <span class="number">1</span>,</span><br><span class="line">    <span class="string">&quot;INFO&quot;</span>: <span class="number">2</span>,</span><br><span class="line">    <span class="string">&quot;WARNING&quot;</span>: <span class="number">3</span>,</span><br><span class="line">    <span class="string">&quot;ERROR&quot;</span>: <span class="number">4</span>,</span><br><span class="line">    <span class="string">&quot;CRITICAL&quot;</span>: <span class="number">5</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="3-3-统一日志格式（JSON）示例"><a href="#3-3-统一日志格式（JSON）示例" class="headerlink" title="3.3 统一日志格式（JSON）示例"></a>3.3 统一日志格式（JSON）示例</h4><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;timestamp&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2026-01-22T10:30:00.123Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;level&quot;</span><span class="punctuation">:</span> <span class="string">&quot;INFO&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;hostname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;web-01&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;service&quot;</span><span class="punctuation">:</span> <span class="string">&quot;nginx&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;event_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;http_access&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;ip_address&quot;</span><span class="punctuation">:</span> <span class="string">&quot;192.168.1.10&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;user_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;user001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;http&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;method&quot;</span><span class="punctuation">:</span> <span class="string">&quot;GET&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;path&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/api/users&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;query_string&quot;</span><span class="punctuation">:</span> <span class="string">&quot;?page=1&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;status_code&quot;</span><span class="punctuation">:</span> <span class="number">200</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;response_size&quot;</span><span class="punctuation">:</span> <span class="number">1234</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;duration_ms&quot;</span><span class="punctuation">:</span> <span class="number">123</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;context&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;user_agent&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Mozilla/5.0&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;referer&quot;</span><span class="punctuation">:</span> <span class="string">&quot;https://example.com&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;trace_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;trace_abc123&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="4️⃣-日志采集与标准化"><a href="#4️⃣-日志采集与标准化" class="headerlink" title="4️⃣ 日志采集与标准化"></a>4️⃣ 日志采集与标准化</h3><h4 id="4-1-常用日志采集工具"><a href="#4-1-常用日志采集工具" class="headerlink" title="4.1 常用日志采集工具"></a>4.1 常用日志采集工具</h4><table>
+<thead>
+<tr>
+<th>工具</th>
+<th>适用场景</th>
+<th>特点</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Filebeat</strong></td>
+<td>文件日志采集</td>
+<td>轻量级、配置简单</td>
+</tr>
+<tr>
+<td><strong>Fluentd</strong></td>
+<td>多源日志采集</td>
+<td>插件丰富、灵活</td>
+</tr>
+<tr>
+<td><strong>Logstash</strong></td>
+<td>日志处理与转换</td>
+<td>强大的过滤和转换能力</td>
+</tr>
+<tr>
+<td><strong>Flume</strong></td>
+<td>大数据日志</td>
+<td>Hadoop 生态</td>
+</tr>
+<tr>
+<td><strong>Splunk</strong></td>
+<td>日志分析平台</td>
+<td>商业软件、功能强大</td>
+</tr>
+<tr>
+<td><strong>ELK Stack</strong></td>
+<td>开源日志平台</td>
+<td>Elasticsearch + Logstash + Kibana</td>
+</tr>
+</tbody></table>
+<hr>
+<h4 id="4-2-日志标准化流程"><a href="#4-2-日志标准化流程" class="headerlink" title="4.2 日志标准化流程"></a>4.2 日志标准化流程</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────────────┐</span><br><span class="line">│ 1. 日志采集                                     │</span><br><span class="line">│    - 文件日志：Filebeat/Fluentd                     │</span><br><span class="line">│    - 系统日志：Syslog/Windows Event Log           │</span><br><span class="line">│    - 应用日志：直接写入或通过 Agent                │</span><br><span class="line">└─────────────────────────────────────────────────────┘</span><br><span class="line">                         ↓</span><br><span class="line">┌─────────────────────────────────────────────────────┐</span><br><span class="line">│ 2. 格式转换                                     │</span><br><span class="line">│    - 解析原始日志（文本 → 结构化）                │</span><br><span class="line">│    - 统一字段名称                                 │</span><br><span class="line">│    - 转换时间格式                                 │</span><br><span class="line">└─────────────────────────────────────────────────────┘</span><br><span class="line">                         ↓</span><br><span class="line">┌─────────────────────────────────────────────────────┐</span><br><span class="line">│ 3. 字段映射                                     │</span><br><span class="line">│    - 提取关键字段                                 │</span><br><span class="line">│    - 添加上下文信息                                 │</span><br><span class="line">│    - 富化数据（IP 地理位置、User Agent 解析）      │</span><br><span class="line">└─────────────────────────────────────────────────────┘</span><br><span class="line">                         ↓</span><br><span class="line">┌─────────────────────────────────────────────────────┐</span><br><span class="line">│ 4. 数据存储                                     │</span><br><span class="line">│    - 时序数据库：Elasticsearch、InfluxDB           │</span><br><span class="line">│    - 数据仓库：ClickHouse、Hive                   │</span><br><span class="line">│    - 对象存储：S3、HDFS                          │</span><br><span class="line">└─────────────────────────────────────────────────────┘</span><br><span class="line">                         ↓</span><br><span class="line">┌─────────────────────────────────────────────────────┐</span><br><span class="line">│ 5. 分析与可视化                                 │</span><br><span class="line">│    - 搜索查询                                     │</span><br><span class="line">│    - 统计分析                                     │</span><br><span class="line">│    - 告警规则                                     │</span><br><span class="line">│    - 可视化仪表盘                                 │</span><br><span class="line">└─────────────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="4-3-字段映射示例"><a href="#4-3-字段映射示例" class="headerlink" title="4.3 字段映射示例"></a>4.3 字段映射示例</h4><p><strong>原始 Nginx 日志</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">192.168.1.10 - user01 [22/Jan/2026:10:30:00 +0800] &quot;GET /api/users HTTP/1.1&quot; 200 1234 &quot;-&quot; &quot;Mozilla/5.0&quot;</span><br></pre></td></tr></table></figure>
+
+<p><strong>标准化后的 JSON</strong>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;timestamp&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2026-01-22T02:30:00.000Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;level&quot;</span><span class="punctuation">:</span> <span class="string">&quot;INFO&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;hostname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;web-01&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;service&quot;</span><span class="punctuation">:</span> <span class="string">&quot;nginx&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;event_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;http_access&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;ip_address&quot;</span><span class="punctuation">:</span> <span class="string">&quot;192.168.1.10&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;user_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;user01&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;http&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;method&quot;</span><span class="punctuation">:</span> <span class="string">&quot;GET&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;path&quot;</span><span class="punctuation">:</span> <span class="string">&quot;/api/users&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;protocol&quot;</span><span class="punctuation">:</span> <span class="string">&quot;HTTP/1.1&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;status_code&quot;</span><span class="punctuation">:</span> <span class="number">200</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;response_size&quot;</span><span class="punctuation">:</span> <span class="number">1234</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;context&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;user_agent&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Mozilla/5.0&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="5️⃣-合规要求与最佳实践"><a href="#5️⃣-合规要求与最佳实践" class="headerlink" title="5️⃣ 合规要求与最佳实践"></a>5️⃣ 合规要求与最佳实践</h3><h4 id="5-1-合规要求"><a href="#5-1-合规要求" class="headerlink" title="5.1 合规要求"></a>5.1 合规要求</h4><table>
+<thead>
+<tr>
+<th>合规标准</th>
+<th>日志要求</th>
+<th>保留期限</th>
+<th>关键字段</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>等保 2.0</strong></td>
+<td>访问日志、安全日志</td>
+<td>≥ 6 个月</td>
+<td>用户 ID、IP、时间、操作内容</td>
+</tr>
+<tr>
+<td><strong>PCI DSS</strong></td>
+<td>访问日志、审计日志</td>
+<td>≥ 1 年</td>
+<td>用户 ID、IP、时间、操作内容</td>
+</tr>
+<tr>
+<td><strong>GDPR</strong></td>
+<td>个人数据处理日志</td>
+<td>特定场景</td>
+<td>用户标识、数据处理目的</td>
+</tr>
+<tr>
+<td><strong>SOX</strong></td>
+<td>财务相关日志</td>
+<td>≥ 7 年</td>
+<td>操作人员、操作内容、审计记录</td>
+</tr>
+</tbody></table>
+<hr>
+<h4 id="5-2-日志最佳实践"><a href="#5-2-日志最佳实践" class="headerlink" title="5.2 日志最佳实践"></a>5.2 日志最佳实践</h4><table>
+<thead>
+<tr>
+<th>实践</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>结构化日志</strong></td>
+<td>使用 JSON 格式</td>
+<td>{“timestamp”: “…”, “level”: “INFO”}</td>
+</tr>
+<tr>
+<td><strong>统一时间格式</strong></td>
+<td>使用 ISO 8601</td>
+<td>2026-01-22T10:30:00.123Z</td>
+</tr>
+<tr>
+<td><strong>唯一追踪 ID</strong></td>
+<td>每个请求生成唯一 ID</td>
+<td>trace_abc123</td>
+</tr>
+<tr>
+<td><strong>敏感信息脱敏</strong></td>
+<td>不记录密码、信用卡号</td>
+<td><code>password=***</code></td>
+</tr>
+<tr>
+<td><strong>日志分级</strong></td>
+<td>合理使用日志级别</td>
+<td>错误用 ERROR，普通操作用 INFO</td>
+</tr>
+<tr>
+<td><strong>日志轮转</strong></td>
+<td>定期清理旧日志</td>
+<td>日志文件按天&#x2F;大小轮转</td>
+</tr>
+<tr>
+<td><strong>异步日志</strong></td>
+<td>不阻塞主线程</td>
+<td>使用异步日志库</td>
+</tr>
+<tr>
+<td><strong>上下文信息</strong></td>
+<td>记录请求上下文</td>
+<td>user_id, session_id, ip_address</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="6️⃣-日志分析案例"><a href="#6️⃣-日志分析案例" class="headerlink" title="6️⃣ 日志分析案例"></a>6️⃣ 日志分析案例</h3><h4 id="6-1-分析场景-1：暴力破解检测"><a href="#6-1-分析场景-1：暴力破解检测" class="headerlink" title="6.1 分析场景 1：暴力破解检测"></a>6.1 分析场景 1：暴力破解检测</h4><p><strong>查询语句（Elasticsearch&#x2F;Kibana）</strong>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;bool&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;must&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="punctuation">&#123;</span><span class="attr">&quot;match&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;event_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;auth_failed&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">        <span class="punctuation">&#123;</span><span class="attr">&quot;range&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;timestamp&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;gte&quot;</span><span class="punctuation">:</span> <span class="string">&quot;now-1h&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;aggs&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;failed_logins_by_ip&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;terms&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;field&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ip_address&quot;</span><span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>告警规则</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">如果同一 IP 在 5 分钟内失败登录超过 10 次，触发告警</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h4 id="6-2-分析场景-2：异常流量检测"><a href="#6-2-分析场景-2：异常流量检测" class="headerlink" title="6.2 分析场景 2：异常流量检测"></a>6.2 分析场景 2：异常流量检测</h4><p><strong>查询语句</strong>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;query&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;bool&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;must&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="punctuation">&#123;</span><span class="attr">&quot;match&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;event_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;http_access&quot;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">]</span><span class="punctuation">,</span></span><br><span class="line">      <span class="attr">&quot;filter&quot;</span><span class="punctuation">:</span> <span class="punctuation">[</span></span><br><span class="line">        <span class="punctuation">&#123;</span><span class="attr">&quot;range&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;http.response_size&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;gte&quot;</span><span class="punctuation">:</span> <span class="number">10000000</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span><span class="punctuation">&#125;</span></span><br><span class="line">      <span class="punctuation">]</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;aggs&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;top_downloads&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">      <span class="attr">&quot;terms&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span><span class="attr">&quot;field&quot;</span><span class="punctuation">:</span> <span class="string">&quot;http.path&quot;</span><span class="punctuation">,</span> <span class="attr">&quot;size&quot;</span><span class="punctuation">:</span> <span class="number">10</span><span class="punctuation">&#125;</span></span><br><span class="line">    <span class="punctuation">&#125;</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>告警规则</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">如果单次响应大小超过 10 MB，触发告警</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="实践任务（合法授权范围内）"><a href="#实践任务（合法授权范围内）" class="headerlink" title="实践任务（合法授权范围内）"></a>实践任务（合法授权范围内）</h2><blockquote>
+<p><strong>注意</strong>：请在你自己的测试环境或授权靶场中执行以下任务。</p>
+</blockquote>
+<hr>
+<h3 id="任务-1（必做）：分析本地日志"><a href="#任务-1（必做）：分析本地日志" class="headerlink" title="任务 1（必做）：分析本地日志"></a>任务 1（必做）：分析本地日志</h3><p><strong>目标</strong>：分析本地系统的不同类型日志，识别关键字段。</p>
+<p><strong>步骤</strong>：</p>
+<ol>
+<li><strong>查看系统日志（Linux）</strong></li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看 syslog</span></span><br><span class="line"><span class="built_in">tail</span> -50 /var/log/syslog</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看 auth.log（认证日志）</span></span><br><span class="line"><span class="built_in">tail</span> -50 /var/log/auth.log</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看 Nginx 访问日志</span></span><br><span class="line"><span class="built_in">tail</span> -50 /var/log/nginx/access.log</span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看 Nginx 错误日志</span></span><br><span class="line"><span class="built_in">tail</span> -50 /var/log/nginx/error.log</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li><strong>查看系统日志（Windows）</strong></li>
+</ol>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看系统日志</span></span><br><span class="line"><span class="built_in">Get-EventLog</span> <span class="literal">-LogName</span> System <span class="literal">-Newest</span> <span class="number">50</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看安全日志</span></span><br><span class="line"><span class="built_in">Get-EventLog</span> <span class="literal">-LogName</span> Security <span class="literal">-Newest</span> <span class="number">50</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 查看应用程序日志</span></span><br><span class="line"><span class="built_in">Get-EventLog</span> <span class="literal">-LogName</span> Application <span class="literal">-Newest</span> <span class="number">50</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li><strong>记录字段</strong></li>
+</ol>
+<p>创建 <code>log_fields_analysis.md</code>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># 日志字段分析</span></span><br><span class="line"></span><br><span class="line"><span class="section">## 系统日志 (/var/log/syslog)</span></span><br><span class="line"></span><br><span class="line">| 字段 | 类型 | 示例 | 说明 |</span><br><span class="line">|------|------|------|------|</span><br><span class="line">| timestamp | datetime | Jan 22 10:30:00 | 事件时间 |</span><br><span class="line">| hostname | string | server01 | 主机名 |</span><br><span class="line">| process | string | systemd[1] | 进程名 |</span><br><span class="line">| message | string | Started nginx.service | 消息内容 |</span><br><span class="line"></span><br><span class="line"><span class="section">## 认证日志 (/var/log/auth.log)</span></span><br><span class="line"></span><br><span class="line">| 字段 | 类型 | 示例 | 说明 |</span><br><span class="line">|------|------|------|------|</span><br><span class="line">| timestamp | datetime | Jan 22 10:30:00 | 事件时间 |</span><br><span class="line">| hostname | string | server01 | 主机名 |</span><br><span class="line">| process | string | sshd[12345] | 进程名 |</span><br><span class="line">| action | string | Accepted | 动作类型 |</span><br><span class="line">| username | string | user01 | 用户名 |</span><br><span class="line">| ip | string | 192.168.1.10 | IP 地址 |</span><br><span class="line"></span><br><span class="line"><span class="section">## Nginx 访问日志</span></span><br><span class="line"></span><br><span class="line">| 字段 | 类型 | 示例 | 说明 |</span><br><span class="line">|------|------|------|------|</span><br><span class="line">| ip | string | 192.168.1.10 | 客户端 IP |</span><br><span class="line">| user | string | user01 | 用户名 |</span><br><span class="line">| timestamp | string | 22/Jan/2026:10:30:00 | 时间 |</span><br><span class="line">| method | string | GET | HTTP 方法 |</span><br><span class="line">| path | string | /api/users | 请求路径 |</span><br><span class="line">| protocol | string | HTTP/1.1 | 协议版本 |</span><br><span class="line">| status | int | 200 | 状态码 |</span><br><span class="line">| size | int | 1234 | 响应大小 |</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="任务-2（必做）：设计日志规范"><a href="#任务-2（必做）：设计日志规范" class="headerlink" title="任务 2（必做）：设计日志规范"></a>任务 2（必做）：设计日志规范</h3><p><strong>目标</strong>：为你的应用设计统一的日志规范。</p>
+<p><strong>步骤</strong>：</p>
+<p>创建 <code>log_specification.md</code>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># 日志规范草案</span></span><br><span class="line"></span><br><span class="line"><span class="section">## 概述</span></span><br><span class="line"></span><br><span class="line">本文档定义了 [你的应用名称] 的日志规范，确保所有日志格式统一、易于分析。</span><br><span class="line"></span><br><span class="line"><span class="section">## 通用字段</span></span><br><span class="line"></span><br><span class="line">所有日志必须包含以下字段：</span><br><span class="line"></span><br><span class="line">| 字段名 | 类型 | 必填 | 说明 | 示例 |</span><br><span class="line">|-------|------|------|------|------|</span><br><span class="line">| timestamp | string (ISO 8601) | ✅ | 事件时间（UTC）| 2026-01-22T10:30:00.123Z |</span><br><span class="line">| level | string | ✅ | 日志级别 | DEBUG, INFO, WARNING, ERROR, CRITICAL |</span><br><span class="line">| hostname | string | ✅ | 主机名 | web-01 |</span><br><span class="line">| service | string | ✅ | 服务名 | user-service |</span><br><span class="line">| trace<span class="emphasis">_id | string | ⚠️ | 追踪 ID（可选）| trace_</span>abc123 |</span><br><span class="line"></span><br><span class="line"><span class="section">## HTTP 访问日志</span></span><br><span class="line"></span><br><span class="line">| 字段名 | 类型 | 必填 | 说明 | 示例 |</span><br><span class="line">|-------|------|------|------|------|</span><br><span class="line">| event<span class="emphasis">_type | string | ✅ | 事件类型 | http_</span>access |</span><br><span class="line">| ip<span class="emphasis">_address | string | ✅ | 客户端 IP | 192.168.1.10 |</span></span><br><span class="line"><span class="emphasis">| user_</span>id | string | ⚠️ | 用户 ID（如已认证）| user001 |</span><br><span class="line">| http.method | string | ✅ | HTTP 方法 | GET |</span><br><span class="line">| http.path | string | ✅ | 请求路径 | /api/users |</span><br><span class="line">| http.query<span class="emphasis">_string | string | ⚠️ | 查询参数 | ?page=1 |</span></span><br><span class="line"><span class="emphasis">| http.status_</span>code | int | ✅ | HTTP 状态码 | 200 |</span><br><span class="line">| http.response<span class="emphasis">_size | int | ✅ | 响应大小（字节）| 1234 |</span></span><br><span class="line"><span class="emphasis">| http.duration_</span>ms | int | ✅ | 请求时长（毫秒）| 123 |</span><br><span class="line">| context.user<span class="emphasis">_agent | string | ⚠️ | 用户代理 | Mozilla/5.0... |</span></span><br><span class="line"><span class="emphasis">| context.referer | string | ⚠️ | 来源页面 | https://example.com |</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">### 示例</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">```json</span></span><br><span class="line"><span class="emphasis">&#123;</span></span><br><span class="line"><span class="emphasis">  &quot;timestamp&quot;: &quot;2026-01-22T10:30:00.123Z&quot;,</span></span><br><span class="line"><span class="emphasis">  &quot;level&quot;: &quot;INFO&quot;,</span></span><br><span class="line"><span class="emphasis">  &quot;hostname&quot;: &quot;web-01&quot;,</span></span><br><span class="line"><span class="emphasis">  &quot;service&quot;: &quot;user-service&quot;,</span></span><br><span class="line"><span class="emphasis">  &quot;trace_</span>id&quot;: &quot;trace<span class="emphasis">_abc123&quot;,</span></span><br><span class="line"><span class="emphasis">  &quot;event_</span>type&quot;: &quot;http<span class="emphasis">_access&quot;,</span></span><br><span class="line"><span class="emphasis">  &quot;ip_</span>address&quot;: &quot;192.168.1.10&quot;,</span><br><span class="line">  &quot;user<span class="emphasis">_id&quot;: &quot;user001&quot;,</span></span><br><span class="line"><span class="emphasis">  &quot;http&quot;: &#123;</span></span><br><span class="line"><span class="emphasis">    &quot;method&quot;: &quot;GET&quot;,</span></span><br><span class="line"><span class="emphasis">    &quot;path&quot;: &quot;/api/users&quot;,</span></span><br><span class="line"><span class="emphasis">    &quot;query_</span>string&quot;: &quot;?page=1&quot;,</span><br><span class="line"><span class="code">    &quot;status_code&quot;: 200,</span></span><br><span class="line"><span class="code">    &quot;response_size&quot;: 1234,</span></span><br><span class="line"><span class="code">    &quot;duration_ms&quot;: 123</span></span><br><span class="line"><span class="code">  &#125;,</span></span><br><span class="line"><span class="code">  &quot;context&quot;: &#123;</span></span><br><span class="line"><span class="code">    &quot;user_agent&quot;: &quot;Mozilla/5.0...&quot;,</span></span><br><span class="line"><span class="code">    &quot;referer&quot;: &quot;https://example.com&quot;</span></span><br><span class="line"><span class="code">  &#125;</span></span><br><span class="line"><span class="code">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="认证日志"><a href="#认证日志" class="headerlink" title="认证日志"></a>认证日志</h2><table>
+<thead>
+<tr>
+<th>字段名</th>
+<th>类型</th>
+<th>必填</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>event_type</td>
+<td>string</td>
+<td>✅</td>
+<td>事件类型</td>
+<td>login, logout, auth_failed</td>
+</tr>
+<tr>
+<td>ip_address</td>
+<td>string</td>
+<td>✅</td>
+<td>客户端 IP</td>
+<td>192.168.1.10</td>
+</tr>
+<tr>
+<td>username</td>
+<td>string</td>
+<td>⚠️</td>
+<td>用户名</td>
+<td>admin</td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>✅</td>
+<td>状态</td>
+<td>success, failed</td>
+</tr>
+<tr>
+<td>failure_reason</td>
+<td>string</td>
+<td>⚠️</td>
+<td>失败原因（如失败）</td>
+<td>invalid_password, account_locked</td>
+</tr>
+</tbody></table>
+<h3 id="示例"><a href="#示例" class="headerlink" title="示例"></a>示例</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;timestamp&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2026-01-22T10:30:00.123Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;level&quot;</span><span class="punctuation">:</span> <span class="string">&quot;INFO&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;hostname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;web-01&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;service&quot;</span><span class="punctuation">:</span> <span class="string">&quot;user-service&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;event_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;login&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;ip_address&quot;</span><span class="punctuation">:</span> <span class="string">&quot;192.168.1.10&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;username&quot;</span><span class="punctuation">:</span> <span class="string">&quot;user001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;status&quot;</span><span class="punctuation">:</span> <span class="string">&quot;success&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="错误日志"><a href="#错误日志" class="headerlink" title="错误日志"></a>错误日志</h2><table>
+<thead>
+<tr>
+<th>字段名</th>
+<th>类型</th>
+<th>必填</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>event_type</td>
+<td>string</td>
+<td>✅</td>
+<td>事件类型</td>
+<td>error, exception</td>
+</tr>
+<tr>
+<td>error_code</td>
+<td>string</td>
+<td>⚠️</td>
+<td>错误代码</td>
+<td>ERR_001</td>
+</tr>
+<tr>
+<td>error_message</td>
+<td>string</td>
+<td>✅</td>
+<td>错误消息</td>
+<td>Division by zero</td>
+</tr>
+<tr>
+<td>exception_type</td>
+<td>string</td>
+<td>⚠️</td>
+<td>异常类型</td>
+<td>ValueError</td>
+</tr>
+<tr>
+<td>stack_trace</td>
+<td>string</td>
+<td>⚠️</td>
+<td>堆栈信息</td>
+<td>at line 42…</td>
+</tr>
+</tbody></table>
+<h3 id="示例-1"><a href="#示例-1" class="headerlink" title="示例"></a>示例</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;timestamp&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2026-01-22T10:30:00.123Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;level&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ERROR&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;hostname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;web-01&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;service&quot;</span><span class="punctuation">:</span> <span class="string">&quot;user-service&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;event_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;error&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;error_code&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ERR_001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;error_message&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Division by zero&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;exception_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ZeroDivisionError&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;stack_trace&quot;</span><span class="punctuation">:</span> <span class="string">&quot;at line 42...&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">### 任务 3（必做）：日志标准化脚本</span><br><span class="line"></span><br><span class="line">**目标**：编写脚本，将不同来源的日志转换为统一格式。</span><br><span class="line"></span><br><span class="line">**步骤**：</span><br><span class="line"></span><br><span class="line">创建 `log_normalizer.py`：</span><br><span class="line"></span><br><span class="line">```python</span><br><span class="line">#!/usr/bin/env python3</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">日志标准化脚本</span><br><span class="line">将 Nginx 访问日志转换为统一 JSON 格式</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">import re</span><br><span class="line">import json</span><br><span class="line">import sys</span><br><span class="line">from datetime import datetime</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">class NginxLogNormalizer:</span><br><span class="line">    &quot;&quot;&quot;Nginx 访问日志标准化器&quot;&quot;&quot;</span><br><span class="line">    </span><br><span class="line">    # Nginx 访问日志正则</span><br><span class="line">    LOG_PATTERN = re.compile(</span><br><span class="line">        r&#x27;(?P&lt;ip&gt;\S+) &#x27;</span><br><span class="line">        r&#x27;(?P&lt;user&gt;\S+) &#x27;</span><br><span class="line">        r&#x27;\[(?P&lt;timestamp&gt;[^\]]+)\] &#x27;</span><br><span class="line">        r&#x27;&quot;(?P&lt;request&gt;[^&quot;]*)&quot; &#x27;</span><br><span class="line">        r&#x27;(?P&lt;status&gt;\d+) &#x27;</span><br><span class="line">        r&#x27;(?P&lt;size&gt;\d+) &#x27;</span><br><span class="line">        r&#x27;&quot;(?P&lt;referer&gt;[^&quot;]*)&quot; &#x27;</span><br><span class="line">        r&#x27;&quot;(?P&lt;user_agent&gt;[^&quot;]*)&quot;&#x27;</span><br><span class="line">    )</span><br><span class="line">    </span><br><span class="line">    def __init__(self, hostname: str = &quot;localhost&quot;, service: str = &quot;nginx&quot;):</span><br><span class="line">        self.hostname = hostname</span><br><span class="line">        self.service = service</span><br><span class="line">    </span><br><span class="line">    def parse(self, line: str) -&gt; dict | None:</span><br><span class="line">        &quot;&quot;&quot;解析单行 Nginx 日志</span><br><span class="line">        </span><br><span class="line">        Args:</span><br><span class="line">            line: Nginx 日志行</span><br><span class="line">            </span><br><span class="line">        Returns:</span><br><span class="line">            标准化的日志字典</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        match = self.LOG_PATTERN.match(line)</span><br><span class="line">        if not match:</span><br><span class="line">            return None</span><br><span class="line">        </span><br><span class="line">        data = match.groupdict()</span><br><span class="line">        </span><br><span class="line">        # 解析请求</span><br><span class="line">        request_parts = data[&#x27;request&#x27;].split()</span><br><span class="line">        method = request_parts[0] if len(request_parts) &gt; 0 else &quot;-&quot;</span><br><span class="line">        path = request_parts[1] if len(request_parts) &gt; 1 else &quot;-&quot;</span><br><span class="line">        </span><br><span class="line">        # 分离路径和查询字符串</span><br><span class="line">        if &#x27;?&#x27; in path:</span><br><span class="line">            path, query_string = path.split(&#x27;?&#x27;, 1)</span><br><span class="line">        else:</span><br><span class="line">            query_string = None</span><br><span class="line">        </span><br><span class="line">        # 转换时间格式（Nginx → ISO 8601）</span><br><span class="line">        try:</span><br><span class="line">            # 22/Jan/2026:10:30:00 +0800 → datetime</span><br><span class="line">            dt = datetime.strptime(data[&#x27;timestamp&#x27;], &#x27;%d/%b/%Y:%H:%M:%S %z&#x27;)</span><br><span class="line">            timestamp = dt.strftime(&#x27;%Y-%m-%dT%H:%M:%S.%fZ&#x27;)</span><br><span class="line">        except ValueError:</span><br><span class="line">            timestamp = data[&#x27;timestamp&#x27;]</span><br><span class="line">        </span><br><span class="line">        # 构建标准化日志</span><br><span class="line">        return &#123;</span><br><span class="line">            &quot;timestamp&quot;: timestamp,</span><br><span class="line">            &quot;level&quot;: &quot;INFO&quot;,</span><br><span class="line">            &quot;hostname&quot;: self.hostname,</span><br><span class="line">            &quot;service&quot;: self.service,</span><br><span class="line">            &quot;event_type&quot;: &quot;http_access&quot;,</span><br><span class="line">            &quot;ip_address&quot;: data[&#x27;ip&#x27;],</span><br><span class="line">            &quot;user_id&quot;: data[&#x27;user&#x27;] if data[&#x27;user&#x27;] != &#x27;-&#x27; else None,</span><br><span class="line">            &quot;http&quot;: &#123;</span><br><span class="line">                &quot;method&quot;: method,</span><br><span class="line">                &quot;path&quot;: path,</span><br><span class="line">                &quot;query_string&quot;: query_string,</span><br><span class="line">                &quot;status_code&quot;: int(data[&#x27;status&#x27;]),</span><br><span class="line">                &quot;response_size&quot;: int(data[&#x27;size&#x27;]),</span><br><span class="line">                &quot;duration_ms&quot;: 0  # Nginx 默认不记录时长，需配置</span><br><span class="line">            &#125;,</span><br><span class="line">            &quot;context&quot;: &#123;</span><br><span class="line">                &quot;user_agent&quot;: data[&#x27;user_agent&#x27;],</span><br><span class="line">                &quot;referer&quot;: data[&#x27;referer&#x27;]</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">def main():</span><br><span class="line">    if len(sys.argv) != 2:</span><br><span class="line">        print(&quot;用法: python log_normalizer.py &lt;nginx_access_log&gt;&quot;)</span><br><span class="line">        sys.exit(1)</span><br><span class="line">    </span><br><span class="line">    input_file = sys.argv[1]</span><br><span class="line">    output_file = input_file.replace(&#x27;.log&#x27;, &#x27;_normalized.jsonl&#x27;)</span><br><span class="line">    </span><br><span class="line">    normalizer = NginxLogNormalizer(hostname=&quot;web-01&quot;, service=&quot;nginx&quot;)</span><br><span class="line">    </span><br><span class="line">    with open(input_file, &#x27;r&#x27;, encoding=&#x27;utf-8&#x27;) as f_in, \</span><br><span class="line">         open(output_file, &#x27;w&#x27;, encoding=&#x27;utf-8&#x27;) as f_out:</span><br><span class="line">        </span><br><span class="line">        count = 0</span><br><span class="line">        for line in f_in:</span><br><span class="line">            line = line.strip()</span><br><span class="line">            if not line:</span><br><span class="line">                continue</span><br><span class="line">            </span><br><span class="line">            normalized = normalizer.parse(line)</span><br><span class="line">            if normalized:</span><br><span class="line">                f_out.write(json.dumps(normalized, ensure_ascii=False) + &#x27;\n&#x27;)</span><br><span class="line">                count += 1</span><br><span class="line">    </span><br><span class="line">    print(f&quot;✅ 完成！&quot;)</span><br><span class="line">    print(f&quot;   输入文件: &#123;input_file&#125;&quot;)</span><br><span class="line">    print(f&quot;   输出文件: &#123;output_file&#125;&quot;)</span><br><span class="line">    print(f&quot;   处理记录: &#123;count&#125; 条&quot;)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">if __name__ == &quot;__main__&quot;:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<p><strong>运行脚本</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 获取 Nginx 访问日志（如有）</span></span><br><span class="line">sudo <span class="built_in">tail</span> -100 /var/log/nginx/access.log &gt; /tmp/nginx_sample.log</span><br><span class="line"></span><br><span class="line"><span class="comment"># 或者创建示例日志</span></span><br><span class="line"><span class="built_in">cat</span> &gt; /tmp/nginx_sample.log &lt;&lt;<span class="string">&#x27;EOF&#x27;</span></span><br><span class="line">192.168.1.10 - user01 [22/Jan/2026:10:30:00 +0800] <span class="string">&quot;GET /api/users HTTP/1.1&quot;</span> 200 1234 <span class="string">&quot;-&quot;</span> <span class="string">&quot;Mozilla/5.0&quot;</span></span><br><span class="line">192.168.1.11 - - [22/Jan/2026:10:30:01 +0800] <span class="string">&quot;POST /api/login HTTP/1.1&quot;</span> 401 567 <span class="string">&quot;-&quot;</span> <span class="string">&quot;Mozilla/5.0&quot;</span></span><br><span class="line">192.168.1.12 - user02 [22/Jan/2026:10:30:02 +0800] <span class="string">&quot;GET /api/data HTTP/1.1&quot;</span> 500 890 <span class="string">&quot;-&quot;</span> <span class="string">&quot;Mozilla/5.0&quot;</span></span><br><span class="line">EOF</span><br><span class="line"></span><br><span class="line"><span class="comment"># 运行标准化脚本</span></span><br><span class="line">python log_normalizer.py /tmp/nginx_sample.log</span><br></pre></td></tr></table></figure>
+
+<p><strong>预期输出</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">✅ 完成！</span><br><span class="line">   输入文件: /tmp/nginx_sample.log</span><br><span class="line">   输出文件: /tmp/nginx_sample_normalized.jsonl</span><br><span class="line">   处理记录: 3 条</span><br></pre></td></tr></table></figure>
+
+<p><strong>查看标准化后的日志</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> /tmp/nginx_sample_normalized.jsonl | python -m json.tool | <span class="built_in">head</span> -30</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="任务-4（进阶）：生成-CSV-格式"><a href="#任务-4（进阶）：生成-CSV-格式" class="headerlink" title="任务 4（进阶）：生成 CSV 格式"></a>任务 4（进阶）：生成 CSV 格式</h3><p><strong>目标</strong>：将标准化后的日志导出为 CSV 格式。</p>
+<p>**创建 <code>log_exporter.py</code>**：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">日志导出器</span></span><br><span class="line"><span class="string">将 JSONL 日志导出为 CSV 格式</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="keyword">import</span> csv</span><br><span class="line"><span class="keyword">import</span> json</span><br><span class="line"><span class="keyword">import</span> sys</span><br><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">export_to_csv</span>(<span class="params">input_file: <span class="built_in">str</span>, output_file: <span class="built_in">str</span> | <span class="literal">None</span> = <span class="literal">None</span></span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;将 JSONL 日志导出为 CSV</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        input_file: 输入 JSONL 文件</span></span><br><span class="line"><span class="string">        output_file: 输出 CSV 文件（可选）</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">if</span> output_file <span class="keyword">is</span> <span class="literal">None</span>:</span><br><span class="line">        output_file = input_file.replace(<span class="string">&#x27;.jsonl&#x27;</span>, <span class="string">&#x27;.csv&#x27;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 读取日志并提取字段</span></span><br><span class="line">    records = []</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(input_file, <span class="string">&#x27;r&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        <span class="keyword">for</span> line <span class="keyword">in</span> f:</span><br><span class="line">            line = line.strip()</span><br><span class="line">            <span class="keyword">if</span> <span class="keyword">not</span> line:</span><br><span class="line">                <span class="keyword">continue</span></span><br><span class="line">            </span><br><span class="line">            record = json.loads(line)</span><br><span class="line">            records.append(record)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> records:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;❌ 无数据可导出&quot;</span>)</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 展平嵌套字段</span></span><br><span class="line">    flat_records = []</span><br><span class="line">    <span class="keyword">for</span> record <span class="keyword">in</span> records:</span><br><span class="line">        flat = &#123;&#125;</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 顶层字段</span></span><br><span class="line">        <span class="keyword">for</span> key <span class="keyword">in</span> [<span class="string">&#x27;timestamp&#x27;</span>, <span class="string">&#x27;level&#x27;</span>, <span class="string">&#x27;hostname&#x27;</span>, <span class="string">&#x27;service&#x27;</span>, <span class="string">&#x27;event_type&#x27;</span>, <span class="string">&#x27;ip_address&#x27;</span>, <span class="string">&#x27;user_id&#x27;</span>]:</span><br><span class="line">            flat[key] = record.get(key, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># HTTP 字段</span></span><br><span class="line">        http = record.get(<span class="string">&#x27;http&#x27;</span>, &#123;&#125;)</span><br><span class="line">        <span class="keyword">for</span> key <span class="keyword">in</span> [<span class="string">&#x27;method&#x27;</span>, <span class="string">&#x27;path&#x27;</span>, <span class="string">&#x27;query_string&#x27;</span>, <span class="string">&#x27;status_code&#x27;</span>, <span class="string">&#x27;response_size&#x27;</span>, <span class="string">&#x27;duration_ms&#x27;</span>]:</span><br><span class="line">            flat[<span class="string">f&#x27;http.<span class="subst">&#123;key&#125;</span>&#x27;</span>] = http.get(key, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 上下文字段</span></span><br><span class="line">        context = record.get(<span class="string">&#x27;context&#x27;</span>, &#123;&#125;)</span><br><span class="line">        <span class="keyword">for</span> key <span class="keyword">in</span> [<span class="string">&#x27;user_agent&#x27;</span>, <span class="string">&#x27;referer&#x27;</span>]:</span><br><span class="line">            flat[<span class="string">f&#x27;context.<span class="subst">&#123;key&#125;</span>&#x27;</span>] = context.get(key, <span class="string">&#x27;&#x27;</span>)</span><br><span class="line">        </span><br><span class="line">        flat_records.append(flat)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 写入 CSV</span></span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(output_file, <span class="string">&#x27;w&#x27;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>, newline=<span class="string">&#x27;&#x27;</span>) <span class="keyword">as</span> f:</span><br><span class="line">        fieldnames = <span class="built_in">list</span>(flat_records[<span class="number">0</span>].keys())</span><br><span class="line">        writer = csv.DictWriter(f, fieldnames=fieldnames)</span><br><span class="line">        writer.writeheader()</span><br><span class="line">        writer.writerows(flat_records)</span><br><span class="line">    </span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;✅ 完成！&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;   输入文件: <span class="subst">&#123;input_file&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;   输出文件: <span class="subst">&#123;output_file&#125;</span>&quot;</span>)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;   导出记录: <span class="subst">&#123;<span class="built_in">len</span>(flat_records)&#125;</span> 条&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(sys.argv) &lt; <span class="number">2</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&quot;用法: python log_exporter.py &lt;input.jsonl&gt; [output.csv]&quot;</span>)</span><br><span class="line">        sys.exit(<span class="number">1</span>)</span><br><span class="line">    </span><br><span class="line">    input_file = sys.argv[<span class="number">1</span>]</span><br><span class="line">    output_file = sys.argv[<span class="number">2</span>] <span class="keyword">if</span> <span class="built_in">len</span>(sys.argv) &gt; <span class="number">2</span> <span class="keyword">else</span> <span class="literal">None</span></span><br><span class="line">    </span><br><span class="line">    export_to_csv(input_file, output_file)</span><br></pre></td></tr></table></figure>
+
+<p><strong>运行导出</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python log_exporter.py /tmp/nginx_sample_normalized.jsonl /tmp/nginx_sample_normalized.csv</span><br></pre></td></tr></table></figure>
+
+<p><strong>查看 CSV</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> /tmp/nginx_sample_normalized.csv</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="巩固练习（题与复盘）"><a href="#巩固练习（题与复盘）" class="headerlink" title="巩固练习（题与复盘）"></a>巩固练习（题与复盘）</h2><hr>
+<h3 id="练习-1：为何需要统一字段？"><a href="#练习-1：为何需要统一字段？" class="headerlink" title="练习 1：为何需要统一字段？"></a>练习 1：为何需要统一字段？</h3><p><strong>思路提示</strong>：</p>
+<ul>
+<li>字段不统一带来的问题（搜索、分析、自动化）</li>
+<li>不同团队协作时的沟通成本</li>
+<li>日志聚合和分析工具的效率</li>
+</ul>
+<hr>
+<h3 id="练习-2：设计一份日志规范草案"><a href="#练习-2：设计一份日志规范草案" class="headerlink" title="练习 2：设计一份日志规范草案"></a>练习 2：设计一份日志规范草案</h3><p><strong>任务</strong>：为以下场景设计日志规范。</p>
+<p><strong>场景</strong>：电商订单服务</p>
+<p><strong>要求</strong>：</p>
+<ol>
+<li>订单创建日志</li>
+<li>订单支付日志</li>
+<li>订单发货日志</li>
+<li>错误日志</li>
+</ol>
+<p><strong>提示</strong>：</p>
+<ul>
+<li>必须包含通用字段（timestamp, level, hostname, service）</li>
+<li>必须包含事件类型（event_type）</li>
+<li>必须包含业务相关字段（order_id, user_id, amount 等）</li>
+</ul>
+<hr>
+<h3 id="练习-3：日志敏感信息脱敏"><a href="#练习-3：日志敏感信息脱敏" class="headerlink" title="练习 3：日志敏感信息脱敏"></a>练习 3：日志敏感信息脱敏</h3><p><strong>任务</strong>：编写脚本，脱敏日志中的敏感信息。</p>
+<p><strong>示例</strong>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> re</span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">sanitize_log</span>(<span class="params">message: <span class="built_in">str</span></span>) -&gt; <span class="built_in">str</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;脱敏敏感信息&quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment"># 脱敏密码</span></span><br><span class="line">    message = re.sub(<span class="string">r&#x27;password=[^&amp;\s]+&#x27;</span>, <span class="string">&#x27;password=***&#x27;</span>, message)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 脱敏信用卡号</span></span><br><span class="line">    message = re.sub(<span class="string">r&#x27;\b\d&#123;16&#125;\b&#x27;</span>, <span class="string">&#x27;************&#x27;</span>, message)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 脱敏手机号</span></span><br><span class="line">    message = re.sub(<span class="string">r&#x27;\b1[3-9]\d&#123;9&#125;\b&#x27;</span>, <span class="string">&#x27;***&#x27;</span>, message)</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">return</span> message</span><br></pre></td></tr></table></figure>
+
+<p><strong>任务</strong>：</p>
+<ol>
+<li>扩展脱敏规则（邮箱、身份证等）</li>
+<li>应用到日志标准化流程</li>
+</ol>
+<hr>
+<h3 id="练习-4：设计日志轮转策略"><a href="#练习-4：设计日志轮转策略" class="headerlink" title="练习 4：设计日志轮转策略"></a>练习 4：设计日志轮转策略</h3><p><strong>任务</strong>：为你的应用设计日志轮转策略。</p>
+<p><strong>思路提示</strong>：</p>
+<ul>
+<li>按时间轮转（按天、按小时）</li>
+<li>按大小轮转（100MB、1GB）</li>
+<li>压缩旧日志（gzip）</li>
+<li>删除过期日志（保留 7 天、30 天）</li>
+</ul>
+<p><strong>示例（logrotate 配置）</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">/var/log/myapp/*.log &#123;</span><br><span class="line">    daily           # 每天轮转</span><br><span class="line">    rotate 7        # 保留 7 个文件</span><br><span class="line">    compress        # 压缩旧日志</span><br><span class="line">    delaycompress   # 延迟压缩</span><br><span class="line">    missingok       # 文件不存在不报错</span><br><span class="line">    notifempty      # 文件为空不轮转</span><br><span class="line">    create 0644 www-data www-data  # 创建新文件，指定权限</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="评估标准（达成判定）"><a href="#评估标准（达成判定）" class="headerlink" title="评估标准（达成判定）"></a>评估标准（达成判定）</h2><ul>
+<li>✅ 完成了本地日志分析，识别了关键字段</li>
+<li>✅ 设计了日志规范文档（包含字段定义和示例）</li>
+<li>✅ 编写了日志标准化脚本</li>
+<li>✅ 将标准化日志导出为 CSV 格式</li>
+<li>✅ 能说明日志规范化的好处</li>
+</ul>
+<hr>
+<h2 id="学习成果达成情况（由学习者填写）"><a href="#学习成果达成情况（由学习者填写）" class="headerlink" title="学习成果达成情况（由学习者填写）"></a>学习成果达成情况（由学习者填写）</h2><hr>
+<h3 id="截图与证据"><a href="#截图与证据" class="headerlink" title="截图与证据"></a>截图与证据</h3><ul>
+<li><input disabled="" type="checkbox"> 本地日志分析截图（syslog, auth.log, nginx.log）</li>
+<li><input disabled="" type="checkbox"> 日志字段分析文档（log_fields_analysis.md）</li>
+<li><input disabled="" type="checkbox"> 日志规范文档（log_specification.md）</li>
+<li><input disabled="" type="checkbox"> 日志标准化脚本（log_normalizer.py）</li>
+<li><input disabled="" type="checkbox"> 标准化后的日志输出（JSONL 格式）</li>
+<li><input disabled="" type="checkbox"> CSV 导出脚本（log_exporter.py）</li>
+<li><input disabled="" type="checkbox"> 导出的 CSV 文件</li>
+</ul>
+<hr>
+<h3 id="关键命令与输出（粘贴关键片段）"><a href="#关键命令与输出（粘贴关键片段）" class="headerlink" title="关键命令与输出（粘贴关键片段）"></a>关键命令与输出（粘贴关键片段）</h3><p><strong>查看系统日志</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">tail</span> -20 /var/log/syslog</span><br><span class="line">Jan 22 10:30:00 server01 systemd[1]: Started nginx.service</span><br><span class="line">Jan 22 10:30:01 server01 sshd[12345]: Accepted password <span class="keyword">for</span> user01 from 192.168.1.10</span><br></pre></td></tr></table></figure>
+
+<p><strong>查看 Nginx 访问日志</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">tail</span> -10 /var/log/nginx/access.log</span><br><span class="line">192.168.1.10 - user01 [22/Jan/2026:10:30:00 +0800] <span class="string">&quot;GET /api/users HTTP/1.1&quot;</span> 200 1234 <span class="string">&quot;-&quot;</span> <span class="string">&quot;Mozilla/5.0&quot;</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>运行日志标准化脚本</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ python log_normalizer.py /tmp/nginx_sample.log</span><br><span class="line">✅ 完成！</span><br><span class="line">   输入文件: /tmp/nginx_sample.log</span><br><span class="line">   输出文件: /tmp/nginx_sample_normalized.jsonl</span><br><span class="line">   处理记录: 3 条</span><br></pre></td></tr></table></figure>
+
+<p><strong>查看标准化后的日志</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cat</span> /tmp/nginx_sample_normalized.jsonl | python -m json.tool</span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">&quot;timestamp&quot;</span>: <span class="string">&quot;2026-01-22T02:30:00.000Z&quot;</span>,</span><br><span class="line">  <span class="string">&quot;level&quot;</span>: <span class="string">&quot;INFO&quot;</span>,</span><br><span class="line">  <span class="string">&quot;hostname&quot;</span>: <span class="string">&quot;web-01&quot;</span>,</span><br><span class="line">  <span class="string">&quot;service&quot;</span>: <span class="string">&quot;nginx&quot;</span>,</span><br><span class="line">  <span class="string">&quot;event_type&quot;</span>: <span class="string">&quot;http_access&quot;</span>,</span><br><span class="line">  <span class="string">&quot;ip_address&quot;</span>: <span class="string">&quot;192.168.1.10&quot;</span>,</span><br><span class="line">  <span class="string">&quot;user_id&quot;</span>: <span class="string">&quot;user01&quot;</span>,</span><br><span class="line">  <span class="string">&quot;http&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;method&quot;</span>: <span class="string">&quot;GET&quot;</span>,</span><br><span class="line">    <span class="string">&quot;path&quot;</span>: <span class="string">&quot;/api/users&quot;</span>,</span><br><span class="line">    <span class="string">&quot;query_string&quot;</span>: null,</span><br><span class="line">    <span class="string">&quot;status_code&quot;</span>: 200,</span><br><span class="line">    <span class="string">&quot;response_size&quot;</span>: 1234,</span><br><span class="line">    <span class="string">&quot;duration_ms&quot;</span>: 0</span><br><span class="line">  &#125;,</span><br><span class="line">  <span class="string">&quot;context&quot;</span>: &#123;</span><br><span class="line">    <span class="string">&quot;user_agent&quot;</span>: <span class="string">&quot;Mozilla/5.0&quot;</span>,</span><br><span class="line">    <span class="string">&quot;referer&quot;</span>: <span class="string">&quot;-&quot;</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>导出 CSV 格式</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">$ python log_exporter.py /tmp/nginx_sample_normalized.jsonl /tmp/nginx_sample_normalized.csv</span><br><span class="line">✅ 完成！</span><br><span class="line">   输入文件: /tmp/nginx_sample_normalized.jsonl</span><br><span class="line">   输出文件: /tmp/nginx_sample_normalized.csv</span><br><span class="line">   导出记录: 3 条</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="结论与反思"><a href="#结论与反思" class="headerlink" title="结论与反思"></a>结论与反思</h3><p><strong>我今天搞清楚了</strong>：</p>
+<ul>
+<li>不同类型日志（系统、应用、安全、访问）的区别和用途</li>
+<li>日志关键字段（timestamp, hostname, user_id, event_type 等）的作用</li>
+<li>日志规范化和标准化的重要性</li>
+<li>如何编写脚本将不同格式的日志转换为统一的 JSON 格式</li>
+<li>如何将结构化日志导出为 CSV 格式便于分析</li>
+</ul>
+<p><strong>我差点搞混的是</strong>：</p>
+<ul>
+<li>最初不理解 ISO 8601 时间格式的优势</li>
+<li>混淆了日志级别（DEBUG&#x2F;INFO&#x2F;WARNING&#x2F;ERROR）的使用场景</li>
+<li>不清楚字段映射和结构化日志的关系</li>
+</ul>
+<p><strong>明天我要继续补的是</strong>：</p>
+<ul>
+<li>学习日志分析工具（Elasticsearch&#x2F;Kibana、Splunk）的使用（Day030）</li>
+<li>了解日志告警规则的设计与配置（Day031）</li>
+<li>学习日志存储与检索优化（Day032）</li>
+</ul>
+<p><strong>本次学习耗时</strong>：约 3 小时</p>
+<p><strong>掌握程度自评</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 😕 理解了基本概念，但实践不熟练</li>
+<li><input disabled="" type="checkbox"> 🙂 完成了日志分析和规范设计</li>
+<li><input disabled="" type="checkbox"> 😃 完成了所有任务并理解原理</li>
+<li><input disabled="" type="checkbox"> 🤩 额外扩展了脱敏和轮转功能</li>
+</ul>
+<hr>
+<h2 id="集中参考答案（含思路）"><a href="#集中参考答案（含思路）" class="headerlink" title="集中参考答案（含思路）"></a>集中参考答案（含思路）</h2><hr>
+<h3 id="练习-1-参考答案：为何需要统一字段？"><a href="#练习-1-参考答案：为何需要统一字段？" class="headerlink" title="练习 1 参考答案：为何需要统一字段？"></a>练习 1 参考答案：为何需要统一字段？</h3><p><strong>字段不统一带来的问题</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>问题类型</th>
+<th>具体表现</th>
+<th>影响</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>检索困难</strong></td>
+<td><code>user_id</code>, <code>userId</code>, <code>User_ID</code> 混用</td>
+<td>搜索时需要尝试多种字段名，效率低</td>
+</tr>
+<tr>
+<td><strong>分析复杂</strong></td>
+<td>时间格式不统一（<code>2026-01-22</code> vs <code>01/22/2026</code>）</td>
+<td>需要额外转换才能做时间范围查询</td>
+</tr>
+<tr>
+<td><strong>自动化困难</strong></td>
+<td>字段含义不明确</td>
+<td>需要人工干预，自动化脚本无法通用</td>
+</tr>
+<tr>
+<td><strong>协作成本高</strong></td>
+<td>不同团队使用不同字段规范</td>
+<td>数据共享和集成需要额外适配工作</td>
+</tr>
+<tr>
+<td><strong>合规审计难</strong></td>
+<td>字段缺失或不一致</td>
+<td>难以满足审计和合规要求</td>
+</tr>
+</tbody></table>
+<p><strong>统一字段的好处</strong>：</p>
+<ol>
+<li><p><strong>提高检索效率</strong>：</p>
+<ul>
+<li>字段名统一，一次查询即可找到所有相关记录</li>
+<li>不需要尝试多个可能的字段名</li>
+</ul>
+</li>
+<li><p><strong>简化数据分析</strong>：</p>
+<ul>
+<li>时间格式统一（ISO 8601），时间范围查询更简单</li>
+<li>数据类型一致，聚合统计更容易</li>
+</ul>
+</li>
+<li><p><strong>便于自动化</strong>：</p>
+<ul>
+<li>标准化字段，自动化脚本可通用</li>
+<li>减少人工干预，提高效率</li>
+</ul>
+</li>
+<li><p><strong>降低协作成本</strong>：</p>
+<ul>
+<li>团队之间数据共享无需额外适配</li>
+<li>新人快速理解日志结构</li>
+</ul>
+</li>
+<li><p><strong>满足合规要求</strong>：</p>
+<ul>
+<li>审计所需字段明确</li>
+<li>便于生成合规报告</li>
+</ul>
+</li>
+</ol>
+<p><strong>示例：字段不统一的检索问题</strong></p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 不统一：需要尝试多种字段名</span></span><br><span class="line">grep <span class="string">&quot;user001&quot;</span> log1.txt | grep <span class="string">&quot;user_id&quot;</span></span><br><span class="line">grep <span class="string">&quot;user001&quot;</span> log2.txt | grep <span class="string">&quot;userId&quot;</span></span><br><span class="line">grep <span class="string">&quot;user001&quot;</span> log3.txt | grep <span class="string">&quot;User_ID&quot;</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 统一：一次查询</span></span><br><span class="line">grep <span class="string">&#x27;&quot;user_id&quot;: &quot;user001&quot;&#x27;</span> standardized_logs.jsonl</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="练习-2-参考答案：设计一份日志规范草案"><a href="#练习-2-参考答案：设计一份日志规范草案" class="headerlink" title="练习 2 参考答案：设计一份日志规范草案"></a>练习 2 参考答案：设计一份日志规范草案</h3><p><strong>电商订单服务日志规范</strong>：</p>
+<figure class="highlight markdown"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="section"># 电商订单服务日志规范</span></span><br><span class="line"></span><br><span class="line"><span class="section">## 通用字段</span></span><br><span class="line"></span><br><span class="line">| 字段名 | 类型 | 必填 | 说明 | 示例 |</span><br><span class="line">|-------|------|------|------|------|</span><br><span class="line">| timestamp | string (ISO 8601) | ✅ | 事件时间（UTC）| 2026-01-22T10:30:00.123Z |</span><br><span class="line">| level | string | ✅ | 日志级别 | DEBUG, INFO, WARNING, ERROR, CRITICAL |</span><br><span class="line">| hostname | string | ✅ | 主机名 | order-service-01 |</span><br><span class="line">| service | string | ✅ | 服务名 | order-service |</span><br><span class="line">| trace<span class="emphasis">_id | string | ⚠️ | 追踪 ID | trace_</span>abc123 |</span><br><span class="line">| event<span class="emphasis">_type | string | ✅ | 事件类型 | order_</span>created, order<span class="emphasis">_paid, order_</span>shipped |</span><br><span class="line"></span><br><span class="line"><span class="section">## 订单创建日志</span></span><br><span class="line"></span><br><span class="line">| 字段名 | 类型 | 必填 | 说明 | 示例 |</span><br><span class="line">|-------|------|------|------|------|</span><br><span class="line">| order<span class="emphasis">_id | string | ✅ | 订单 ID | ORD-20260122-001 |</span></span><br><span class="line"><span class="emphasis">| user_</span>id | string | ✅ | 用户 ID | user001 |</span><br><span class="line">| product<span class="emphasis">_id | string | ✅ | 产品 ID | PROD-001 |</span></span><br><span class="line"><span class="emphasis">| quantity | int | ✅ | 数量 | 2 |</span></span><br><span class="line"><span class="emphasis">| unit_</span>price | decimal | ✅ | 单价 | 99.99 |</span><br><span class="line">| total<span class="emphasis">_amount | decimal | ✅ | 总金额 | 199.98 |</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">### 示例</span></span><br><span class="line"><span class="emphasis"></span></span><br><span class="line"><span class="emphasis">```json</span></span><br><span class="line"><span class="emphasis">&#123;</span></span><br><span class="line"><span class="emphasis">  &quot;timestamp&quot;: &quot;2026-01-22T10:30:00.123Z&quot;,</span></span><br><span class="line"><span class="emphasis">  &quot;level&quot;: &quot;INFO&quot;,</span></span><br><span class="line"><span class="emphasis">  &quot;hostname&quot;: &quot;order-service-01&quot;,</span></span><br><span class="line"><span class="emphasis">  &quot;service&quot;: &quot;order-service&quot;,</span></span><br><span class="line"><span class="emphasis">  &quot;trace_</span>id&quot;: &quot;trace<span class="emphasis">_abc123&quot;,</span></span><br><span class="line"><span class="emphasis">  &quot;event_</span>type&quot;: &quot;order<span class="emphasis">_created&quot;,</span></span><br><span class="line"><span class="emphasis">  &quot;order_</span>id&quot;: &quot;ORD-20260122-001&quot;,</span><br><span class="line">  &quot;user<span class="emphasis">_id&quot;: &quot;user001&quot;,</span></span><br><span class="line"><span class="emphasis">  &quot;product_</span>id&quot;: &quot;PROD-001&quot;,</span><br><span class="line">  &quot;quantity&quot;: 2,</span><br><span class="line">  &quot;unit<span class="emphasis">_price&quot;: 99.99,</span></span><br><span class="line"><span class="emphasis">  &quot;total_</span>amount&quot;: 199.98</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="订单支付日志"><a href="#订单支付日志" class="headerlink" title="订单支付日志"></a>订单支付日志</h2><table>
+<thead>
+<tr>
+<th>字段名</th>
+<th>类型</th>
+<th>必填</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>order_id</td>
+<td>string</td>
+<td>✅</td>
+<td>订单 ID</td>
+<td>ORD-20260122-001</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>string</td>
+<td>✅</td>
+<td>用户 ID</td>
+<td>user001</td>
+</tr>
+<tr>
+<td>payment_method</td>
+<td>string</td>
+<td>✅</td>
+<td>支付方式</td>
+<td>credit_card, wechat_pay, alipay</td>
+</tr>
+<tr>
+<td>amount</td>
+<td>decimal</td>
+<td>✅</td>
+<td>支付金额</td>
+<td>199.98</td>
+</tr>
+<tr>
+<td>transaction_id</td>
+<td>string</td>
+<td>✅</td>
+<td>交易 ID</td>
+<td>TXN-20260122-001</td>
+</tr>
+<tr>
+<td>status</td>
+<td>string</td>
+<td>✅</td>
+<td>状态</td>
+<td>success, failed, pending</td>
+</tr>
+<tr>
+<td>failure_reason</td>
+<td>string</td>
+<td>⚠️</td>
+<td>失败原因（如失败）</td>
+<td>insufficient_balance</td>
+</tr>
+</tbody></table>
+<h3 id="示例-2"><a href="#示例-2" class="headerlink" title="示例"></a>示例</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;timestamp&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2026-01-22T10:30:05.456Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;level&quot;</span><span class="punctuation">:</span> <span class="string">&quot;INFO&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;hostname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;order-service-01&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;service&quot;</span><span class="punctuation">:</span> <span class="string">&quot;order-service&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;trace_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;trace_abc123&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;event_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;order_paid&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;order_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ORD-20260122-001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;user_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;user001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;payment_method&quot;</span><span class="punctuation">:</span> <span class="string">&quot;wechat_pay&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;amount&quot;</span><span class="punctuation">:</span> <span class="number">199.98</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;transaction_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;TXN-20260122-001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;status&quot;</span><span class="punctuation">:</span> <span class="string">&quot;success&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="订单发货日志"><a href="#订单发货日志" class="headerlink" title="订单发货日志"></a>订单发货日志</h2><table>
+<thead>
+<tr>
+<th>字段名</th>
+<th>类型</th>
+<th>必填</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>order_id</td>
+<td>string</td>
+<td>✅</td>
+<td>订单 ID</td>
+<td>ORD-20260122-001</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>string</td>
+<td>✅</td>
+<td>用户 ID</td>
+<td>user001</td>
+</tr>
+<tr>
+<td>shipping_address</td>
+<td>object</td>
+<td>✅</td>
+<td>收货地址</td>
+<td>{“province”: “Beijing”, “city”: “Beijing”, …}</td>
+</tr>
+<tr>
+<td>shipping_method</td>
+<td>string</td>
+<td>✅</td>
+<td>配送方式</td>
+<td>standard, express</td>
+</tr>
+<tr>
+<td>tracking_number</td>
+<td>string</td>
+<td>✅</td>
+<td>物流单号</td>
+<td>SF1234567890</td>
+</tr>
+</tbody></table>
+<h3 id="示例-3"><a href="#示例-3" class="headerlink" title="示例"></a>示例</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;timestamp&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2026-01-22T10:35:00.789Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;level&quot;</span><span class="punctuation">:</span> <span class="string">&quot;INFO&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;hostname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;order-service-01&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;service&quot;</span><span class="punctuation">:</span> <span class="string">&quot;order-service&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;trace_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;trace_abc123&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;event_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;order_shipped&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;order_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ORD-20260122-001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;user_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;user001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;shipping_address&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;province&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Beijing&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;city&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Beijing&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;district&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Chaoyang&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;address&quot;</span><span class="punctuation">:</span> <span class="string">&quot;xxx Street&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;postal_code&quot;</span><span class="punctuation">:</span> <span class="string">&quot;100000&quot;</span></span><br><span class="line">  <span class="punctuation">&#125;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;shipping_method&quot;</span><span class="punctuation">:</span> <span class="string">&quot;express&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;tracking_number&quot;</span><span class="punctuation">:</span> <span class="string">&quot;SF1234567890&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="错误日志-1"><a href="#错误日志-1" class="headerlink" title="错误日志"></a>错误日志</h2><table>
+<thead>
+<tr>
+<th>字段名</th>
+<th>类型</th>
+<th>必填</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>error_code</td>
+<td>string</td>
+<td>⚠️</td>
+<td>错误代码</td>
+<td>ORD_ERR_001</td>
+</tr>
+<tr>
+<td>error_message</td>
+<td>string</td>
+<td>✅</td>
+<td>错误消息</td>
+<td>Inventory insufficient</td>
+</tr>
+<tr>
+<td>exception_type</td>
+<td>string</td>
+<td>⚠️</td>
+<td>异常类型</td>
+<td>ValueError</td>
+</tr>
+<tr>
+<td>stack_trace</td>
+<td>string</td>
+<td>⚠️</td>
+<td>堆栈信息</td>
+<td>at line 42…</td>
+</tr>
+</tbody></table>
+<h3 id="示例-4"><a href="#示例-4" class="headerlink" title="示例"></a>示例</h3><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;timestamp&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2026-01-22T10:32:00.123Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;level&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ERROR&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;hostname&quot;</span><span class="punctuation">:</span> <span class="string">&quot;order-service-01&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;service&quot;</span><span class="punctuation">:</span> <span class="string">&quot;order-service&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;trace_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;trace_abc123&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;event_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;error&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;order_id&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ORD-20260122-002&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;error_code&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ORD_ERR_001&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;error_message&quot;</span><span class="punctuation">:</span> <span class="string">&quot;Inventory insufficient&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;exception_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;ValueError&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;stack_trace&quot;</span><span class="punctuation">:</span> <span class="string">&quot;at line 42...&quot;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">---</span><br><span class="line"></span><br><span class="line">### 练习 3 参考答案：日志敏感信息脱敏</span><br><span class="line"></span><br><span class="line">**扩展脱敏规则**：</span><br><span class="line"></span><br><span class="line">```python</span><br><span class="line">import re</span><br><span class="line"></span><br><span class="line">class LogSanitizer:</span><br><span class="line">    &quot;&quot;&quot;日志脱敏器&quot;&quot;&quot;</span><br><span class="line">    </span><br><span class="line">    def __init__(self):</span><br><span class="line">        self.rules = [</span><br><span class="line">            # 密码</span><br><span class="line">            (r&#x27;password=[^&amp;\s]+&#x27;, &#x27;password=***&#x27;),</span><br><span class="line">            # 信用卡号（16位）</span><br><span class="line">            (r&#x27;\b\d&#123;16&#125;\b&#x27;, &#x27;************&#x27;),</span><br><span class="line">            # 手机号（中国）</span><br><span class="line">            (r&#x27;\b1[3-9]\d&#123;9&#125;\b&#x27;, &#x27;***&#x27;),</span><br><span class="line">            # 邮箱</span><br><span class="line">            (r&#x27;\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]&#123;2,&#125;\b&#x27;, &#x27;***@***.com&#x27;),</span><br><span class="line">            # 身份证号（18位）</span><br><span class="line">            (r&#x27;\b\d&#123;17&#125;[\dXx]\b&#x27;, &#x27;******************&#x27;),</span><br><span class="line">            # API Key</span><br><span class="line">            (r&#x27;api[_-]?key\s*=\s*[\w-]&#123;20,&#125;&#x27;, &#x27;api_key=***&#x27;),</span><br><span class="line">            # Token</span><br><span class="line">            (r&#x27;token\s*=\s*[\w.-]&#123;20,&#125;&#x27;, &#x27;token=***&#x27;),</span><br><span class="line">        ]</span><br><span class="line">    </span><br><span class="line">    def sanitize(self, message: str) -&gt; str:</span><br><span class="line">        &quot;&quot;&quot;脱敏敏感信息</span><br><span class="line">        </span><br><span class="line">        Args:</span><br><span class="line">            message: 原始日志消息</span><br><span class="line">            </span><br><span class="line">        Returns:</span><br><span class="line">            脱敏后的日志消息</span><br><span class="line">        &quot;&quot;&quot;</span><br><span class="line">        result = message</span><br><span class="line">        </span><br><span class="line">        for pattern, replacement in self.rules:</span><br><span class="line">            result = re.sub(pattern, replacement, result)</span><br><span class="line">        </span><br><span class="line">        return result</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"># 使用示例</span><br><span class="line">sanitizer = LogSanitizer()</span><br><span class="line"></span><br><span class="line">original = &quot;user=admin&amp;password=secret123&amp;email=user@example.com&quot;</span><br><span class="line">sanitized = sanitizer.sanitize(original)</span><br><span class="line"></span><br><span class="line">print(f&quot;原始: &#123;original&#125;&quot;)</span><br><span class="line">print(f&quot;脱敏: &#123;sanitized&#125;&quot;)</span><br><span class="line"></span><br><span class="line"># 输出:</span><br><span class="line"># 原始: user=admin&amp;password=secret123&amp;email=user@example.com</span><br><span class="line"># 脱敏: user=admin&amp;password=***&amp;email=***@***.com</span><br></pre></td></tr></table></figure>
+
+<p><strong>集成到日志标准化流程</strong>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span> <span class="title class_">NginxLogNormalizer</span>:</span><br><span class="line">    <span class="string">&quot;&quot;&quot;Nginx 访问日志标准化器（带脱敏）&quot;&quot;&quot;</span></span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">__init__</span>(<span class="params">self, hostname: <span class="built_in">str</span> = <span class="string">&quot;localhost&quot;</span>, service: <span class="built_in">str</span> = <span class="string">&quot;nginx&quot;</span></span>):</span><br><span class="line">        self.hostname = hostname</span><br><span class="line">        self.service = service</span><br><span class="line">        self.sanitizer = LogSanitizer()</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">def</span> <span class="title function_">parse</span>(<span class="params">self, line: <span class="built_in">str</span></span>) -&gt; <span class="built_in">dict</span> | <span class="literal">None</span>:</span><br><span class="line">        <span class="string">&quot;&quot;&quot;解析单行 Nginx 日志（带脱敏）&quot;&quot;&quot;</span></span><br><span class="line">        match = self.LOG_PATTERN.match(line)</span><br><span class="line">        <span class="keyword">if</span> <span class="keyword">not</span> match:</span><br><span class="line">            <span class="keyword">return</span> <span class="literal">None</span></span><br><span class="line">        </span><br><span class="line">        data = match.groupdict()</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 脱敏敏感信息</span></span><br><span class="line">        sanitized_user_agent = self.sanitizer.sanitize(data[<span class="string">&#x27;user_agent&#x27;</span>])</span><br><span class="line">        sanitized_referer = self.sanitizer.sanitize(data[<span class="string">&#x27;referer&#x27;</span>])</span><br><span class="line">        </span><br><span class="line">        <span class="comment"># ... 其他解析逻辑 ...</span></span><br><span class="line">        </span><br><span class="line">        <span class="keyword">return</span> &#123;</span><br><span class="line">            <span class="comment"># ...</span></span><br><span class="line">            <span class="string">&quot;context&quot;</span>: &#123;</span><br><span class="line">                <span class="string">&quot;user_agent&quot;</span>: sanitized_user_agent,</span><br><span class="line">                <span class="string">&quot;referer&quot;</span>: sanitized_referer</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="练习-4-参考答案：设计日志轮转策略"><a href="#练习-4-参考答案：设计日志轮转策略" class="headerlink" title="练习 4 参考答案：设计日志轮转策略"></a>练习 4 参考答案：设计日志轮转策略</h3><p><strong>logrotate 配置示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"># /etc/logrotate.d/myapp</span><br><span class="line"></span><br><span class="line">/var/log/myapp/*.log &#123;</span><br><span class="line">    # 轮转频率：每天</span><br><span class="line">    daily</span><br><span class="line">    </span><br><span class="line">    # 保留文件数：7 天</span><br><span class="line">    rotate 7</span><br><span class="line">    </span><br><span class="line">    # 压缩旧日志</span><br><span class="line">    compress</span><br><span class="line">    </span><br><span class="line">    # 延迟压缩（最新的不压缩）</span><br><span class="line">    delaycompress</span><br><span class="line">    </span><br><span class="line">    # 文件不存在不报错</span><br><span class="line">    missingok</span><br><span class="line">    </span><br><span class="line">    # 文件为空不轮转</span><br><span class="line">    notifempty</span><br><span class="line">    </span><br><span class="line">    # 轮转后创建新文件</span><br><span class="line">    # 格式: [path] [owner] [group] [mode]</span><br><span class="line">    create 0644 www-data www-data</span><br><span class="line">    </span><br><span class="line">    # 轮转后执行脚本</span><br><span class="line">    postrotate</span><br><span class="line">        # 通知应用重新打开日志文件</span><br><span class="line">        systemctl reload myapp &gt; /dev/null 2&gt;&amp;1 || true</span><br><span class="line">    endscript</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">/var/log/myapp/access.log &#123;</span><br><span class="line">    # 按大小轮转（100MB）</span><br><span class="line">    size 100M</span><br><span class="line">    </span><br><span class="line">    # 保留 5 个文件</span><br><span class="line">    rotate 5</span><br><span class="line">    </span><br><span class="line">    # 压缩</span><br><span class="line">    compress</span><br><span class="line">    </span><br><span class="line">    delaycompress</span><br><span class="line">    missingok</span><br><span class="line">    notifempty</span><br><span class="line">    create 0644 www-data www-data</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><strong>轮转策略对比</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>策略类型</th>
+<th>配置项</th>
+<th>优点</th>
+<th>缺点</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>按时间</strong></td>
+<td><code>daily</code>, <code>weekly</code>, <code>monthly</code></td>
+<td>简单、易于理解</td>
+<td>文件大小不固定</td>
+<td>日志量稳定的系统</td>
+</tr>
+<tr>
+<td><strong>按大小</strong></td>
+<td><code>size 100M</code></td>
+<td>控制单个文件大小</td>
+<td>轮转频率不确定</td>
+<td>日志量波动大的系统</td>
+</tr>
+<tr>
+<td><strong>混合</strong></td>
+<td><code>daily</code> + <code>maxsize</code></td>
+<td>兼顾时间和大小</td>
+<td>配置复杂</td>
+<td>需要精细控制的场景</td>
+</tr>
+</tbody></table>
+<p><strong>Python 轮转脚本示例</strong>：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#!/usr/bin/env python3</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">日志轮转脚本</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="keyword">import</span> os</span><br><span class="line"><span class="keyword">import</span> gzip</span><br><span class="line"><span class="keyword">import</span> shutil</span><br><span class="line"><span class="keyword">from</span> pathlib <span class="keyword">import</span> Path</span><br><span class="line"><span class="keyword">from</span> datetime <span class="keyword">import</span> datetime, timedelta</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">rotate_log</span>(<span class="params">log_file: Path, max_files: <span class="built_in">int</span> = <span class="number">7</span>, max_size_mb: <span class="built_in">int</span> = <span class="number">100</span></span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;轮转日志文件</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        log_file: 日志文件路径</span></span><br><span class="line"><span class="string">        max_files: 保留的最大文件数</span></span><br><span class="line"><span class="string">        max_size_mb: 最大文件大小（MB），超过则立即轮转</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="keyword">if</span> <span class="keyword">not</span> log_file.exists():</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 检查文件大小</span></span><br><span class="line">    file_size_mb = log_file.stat().st_size / (<span class="number">1024</span> * <span class="number">1024</span>)</span><br><span class="line">    <span class="keyword">if</span> file_size_mb &lt; max_size_mb:</span><br><span class="line">        <span class="keyword">return</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 生成轮转文件名</span></span><br><span class="line">    timestamp = datetime.now().strftime(<span class="string">&#x27;%Y%m%d_%H%M%S&#x27;</span>)</span><br><span class="line">    rotated_file = log_file.parent / <span class="string">f&quot;<span class="subst">&#123;log_file.name&#125;</span>.<span class="subst">&#123;timestamp&#125;</span>&quot;</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 移动文件</span></span><br><span class="line">    shutil.move(<span class="built_in">str</span>(log_file), <span class="built_in">str</span>(rotated_file))</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;✅ 轮转: <span class="subst">&#123;log_file.name&#125;</span> → <span class="subst">&#123;rotated_file.name&#125;</span>&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 压缩旧文件</span></span><br><span class="line">    compressed_file = rotated_file.with_suffix(<span class="string">f&quot;<span class="subst">&#123;rotated_file.suffix&#125;</span>.gz&quot;</span>)</span><br><span class="line">    <span class="keyword">with</span> <span class="built_in">open</span>(rotated_file, <span class="string">&#x27;rb&#x27;</span>) <span class="keyword">as</span> f_in:</span><br><span class="line">        <span class="keyword">with</span> gzip.<span class="built_in">open</span>(compressed_file, <span class="string">&#x27;wb&#x27;</span>) <span class="keyword">as</span> f_out:</span><br><span class="line">            shutil.copyfileobj(f_in, f_out)</span><br><span class="line">    os.remove(rotated_file)</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">f&quot;✅ 压缩: <span class="subst">&#123;rotated_file.name&#125;</span> → <span class="subst">&#123;compressed_file.name&#125;</span>&quot;</span>)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 清理过期文件</span></span><br><span class="line">    clean_old_logs(log_file.parent, log_file.name, max_files)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">clean_old_logs</span>(<span class="params">directory: Path, base_name: <span class="built_in">str</span>, max_files: <span class="built_in">int</span></span>):</span><br><span class="line">    <span class="string">&quot;&quot;&quot;清理过期日志文件</span></span><br><span class="line"><span class="string">    </span></span><br><span class="line"><span class="string">    Args:</span></span><br><span class="line"><span class="string">        directory: 日志目录</span></span><br><span class="line"><span class="string">        base_name: 基础文件名</span></span><br><span class="line"><span class="string">        max_files: 保留的最大文件数</span></span><br><span class="line"><span class="string">    &quot;&quot;&quot;</span></span><br><span class="line">    <span class="comment"># 获取所有相关文件（包括压缩文件）</span></span><br><span class="line">    files = []</span><br><span class="line">    <span class="keyword">for</span> pattern <span class="keyword">in</span> [<span class="string">f&quot;<span class="subst">&#123;base_name&#125;</span>.*.log*&quot;</span>, <span class="string">f&quot;<span class="subst">&#123;base_name&#125;</span>.log*.gz&quot;</span>]:</span><br><span class="line">        files.extend(directory.glob(pattern))</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 按修改时间排序（从旧到新）</span></span><br><span class="line">    files.sort(key=<span class="keyword">lambda</span> f: f.stat().st_mtime)</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 删除超出数量的文件</span></span><br><span class="line">    <span class="keyword">if</span> <span class="built_in">len</span>(files) &gt; max_files:</span><br><span class="line">        <span class="keyword">for</span> f <span class="keyword">in</span> files[:-max_files]:</span><br><span class="line">            f.unlink()</span><br><span class="line">            <span class="built_in">print</span>(<span class="string">f&quot;✅ 删除过期文件: <span class="subst">&#123;f.name&#125;</span>&quot;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">def</span> <span class="title function_">main</span>():</span><br><span class="line">    log_dir = Path(<span class="string">&quot;/var/log/myapp&quot;</span>)</span><br><span class="line">    log_files = [<span class="string">&quot;access.log&quot;</span>, <span class="string">&quot;error.log&quot;</span>, <span class="string">&quot;app.log&quot;</span>]</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">for</span> log_file <span class="keyword">in</span> log_files:</span><br><span class="line">        full_path = log_dir / log_file</span><br><span class="line">        rotate_log(full_path, max_files=<span class="number">7</span>, max_size_mb=<span class="number">100</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&quot;__main__&quot;</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="学习成果示例填写（可照抄）"><a href="#学习成果示例填写（可照抄）" class="headerlink" title="学习成果示例填写（可照抄）"></a>学习成果示例填写（可照抄）</h2><blockquote>
+<p>可将”示例”内容替换为你自己的时间与截图文件名。</p>
+</blockquote>
+<hr>
+<h3 id="截图与证据（示例）"><a href="#截图与证据（示例）" class="headerlink" title="截图与证据（示例）"></a>截图与证据（示例）</h3><ul>
+<li>日志分析：<code>images/day029_log_analysis.png</code></li>
+<li>规范文档：<code>log_specification.md</code></li>
+<li>标准化脚本：<code>log_normalizer.py</code></li>
+<li>标准化输出：<code>images/day029_normalized_logs.png</code></li>
+<li>CSV 导出：<code>images/day029_csv_export.png</code></li>
+</ul>
+<hr>
+<h3 id="关键命令与输出（示例）"><a href="#关键命令与输出（示例）" class="headerlink" title="关键命令与输出（示例）"></a>关键命令与输出（示例）</h3><p><strong>查看系统日志</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">tail</span> -20 /var/log/syslog</span><br><span class="line">Jan 22 10:30:00 server01 systemd[1]: Started nginx.service</span><br></pre></td></tr></table></figure>
+
+<p><strong>运行日志标准化</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ python log_normalizer.py /tmp/nginx_sample.log</span><br><span class="line">✅ 完成！</span><br><span class="line">   处理记录: 3 条</span><br></pre></td></tr></table></figure>
+
+<p><strong>查看标准化日志</strong>：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="punctuation">&#123;</span></span><br><span class="line">  <span class="attr">&quot;timestamp&quot;</span><span class="punctuation">:</span> <span class="string">&quot;2026-01-22T10:30:00.000Z&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;level&quot;</span><span class="punctuation">:</span> <span class="string">&quot;INFO&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;event_type&quot;</span><span class="punctuation">:</span> <span class="string">&quot;http_access&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;ip_address&quot;</span><span class="punctuation">:</span> <span class="string">&quot;192.168.1.10&quot;</span><span class="punctuation">,</span></span><br><span class="line">  <span class="attr">&quot;http&quot;</span><span class="punctuation">:</span> <span class="punctuation">&#123;</span></span><br><span class="line">    <span class="attr">&quot;method&quot;</span><span class="punctuation">:</span> <span class="string">&quot;GET&quot;</span><span class="punctuation">,</span></span><br><span class="line">    <span class="attr">&quot;status_code&quot;</span><span class="punctuation">:</span> <span class="number">200</span></span><br><span class="line">  <span class="punctuation">&#125;</span></span><br><span class="line"><span class="punctuation">&#125;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="结论与反思（示例）"><a href="#结论与反思（示例）" class="headerlink" title="结论与反思（示例）"></a>结论与反思（示例）</h3><p><strong>我今天搞清楚了</strong>：</p>
+<ul>
+<li>不同类型日志（系统、应用、安全、访问）的区别和用途</li>
+<li>日志关键字段的作用和重要性</li>
+<li>日志规范化和标准化的好处</li>
+<li>如何编写脚本将不同格式日志转换为统一 JSON 格式</li>
+<li>敏感信息脱敏和日志轮转的重要性</li>
+</ul>
+<p><strong>我差点搞混的是</strong>：</p>
+<ul>
+<li>最初不理解 ISO 8601 时间格式的优势</li>
+<li>混淆了日志级别的使用场景</li>
+<li>不清楚结构化日志和字段映射的关系</li>
+</ul>
+<p><strong>明天我要继续补的是</strong>：</p>
+<ul>
+<li>学习 Elasticsearch&#x2F;Kibana 的使用（Day030）</li>
+<li>了解日志告警规则设计（Day031）</li>
+</ul>
+<p><strong>本次学习耗时</strong>：约 3 小时</p>
+<p><strong>掌握程度自评</strong>：</p>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 😃 完成了所有任务并理解原理</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Tigercoll 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+              <a href="/tags/%E5%AE%89%E5%85%A8/" rel="tag"># 安全</a>
+              <a href="/tags/%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" rel="tag"># 学习计划</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/e442a326.html" rel="prev" title="Day028：漏洞扫描与基线 - 周综合实验与测评（扫描+基线+加固）">
+                  <i class="fa fa-chevron-left"></i> Day028：漏洞扫描与基线 - 周综合实验与测评（扫描+基线+加固）
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true,"react":{"opacity":0.7}}});</script></body>
+</html>

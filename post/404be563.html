@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-center-simple.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Day020：操作系统与脚本 - 服务枚举与指纹识别 日期：2026-01-13 周次：第 3 周  学习目标学完今天你应该能做到：  能解释”枚举”在做什么：确认服务是什么+版本是什么+响应特征是什么 知道 Banner 不可靠，并能用”两种方法交叉验证” 用最小脚本把扫描结果整理成”服务矩阵”（host×port×service×version） 掌握常见服务的指纹识别技巧（HTTP&amp;#x2F">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day020：操作系统与脚本 - 服务枚举与指纹识别">
+<meta property="og:url" content="https://tigercoll.top/post/404be563.html">
+<meta property="og:site_name" content="Tigercoll&#39;s Blog">
+<meta property="og:description" content="Day020：操作系统与脚本 - 服务枚举与指纹识别 日期：2026-01-13 周次：第 3 周  学习目标学完今天你应该能做到：  能解释”枚举”在做什么：确认服务是什么+版本是什么+响应特征是什么 知道 Banner 不可靠，并能用”两种方法交叉验证” 用最小脚本把扫描结果整理成”服务矩阵”（host×port×service×version） 掌握常见服务的指纹识别技巧（HTTP&amp;#x2F">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-01-12T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-12T16:00:00.000Z">
+<meta property="article:author" content="Tigercoll">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="学习计划">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://tigercoll.top/post/404be563.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/404be563.html","path":"post/404be563.html","title":"Day020：操作系统与脚本 - 服务枚举与指纹识别"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day020：操作系统与脚本 - 服务枚举与指纹识别 | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Day020%EF%BC%9A%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E4%B8%8E%E8%84%9A%E6%9C%AC-%E6%9C%8D%E5%8A%A1%E6%9E%9A%E4%B8%BE%E4%B8%8E%E6%8C%87%E7%BA%B9%E8%AF%86%E5%88%AB"><span class="nav-number">1.</span> <span class="nav-text">Day020：操作系统与脚本 - 服务枚举与指纹识别</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E7%9B%AE%E6%A0%87"><span class="nav-number">1.1.</span> <span class="nav-text">学习目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%80%E3%80%81%E4%BB%80%E4%B9%88%E6%98%AF%E6%9C%8D%E5%8A%A1%E6%9E%9A%E4%B8%BE%EF%BC%9F"><span class="nav-number">1.2.</span> <span class="nav-text">一、什么是服务枚举？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-1-%E7%AB%AF%E5%8F%A3%E6%89%AB%E6%8F%8F-vs-%E6%9C%8D%E5%8A%A1%E6%9E%9A%E4%B8%BE"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.1 端口扫描 vs 服务枚举</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-2-%E4%B8%BA%E4%BB%80%E4%B9%88-Banner-%E4%B8%8D%E5%8F%AF%E9%9D%A0%EF%BC%9F"><span class="nav-number">1.2.2.</span> <span class="nav-text">1.2 为什么 Banner 不可靠？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%8C%E3%80%81%E5%B8%B8%E8%A7%81%E6%9C%8D%E5%8A%A1%E7%9A%84%E6%9E%9A%E4%B8%BE%E6%8A%80%E5%B7%A7"><span class="nav-number">1.3.</span> <span class="nav-text">二、常见服务的枚举技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#2-1-HTTP-x2F-HTTPS-%E6%9C%8D%E5%8A%A1"><span class="nav-number">1.3.1.</span> <span class="nav-text">2.1 HTTP&#x2F;HTTPS 服务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%95-1%EF%BC%9Acurl-%E6%9F%A5%E7%9C%8B%E5%93%8D%E5%BA%94%E5%A4%B4"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">方法 1：curl 查看响应头</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%95-2%EF%BC%9A%E6%B5%8F%E8%A7%88%E5%99%A8%E5%BC%80%E5%8F%91%E8%80%85%E5%B7%A5%E5%85%B7"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">方法 2：浏览器开发者工具</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%95-3%EF%BC%9ANmap-NSE-%E8%84%9A%E6%9C%AC"><span class="nav-number">1.3.1.3.</span> <span class="nav-text">方法 3：Nmap NSE 脚本</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-2-SSH-%E6%9C%8D%E5%8A%A1"><span class="nav-number">1.3.2.</span> <span class="nav-text">2.2 SSH 服务</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%95-1%EF%BC%9ATelnet-x2F-Netcat-%E8%8E%B7%E5%8F%96-Banner"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">方法 1：Telnet&#x2F;Netcat 获取 Banner</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%95-2%EF%BC%9Assh-%E5%91%BD%E4%BB%A4%E8%AF%A6%E7%BB%86%E6%A8%A1%E5%BC%8F"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">方法 2：ssh 命令详细模式</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-3-MySQL-x2F-MariaDB"><span class="nav-number">1.3.3.</span> <span class="nav-text">2.3 MySQL&#x2F;MariaDB</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%95-1%EF%BC%9ANmap-%E6%8E%A2%E6%B5%8B"><span class="nav-number">1.3.3.1.</span> <span class="nav-text">方法 1：Nmap 探测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%95-2%EF%BC%9AMySQL-%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%BF%9E%E6%8E%A5"><span class="nav-number">1.3.3.2.</span> <span class="nav-text">方法 2：MySQL 客户端连接</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-4-RDP%EF%BC%88%E8%BF%9C%E7%A8%8B%E6%A1%8C%E9%9D%A2%EF%BC%89"><span class="nav-number">1.3.4.</span> <span class="nav-text">2.4 RDP（远程桌面）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%95-1%EF%BC%9ANmap-%E6%8E%A2%E6%B5%8B-1"><span class="nav-number">1.3.4.1.</span> <span class="nav-text">方法 1：Nmap 探测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%95-2%EF%BC%9Ardesktop-x2F-mstsc-%E8%BF%9E%E6%8E%A5%E6%B5%8B%E8%AF%95"><span class="nav-number">1.3.4.2.</span> <span class="nav-text">方法 2：rdesktop&#x2F;mstsc 连接测试</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-5-SMB%EF%BC%88%E6%96%87%E4%BB%B6%E5%85%B1%E4%BA%AB%EF%BC%89"><span class="nav-number">1.3.5.</span> <span class="nav-text">2.5 SMB（文件共享）</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%95-1%EF%BC%9ANmap-%E6%8E%A2%E6%B5%8B-2"><span class="nav-number">1.3.5.1.</span> <span class="nav-text">方法 1：Nmap 探测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%96%B9%E6%B3%95-2%EF%BC%9Asmbclient-%E6%9E%9A%E4%B8%BE%E5%85%B1%E4%BA%AB"><span class="nav-number">1.3.5.2.</span> <span class="nav-text">方法 2：smbclient 枚举共享</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%89%E3%80%81%E8%87%AA%E5%8A%A8%E5%8C%96%E8%84%9A%E6%9C%AC%EF%BC%9A%E8%A7%A3%E6%9E%90-Nmap-%E7%BB%93%E6%9E%9C"><span class="nav-number">1.4.</span> <span class="nav-text">三、自动化脚本：解析 Nmap 结果</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#3-1-Python-%E8%84%9A%E6%9C%AC%E8%A7%A3%E6%9E%90-Nmap-XML"><span class="nav-number">1.4.1.</span> <span class="nav-text">3.1 Python 脚本解析 Nmap XML</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-2-PowerShell-%E8%84%9A%E6%9C%AC%E8%A7%A3%E6%9E%90-Nmap-%E6%96%87%E6%9C%AC%E8%BE%93%E5%87%BA"><span class="nav-number">1.4.2.</span> <span class="nav-text">3.2 PowerShell 脚本解析 Nmap 文本输出</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%9B%E3%80%81%E5%AE%9E%E6%88%98%E4%BB%BB%E5%8A%A1"><span class="nav-number">1.5.</span> <span class="nav-text">四、实战任务</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-1%EF%BC%9A%E6%9E%9A%E4%B8%BE%E6%9C%AC%E6%9C%BA%E5%BC%80%E6%94%BE%E7%9A%84-Web-%E6%9C%8D%E5%8A%A1"><span class="nav-number">1.5.1.</span> <span class="nav-text">任务 1：枚举本机开放的 Web 服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-2%EF%BC%9A%E6%9E%9A%E4%B8%BE%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%9A%84-SSH-%E6%9C%8D%E5%8A%A1"><span class="nav-number">1.5.2.</span> <span class="nav-text">任务 2：枚举虚拟机的 SSH 服务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-3%EF%BC%9A%E6%89%B9%E9%87%8F%E6%9E%9A%E4%B8%BE%E5%A4%9A%E4%B8%AA%E4%B8%BB%E6%9C%BA"><span class="nav-number">1.5.3.</span> <span class="nav-text">任务 3：批量枚举多个主机</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BA%94%E3%80%81%E5%B7%A9%E5%9B%BA%E7%BB%83%E4%B9%A0"><span class="nav-number">1.6.</span> <span class="nav-text">五、巩固练习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-1%EF%BC%9A%E8%A7%A3%E9%87%8A%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81%E4%BA%A4%E5%8F%89%E9%AA%8C%E8%AF%81"><span class="nav-number">1.6.1.</span> <span class="nav-text">练习 1：解释为什么需要交叉验证</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-2%EF%BC%9A%E8%AF%86%E5%88%AB%E4%BB%A5%E4%B8%8B-HTTP-%E5%93%8D%E5%BA%94%E5%A4%B4%E7%9A%84%E5%85%B3%E9%94%AE%E4%BF%A1%E6%81%AF"><span class="nav-number">1.6.2.</span> <span class="nav-text">练习 2：识别以下 HTTP 响应头的关键信息</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%83%E4%B9%A0-3%EF%BC%9A%E8%AE%BE%E8%AE%A1%E4%B8%80%E5%A5%97%E6%9C%8D%E5%8A%A1%E6%9E%9A%E4%B8%BE%E6%B5%81%E7%A8%8B"><span class="nav-number">1.6.3.</span> <span class="nav-text">练习 3：设计一套服务枚举流程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AD%E3%80%81%E8%AF%84%E4%BC%B0%E6%A0%87%E5%87%86"><span class="nav-number">1.7.</span> <span class="nav-text">六、评估标准</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%B8%83%E3%80%81%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="nav-number">1.8.</span> <span class="nav-text">七、参考资料</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%85%AB%E3%80%81%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E8%BE%BE%E6%88%90%E6%83%85%E5%86%B5%EF%BC%88%E7%94%B1%E5%AD%A6%E4%B9%A0%E8%80%85%E5%A1%AB%E5%86%99%EF%BC%89"><span class="nav-number">1.9.</span> <span class="nav-text">八、学习成果达成情况（由学习者填写）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%AA%E5%9B%BE%E4%B8%8E%E8%AF%81%E6%8D%AE"><span class="nav-number">1.9.1.</span> <span class="nav-text">截图与证据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%8F%91%E7%8E%B0"><span class="nav-number">1.9.2.</span> <span class="nav-text">关键发现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E4%B8%8E%E5%8F%8D%E6%80%9D"><span class="nav-number">1.9.3.</span> <span class="nav-text">结论与反思</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">75</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Tigercoll" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/404be563.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day020：操作系统与脚本 - 服务枚举与指纹识别 | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day020：操作系统与脚本 - 服务枚举与指纹识别
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-01-13 00:00:00" itemprop="dateCreated datePublished" datetime="2026-01-13T00:00:00+08:00">2026-01-13</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Day020：操作系统与脚本-服务枚举与指纹识别"><a href="#Day020：操作系统与脚本-服务枚举与指纹识别" class="headerlink" title="Day020：操作系统与脚本 - 服务枚举与指纹识别"></a>Day020：操作系统与脚本 - 服务枚举与指纹识别</h1><ul>
+<li>日期：2026-01-13</li>
+<li>周次：第 3 周</li>
+</ul>
+<h2 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h2><p>学完今天你应该能做到：</p>
+<ul>
+<li>能解释”枚举”在做什么：<strong>确认服务是什么+版本是什么+响应特征是什么</strong></li>
+<li>知道 Banner 不可靠，并能用”两种方法交叉验证”</li>
+<li>用最小脚本把扫描结果整理成”服务矩阵”（host×port×service×version）</li>
+<li>掌握常见服务的指纹识别技巧（HTTP&#x2F;SSH&#x2F;MySQL&#x2F;RDP）</li>
+<li>能输出一份结构化的服务清单（CSV&#x2F;JSON）</li>
+</ul>
+<hr>
+<span id="more"></span>
+
+<h2 id="一、什么是服务枚举？"><a href="#一、什么是服务枚举？" class="headerlink" title="一、什么是服务枚举？"></a>一、什么是服务枚举？</h2><h3 id="1-1-端口扫描-vs-服务枚举"><a href="#1-1-端口扫描-vs-服务枚举" class="headerlink" title="1.1 端口扫描 vs 服务枚举"></a>1.1 端口扫描 vs 服务枚举</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">端口扫描（Day019）</span><br><span class="line">├─ 目标：发现哪些端口开放</span><br><span class="line">├─ 方法：发送 SYN/TCP 探测</span><br><span class="line">└─ 结果：端口号 + 状态（open/closed/filtered）</span><br><span class="line"></span><br><span class="line">服务枚举（Day020）</span><br><span class="line">├─ 目标：确认服务类型、版本、配置</span><br><span class="line">├─ 方法：发送协议特定的握手/请求</span><br><span class="line">└─ 结果：服务名 + 版本号 + Banner + 响应特征</span><br></pre></td></tr></table></figure>
+
+<h3 id="1-2-为什么-Banner-不可靠？"><a href="#1-2-为什么-Banner-不可靠？" class="headerlink" title="1.2 为什么 Banner 不可靠？"></a>1.2 为什么 Banner 不可靠？</h3><table>
+<thead>
+<tr>
+<th>场景</th>
+<th>Banner 显示</th>
+<th>真实情况</th>
+<th>原因</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>伪装</strong></td>
+<td><code>Apache/2.4.41</code></td>
+<td>实际是 Nginx</td>
+<td>管理员手动修改响应头</td>
+</tr>
+<tr>
+<td><strong>代理</strong></td>
+<td><code>Microsoft-IIS/10.0</code></td>
+<td>后端是 Tomcat</td>
+<td>前端有 IIS 反向代理</td>
+</tr>
+<tr>
+<td><strong>隐藏版本</strong></td>
+<td><code>nginx</code></td>
+<td>Nginx 1.18.0</td>
+<td>编译时关闭版本显示</td>
+</tr>
+<tr>
+<td><strong>WAF</strong></td>
+<td><code>Cloudflare</code></td>
+<td>后端未知</td>
+<td>CDN&#x2F;WAF 屏蔽真实指纹</td>
+</tr>
+</tbody></table>
+<p><strong>结论</strong>：Banner 只能当线索，必须交叉验证！</p>
+<hr>
+<h2 id="二、常见服务的枚举技巧"><a href="#二、常见服务的枚举技巧" class="headerlink" title="二、常见服务的枚举技巧"></a>二、常见服务的枚举技巧</h2><h3 id="2-1-HTTP-x2F-HTTPS-服务"><a href="#2-1-HTTP-x2F-HTTPS-服务" class="headerlink" title="2.1 HTTP&#x2F;HTTPS 服务"></a>2.1 HTTP&#x2F;HTTPS 服务</h3><h4 id="方法-1：curl-查看响应头"><a href="#方法-1：curl-查看响应头" class="headerlink" title="方法 1：curl 查看响应头"></a>方法 1：curl 查看响应头</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Windows PowerShell</span></span><br><span class="line">curl.exe -I http://192.168.1.100</span><br><span class="line"></span><br><span class="line"><span class="comment"># Linux/macOS</span></span><br><span class="line">curl -I http://192.168.1.100</span><br></pre></td></tr></table></figure>
+
+<p><strong>关键字段</strong>：</p>
+<ul>
+<li><code>Server: Apache/2.4.41 (Ubuntu)</code>（服务器类型与版本）</li>
+<li><code>X-Powered-By: PHP/7.4.3</code>（后端语言）</li>
+<li><code>Set-Cookie: PHPSESSID=...</code>（会话管理方式）</li>
+</ul>
+<h4 id="方法-2：浏览器开发者工具"><a href="#方法-2：浏览器开发者工具" class="headerlink" title="方法 2：浏览器开发者工具"></a>方法 2：浏览器开发者工具</h4><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">1. 打开 Chrome/Firefox</span><br><span class="line">2. 按 F12 打开开发者工具</span><br><span class="line">3. 访问 http://192.168.1.100</span><br><span class="line">4. 查看 Network 标签 → Headers</span><br></pre></td></tr></table></figure>
+
+<h4 id="方法-3：Nmap-NSE-脚本"><a href="#方法-3：Nmap-NSE-脚本" class="headerlink" title="方法 3：Nmap NSE 脚本"></a>方法 3：Nmap NSE 脚本</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">nmap -p 80 --script http-headers 192.168.1.100</span><br><span class="line">nmap -p 80 --script http-title 192.168.1.100</span><br><span class="line">nmap -p 80 --script http-methods 192.168.1.100</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2-2-SSH-服务"><a href="#2-2-SSH-服务" class="headerlink" title="2.2 SSH 服务"></a>2.2 SSH 服务</h3><h4 id="方法-1：Telnet-x2F-Netcat-获取-Banner"><a href="#方法-1：Telnet-x2F-Netcat-获取-Banner" class="headerlink" title="方法 1：Telnet&#x2F;Netcat 获取 Banner"></a>方法 1：Telnet&#x2F;Netcat 获取 Banner</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Windows</span></span><br><span class="line">telnet 192.168.1.100 22</span><br><span class="line"></span><br><span class="line"><span class="comment"># Linux/macOS</span></span><br><span class="line">nc 192.168.1.100 22</span><br></pre></td></tr></table></figure>
+
+<p><strong>预期输出</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SSH-2.0-OpenSSH_8.9p1 Ubuntu-3ubuntu0.1</span><br></pre></td></tr></table></figure>
+
+<p><strong>解读</strong>：</p>
+<ul>
+<li><code>SSH-2.0</code>：协议版本</li>
+<li><code>OpenSSH_8.9p1</code>：服务软件与版本</li>
+<li><code>Ubuntu-3ubuntu0.1</code>：操作系统与补丁级别</li>
+</ul>
+<h4 id="方法-2：ssh-命令详细模式"><a href="#方法-2：ssh-命令详细模式" class="headerlink" title="方法 2：ssh 命令详细模式"></a>方法 2：ssh 命令详细模式</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ssh -vvv 192.168.1.100 2&gt;&amp;1 | grep <span class="string">&quot;remote software version&quot;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2-3-MySQL-x2F-MariaDB"><a href="#2-3-MySQL-x2F-MariaDB" class="headerlink" title="2.3 MySQL&#x2F;MariaDB"></a>2.3 MySQL&#x2F;MariaDB</h3><h4 id="方法-1：Nmap-探测"><a href="#方法-1：Nmap-探测" class="headerlink" title="方法 1：Nmap 探测"></a>方法 1：Nmap 探测</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -p 3306 --script mysql-info 192.168.1.100</span><br></pre></td></tr></table></figure>
+
+<p><strong>预期输出</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">3306/tcp open  mysql</span><br><span class="line">| mysql-info:</span><br><span class="line">|   Protocol: 10</span><br><span class="line">|   Version: 5.7.42-0ubuntu0.18.04.1</span><br><span class="line">|   Thread ID: 123</span><br><span class="line">|   Capabilities flags: 65535</span><br><span class="line">|   Some Capabilities: SupportsTransactions, LongColumnFlag, Support41Auth</span><br><span class="line">|   Status: Autocommit</span><br><span class="line">|   Salt: xxx</span><br></pre></td></tr></table></figure>
+
+<h4 id="方法-2：MySQL-客户端连接"><a href="#方法-2：MySQL-客户端连接" class="headerlink" title="方法 2：MySQL 客户端连接"></a>方法 2：MySQL 客户端连接</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -h 192.168.1.100 -u root -p</span><br></pre></td></tr></table></figure>
+
+<p><strong>如果允许匿名登录</strong>（极不安全）：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mysql -h 192.168.1.100</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2-4-RDP（远程桌面）"><a href="#2-4-RDP（远程桌面）" class="headerlink" title="2.4 RDP（远程桌面）"></a>2.4 RDP（远程桌面）</h3><h4 id="方法-1：Nmap-探测-1"><a href="#方法-1：Nmap-探测-1" class="headerlink" title="方法 1：Nmap 探测"></a>方法 1：Nmap 探测</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -p 3389 --script rdp-ntlm-info 192.168.1.100</span><br></pre></td></tr></table></figure>
+
+<p><strong>预期输出</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">3389/tcp open  ms-wbt-server</span><br><span class="line">| rdp-ntlm-info:</span><br><span class="line">|   Target_Name: WIN-SERVER</span><br><span class="line">|   NetBIOS_Domain_Name: WORKGROUP</span><br><span class="line">|   DNS_Domain_Name: WIN-SERVER</span><br><span class="line">|   DNS_Computer_Name: WIN-SERVER</span><br><span class="line">|   Product_Version: 10.0.17763</span><br></pre></td></tr></table></figure>
+
+<h4 id="方法-2：rdesktop-x2F-mstsc-连接测试"><a href="#方法-2：rdesktop-x2F-mstsc-连接测试" class="headerlink" title="方法 2：rdesktop&#x2F;mstsc 连接测试"></a>方法 2：rdesktop&#x2F;mstsc 连接测试</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># Linux</span></span><br><span class="line">rdesktop -u <span class="built_in">test</span> 192.168.1.100</span><br><span class="line"></span><br><span class="line"><span class="comment"># Windows</span></span><br><span class="line">mstsc /v:192.168.1.100</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="2-5-SMB（文件共享）"><a href="#2-5-SMB（文件共享）" class="headerlink" title="2.5 SMB（文件共享）"></a>2.5 SMB（文件共享）</h3><h4 id="方法-1：Nmap-探测-2"><a href="#方法-1：Nmap-探测-2" class="headerlink" title="方法 1：Nmap 探测"></a>方法 1：Nmap 探测</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -p 445 --script smb-os-discovery 192.168.1.100</span><br></pre></td></tr></table></figure>
+
+<p><strong>预期输出</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">445/tcp open  microsoft-ds</span><br><span class="line">| smb-os-discovery:</span><br><span class="line">|   OS: Windows Server 2019 Standard 17763</span><br><span class="line">|   Computer name: WIN-SERVER</span><br><span class="line">|   NetBIOS computer name: WIN-SERVER\x00</span><br><span class="line">|   Workgroup: WORKGROUP\x00</span><br></pre></td></tr></table></figure>
+
+<h4 id="方法-2：smbclient-枚举共享"><a href="#方法-2：smbclient-枚举共享" class="headerlink" title="方法 2：smbclient 枚举共享"></a>方法 2：smbclient 枚举共享</h4><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">smbclient -L 192.168.1.100 -N</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="三、自动化脚本：解析-Nmap-结果"><a href="#三、自动化脚本：解析-Nmap-结果" class="headerlink" title="三、自动化脚本：解析 Nmap 结果"></a>三、自动化脚本：解析 Nmap 结果</h2><h3 id="3-1-Python-脚本解析-Nmap-XML"><a href="#3-1-Python-脚本解析-Nmap-XML" class="headerlink" title="3.1 Python 脚本解析 Nmap XML"></a>3.1 Python 脚本解析 Nmap XML</h3><p><strong>目标</strong>：将 Nmap XML 输出转换为 CSV 表格。</p>
+<p><strong>步骤 1</strong>：用 Nmap 扫描并输出 XML</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -sV -oX scan.xml 192.168.1.100</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 2</strong>：Python 脚本解析</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> xml.etree.ElementTree <span class="keyword">as</span> ET</span><br><span class="line"><span class="keyword">import</span> csv</span><br><span class="line"></span><br><span class="line"><span class="comment"># 解析 XML</span></span><br><span class="line">tree = ET.parse(<span class="string">&quot;scan.xml&quot;</span>)</span><br><span class="line">root = tree.getroot()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 提取结果</span></span><br><span class="line">results = []</span><br><span class="line"><span class="keyword">for</span> host <span class="keyword">in</span> root.findall(<span class="string">&quot;host&quot;</span>):</span><br><span class="line">    ip = host.find(<span class="string">&quot;address&quot;</span>).get(<span class="string">&quot;addr&quot;</span>)</span><br><span class="line">    <span class="keyword">for</span> port <span class="keyword">in</span> host.find(<span class="string">&quot;ports&quot;</span>).findall(<span class="string">&quot;port&quot;</span>):</span><br><span class="line">        portid = port.get(<span class="string">&quot;portid&quot;</span>)</span><br><span class="line">        state = port.find(<span class="string">&quot;state&quot;</span>).get(<span class="string">&quot;state&quot;</span>)</span><br><span class="line">        service = port.find(<span class="string">&quot;service&quot;</span>)</span><br><span class="line">        service_name = service.get(<span class="string">&quot;name&quot;</span>, <span class="string">&quot;unknown&quot;</span>) <span class="keyword">if</span> service <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">else</span> <span class="string">&quot;unknown&quot;</span></span><br><span class="line">        version = service.get(<span class="string">&quot;product&quot;</span>, <span class="string">&quot;&quot;</span>) <span class="keyword">if</span> service <span class="keyword">is</span> <span class="keyword">not</span> <span class="literal">None</span> <span class="keyword">else</span> <span class="string">&quot;&quot;</span></span><br><span class="line">        results.append([ip, portid, state, service_name, version])</span><br><span class="line"></span><br><span class="line"><span class="comment"># 写入 CSV</span></span><br><span class="line"><span class="keyword">with</span> <span class="built_in">open</span>(<span class="string">&quot;scan_results.csv&quot;</span>, <span class="string">&quot;w&quot;</span>, newline=<span class="string">&quot;&quot;</span>, encoding=<span class="string">&quot;utf-8&quot;</span>) <span class="keyword">as</span> f:</span><br><span class="line">    writer = csv.writer(f)</span><br><span class="line">    writer.writerow([<span class="string">&quot;IP&quot;</span>, <span class="string">&quot;Port&quot;</span>, <span class="string">&quot;State&quot;</span>, <span class="string">&quot;Service&quot;</span>, <span class="string">&quot;Version&quot;</span>])</span><br><span class="line">    writer.writerows(results)</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">f&quot;✅ 已导出 <span class="subst">&#123;<span class="built_in">len</span>(results)&#125;</span> 条结果到 scan_results.csv&quot;</span>)</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="3-2-PowerShell-脚本解析-Nmap-文本输出"><a href="#3-2-PowerShell-脚本解析-Nmap-文本输出" class="headerlink" title="3.2 PowerShell 脚本解析 Nmap 文本输出"></a>3.2 PowerShell 脚本解析 Nmap 文本输出</h3><p><strong>目标</strong>：从 <code>day019_scan.txt</code> 提取端口&#x2F;服务&#x2F;版本。</p>
+<figure class="highlight powershell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="variable">$results</span> = <span class="selector-tag">@</span>()</span><br><span class="line"></span><br><span class="line"><span class="built_in">Get-Content</span> .\day019_scan.txt | <span class="built_in">ForEach-Object</span> &#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="variable">$_</span> <span class="operator">-match</span> <span class="string">&quot;(\d+)/tcp\s+(\w+)\s+(\S+)\s+(.*)&quot;</span>) &#123;</span><br><span class="line">        <span class="variable">$results</span> += [<span class="type">PSCustomObject</span>]<span class="selector-tag">@</span>&#123;</span><br><span class="line">            Port = <span class="variable">$matches</span>[<span class="number">1</span>]</span><br><span class="line">            State = <span class="variable">$matches</span>[<span class="number">2</span>]</span><br><span class="line">            Service = <span class="variable">$matches</span>[<span class="number">3</span>]</span><br><span class="line">            Version = <span class="variable">$matches</span>[<span class="number">4</span>]</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="variable">$results</span> | <span class="built_in">Export-Csv</span> <span class="literal">-Path</span> .\scan_summary.csv <span class="literal">-NoTypeInformation</span></span><br><span class="line"><span class="built_in">Write-Output</span> <span class="string">&quot;✅ 已导出 <span class="variable">$</span>(<span class="variable">$results</span>.Count) 条结果&quot;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="四、实战任务"><a href="#四、实战任务" class="headerlink" title="四、实战任务"></a>四、实战任务</h2><h3 id="任务-1：枚举本机开放的-Web-服务"><a href="#任务-1：枚举本机开放的-Web-服务" class="headerlink" title="任务 1：枚举本机开放的 Web 服务"></a>任务 1：枚举本机开放的 Web 服务</h3><p><strong>场景</strong>：本机运行了一个 Web 服务（如 IIS&#x2F;Apache&#x2F;Nginx），需要确认版本。</p>
+<p><strong>步骤 1</strong>：确认 Web 服务正在运行</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -p 80,443,8080 127.0.0.1</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 2</strong>：获取 HTTP 响应头</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl.exe -I http://127.0.0.1</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 3</strong>：记录关键信息</p>
+<ul>
+<li>Server 字段：</li>
+<li>X-Powered-By 字段：</li>
+<li>其他特征字段：</li>
+</ul>
+<hr>
+<h3 id="任务-2：枚举虚拟机的-SSH-服务"><a href="#任务-2：枚举虚拟机的-SSH-服务" class="headerlink" title="任务 2：枚举虚拟机的 SSH 服务"></a>任务 2：枚举虚拟机的 SSH 服务</h3><p><strong>场景</strong>：有一台 Linux 虚拟机，需要确认 SSH 版本。</p>
+<p><strong>步骤 1</strong>：获取 SSH Banner</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">nc 192.168.1.100 22</span><br><span class="line"><span class="comment"># 或</span></span><br><span class="line">telnet 192.168.1.100 22</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 2</strong>：用 Nmap 验证</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -p 22 -sV 192.168.1.100</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 3</strong>：对比结果</p>
+<ul>
+<li>Netcat Banner：</li>
+<li>Nmap 探测结果：</li>
+<li>是否一致：</li>
+</ul>
+<hr>
+<h3 id="任务-3：批量枚举多个主机"><a href="#任务-3：批量枚举多个主机" class="headerlink" title="任务 3：批量枚举多个主机"></a>任务 3：批量枚举多个主机</h3><p><strong>场景</strong>：有 3 台主机（192.168.1.100-102），批量枚举。</p>
+<p><strong>步骤 1</strong>：批量扫描</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">nmap -sV -oX multi_scan.xml 192.168.1.100-102</span><br></pre></td></tr></table></figure>
+
+<p><strong>步骤 2</strong>：用 Python 脚本解析（参考 3.1）</p>
+<p><strong>步骤 3</strong>：整理成表格</p>
+<table>
+<thead>
+<tr>
+<th>IP</th>
+<th>Port</th>
+<th>Service</th>
+<th>Version</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+<td>…</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="五、巩固练习"><a href="#五、巩固练习" class="headerlink" title="五、巩固练习"></a>五、巩固练习</h2><h3 id="练习-1：解释为什么需要交叉验证"><a href="#练习-1：解释为什么需要交叉验证" class="headerlink" title="练习 1：解释为什么需要交叉验证"></a>练习 1：解释为什么需要交叉验证</h3><p><strong>参考答案</strong>：</p>
+<ul>
+<li>Banner 可以被伪装（管理员手动修改）</li>
+<li>反向代理会改变响应头</li>
+<li>WAF&#x2F;CDN 会屏蔽真实指纹</li>
+<li>因此需要用多种方法（Nmap&#x2F;curl&#x2F;手动连接）交叉验证</li>
+</ul>
+<hr>
+<h3 id="练习-2：识别以下-HTTP-响应头的关键信息"><a href="#练习-2：识别以下-HTTP-响应头的关键信息" class="headerlink" title="练习 2：识别以下 HTTP 响应头的关键信息"></a>练习 2：识别以下 HTTP 响应头的关键信息</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">HTTP/1.1 200 OK</span><br><span class="line">Server: Apache/2.4.41 (Ubuntu)</span><br><span class="line">X-Powered-By: PHP/7.4.3</span><br><span class="line">Set-Cookie: PHPSESSID=abc123</span><br></pre></td></tr></table></figure>
+
+<p><strong>参考答案</strong>：</p>
+<ul>
+<li>Web 服务器：Apache 2.4.41</li>
+<li>操作系统：Ubuntu</li>
+<li>后端语言：PHP 7.4.3</li>
+<li>会话管理：使用 Cookie（PHPSESSID）</li>
+</ul>
+<hr>
+<h3 id="练习-3：设计一套服务枚举流程"><a href="#练习-3：设计一套服务枚举流程" class="headerlink" title="练习 3：设计一套服务枚举流程"></a>练习 3：设计一套服务枚举流程</h3><p><strong>参考答案</strong>：</p>
+<ol>
+<li>端口扫描：<code>nmap -sV -oX scan.xml target</code></li>
+<li>HTTP 枚举：<code>curl -I http://target</code></li>
+<li>SSH 枚举：<code>nc target 22</code></li>
+<li>数据库枚举：<code>nmap --script mysql-info target</code></li>
+<li>交叉验证：对比 Nmap 和手动结果</li>
+<li>输出报告：整理成 CSV&#x2F;JSON</li>
+</ol>
+<hr>
+<h2 id="六、评估标准"><a href="#六、评估标准" class="headerlink" title="六、评估标准"></a>六、评估标准</h2><ul>
+<li>✅ 能用 curl 获取 HTTP 响应头</li>
+<li>✅ 能用 nc&#x2F;telnet 获取 SSH Banner</li>
+<li>✅ 能用 Nmap NSE 脚本枚举服务</li>
+<li>✅ 能用 Python&#x2F;PowerShell 脚本解析 Nmap 输出</li>
+<li>✅ 能输出一份结构化的服务清单（CSV）</li>
+</ul>
+<hr>
+<h2 id="七、参考资料"><a href="#七、参考资料" class="headerlink" title="七、参考资料"></a>七、参考资料</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://nmap.org/nsedoc/">Nmap NSE 脚本库</a></li>
+<li><a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Headers">HTTP 响应头字段</a></li>
+<li><a target="_blank" rel="noopener" href="https://www.openssh.com/specs.html">SSH Protocol Documentation</a></li>
+</ul>
+<hr>
+<h2 id="八、学习成果达成情况（由学习者填写）"><a href="#八、学习成果达成情况（由学习者填写）" class="headerlink" title="八、学习成果达成情况（由学习者填写）"></a>八、学习成果达成情况（由学习者填写）</h2><h3 id="截图与证据"><a href="#截图与证据" class="headerlink" title="截图与证据"></a>截图与证据</h3><ul>
+<li><input disabled="" type="checkbox"> curl 响应头截图</li>
+<li><input disabled="" type="checkbox"> SSH Banner 截图</li>
+<li><input disabled="" type="checkbox"> Nmap 枚举结果截图</li>
+<li><input disabled="" type="checkbox"> 生成的 CSV 文件</li>
+</ul>
+<h3 id="关键发现"><a href="#关键发现" class="headerlink" title="关键发现"></a>关键发现</h3><p><strong>HTTP 服务</strong>：</p>
+<ul>
+<li>Server：</li>
+<li>版本：</li>
+</ul>
+<p><strong>SSH 服务</strong>：</p>
+<ul>
+<li>Banner：</li>
+<li>版本：</li>
+</ul>
+<h3 id="结论与反思"><a href="#结论与反思" class="headerlink" title="结论与反思"></a>结论与反思</h3><ul>
+<li><strong>我发现的服务版本</strong>：</li>
+<li><strong>我识别的潜在漏洞</strong>：</li>
+<li><strong>我下一步要做的验证</strong>：</li>
+</ul>
+<hr>
+<p><strong>恭喜！你已掌握服务枚举与指纹识别的核心技能。明天我们将进行第 3 周综合实验，整合本周所学知识！</strong> 🎉</p>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Tigercoll 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+              <a href="/tags/%E5%AE%89%E5%85%A8/" rel="tag"># 安全</a>
+              <a href="/tags/%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" rel="tag"># 学习计划</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/b5624f93.html" rel="prev" title="Day019：操作系统与脚本 - Nmap 端口扫描安全使用">
+                  <i class="fa fa-chevron-left"></i> Day019：操作系统与脚本 - Nmap 端口扫描安全使用
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/96499f8c.html" rel="next" title="Day021：操作系统与脚本 - 第 3 周综合实验与测评（OS+枚举+脚本，傻瓜版能照做）">
+                  Day021：操作系统与脚本 - 第 3 周综合实验与测评（OS+枚举+脚本，傻瓜版能照做） <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true,"react":{"opacity":0.7}}});</script></body>
+</html>

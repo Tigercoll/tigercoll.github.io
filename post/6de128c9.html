@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-center-simple.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Day022：漏洞扫描与基线 - 漏洞类型与编号体系 日期：2026-01-15 周次：第4周  学习目标今天你将搞清楚：  CVE&#x2F;CWE&#x2F;CVSS 三个编号体系分别做什么用 能根据 CVSS 评分初步判断漏洞风险等级 理解常见漏洞分类（配置类&#x2F;逻辑类&#x2F;输入校验类等） 能快速查阅官方漏洞数据库并理解缓解建议">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day022：漏洞扫描与基线 - 漏洞类型与编号体系">
+<meta property="og:url" content="https://tigercoll.top/post/6de128c9.html">
+<meta property="og:site_name" content="Tigercoll&#39;s Blog">
+<meta property="og:description" content="Day022：漏洞扫描与基线 - 漏洞类型与编号体系 日期：2026-01-15 周次：第4周  学习目标今天你将搞清楚：  CVE&#x2F;CWE&#x2F;CVSS 三个编号体系分别做什么用 能根据 CVSS 评分初步判断漏洞风险等级 理解常见漏洞分类（配置类&#x2F;逻辑类&#x2F;输入校验类等） 能快速查阅官方漏洞数据库并理解缓解建议">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2026-01-14T16:00:00.000Z">
+<meta property="article:modified_time" content="2026-01-14T16:00:00.000Z">
+<meta property="article:author" content="Tigercoll">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="学习计划">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://tigercoll.top/post/6de128c9.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/6de128c9.html","path":"post/6de128c9.html","title":"Day022：漏洞扫描与基线 - 漏洞类型与编号体系"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day022：漏洞扫描与基线 - 漏洞类型与编号体系 | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Day022%EF%BC%9A%E6%BC%8F%E6%B4%9E%E6%89%AB%E6%8F%8F%E4%B8%8E%E5%9F%BA%E7%BA%BF-%E6%BC%8F%E6%B4%9E%E7%B1%BB%E5%9E%8B%E4%B8%8E%E7%BC%96%E5%8F%B7%E4%BD%93%E7%B3%BB"><span class="nav-number">1.</span> <span class="nav-text">Day022：漏洞扫描与基线 - 漏洞类型与编号体系</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E7%9B%AE%E6%A0%87"><span class="nav-number">1.1.</span> <span class="nav-text">学习目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E5%86%85%E5%AE%B9"><span class="nav-number">1.2.</span> <span class="nav-text">学习内容</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-%E6%BC%8F%E6%B4%9E%E7%BC%96%E5%8F%B7%E4%BD%93%E7%B3%BB%E4%B8%89%E5%85%84%E5%BC%9F%EF%BC%9ACVE-x2F-CWE-x2F-CVSS"><span class="nav-number">1.2.1.</span> <span class="nav-text">1️⃣ 漏洞编号体系三兄弟：CVE&#x2F;CWE&#x2F;CVSS</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#CVE%EF%BC%88Common-Vulnerabilities-and-Exposures%EF%BC%89"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">CVE（Common Vulnerabilities and Exposures）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CWE%EF%BC%88Common-Weakness-Enumeration%EF%BC%89"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">CWE（Common Weakness Enumeration）</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CVSS%EF%BC%88Common-Vulnerability-Scoring-System%EF%BC%89"><span class="nav-number">1.2.1.3.</span> <span class="nav-text">CVSS（Common Vulnerability Scoring System）</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-%E5%B8%B8%E8%A7%81%E6%BC%8F%E6%B4%9E%E5%88%86%E7%B1%BB%EF%BC%88%E6%8C%89%E6%88%90%E5%9B%A0%EF%BC%89"><span class="nav-number">1.2.2.</span> <span class="nav-text">2️⃣ 常见漏洞分类（按成因）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%EF%B8%8F%E2%83%A3-%E5%AE%9E%E6%88%98%E6%A1%88%E4%BE%8B%EF%BC%9ALog4Shell%EF%BC%88CVE-2021-44228%EF%BC%89"><span class="nav-number">1.2.3.</span> <span class="nav-text">3️⃣ 实战案例：Log4Shell（CVE-2021-44228）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%EF%B8%8F%E2%83%A3-%E5%A6%82%E4%BD%95%E5%BF%AB%E9%80%9F%E8%AF%84%E4%BC%B0%E4%B8%80%E4%B8%AA%E6%BC%8F%E6%B4%9E"><span class="nav-number">1.2.4.</span> <span class="nav-text">4️⃣ 如何快速评估一个漏洞</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E8%B7%B5%E4%BB%BB%E5%8A%A1%EF%BC%88%E5%90%88%E6%B3%95%E6%8E%88%E6%9D%83%E8%8C%83%E5%9B%B4%E5%86%85%EF%BC%89"><span class="nav-number">1.3.</span> <span class="nav-text">实践任务（合法授权范围内）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-1%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89%EF%BC%9A%E6%9F%A5%E8%AF%A2-3-%E4%B8%AA%E7%9C%9F%E5%AE%9E-CVE-%E5%B9%B6%E5%88%86%E6%9E%90"><span class="nav-number">1.3.1.</span> <span class="nav-text">任务 1（必做）：查询 3 个真实 CVE 并分析</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-2%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89%EF%BC%9A%E4%BD%BF%E7%94%A8-CVSS-%E8%AE%A1%E7%AE%97%E5%99%A8%E8%AF%84%E4%BC%B0%E4%B8%80%E4%B8%AA%E6%BC%8F%E6%B4%9E"><span class="nav-number">1.3.2.</span> <span class="nav-text">任务 2（必做）：使用 CVSS 计算器评估一个漏洞</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-3%EF%BC%88%E5%BF%85%E5%81%9A%EF%BC%89%EF%BC%9A%E8%AF%86%E5%88%AB-CWE-%E7%B1%BB%E5%9E%8B"><span class="nav-number">1.3.3.</span> <span class="nav-text">任务 3（必做）：识别 CWE 类型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A9%E5%9B%BA%E7%BB%83%E4%B9%A0%EF%BC%88%E9%A2%98%E4%B8%8E%E5%A4%8D%E7%9B%98%EF%BC%89"><span class="nav-number">1.4.</span> <span class="nav-text">巩固练习（题与复盘）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-1%EF%BC%9ACVSS-%E4%B8%AD%E7%9A%84%E6%94%BB%E5%87%BB%E5%90%91%E9%87%8F%EF%BC%88Attack-Vector%EF%BC%89%E5%A6%82%E4%BD%95%E5%BD%B1%E5%93%8D%E8%AF%84%E5%88%86%EF%BC%9F"><span class="nav-number">1.4.1.</span> <span class="nav-text">题 1：CVSS 中的攻击向量（Attack Vector）如何影响评分？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-2%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-CWE-%E5%88%86%E7%B1%BB%EF%BC%8C%E5%8F%AA%E6%9C%89-CVE-%E7%BC%96%E5%8F%B7%E4%B8%8D%E5%A4%9F%E5%90%97%EF%BC%9F"><span class="nav-number">1.4.2.</span> <span class="nav-text">题 2：为什么需要 CWE 分类，只有 CVE 编号不够吗？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-3%EF%BC%9A%E4%B8%80%E4%B8%AA%E6%BC%8F%E6%B4%9E-CVSS-%E8%AF%84%E5%88%86-9-5%EF%BC%8C%E4%BD%86%E6%94%BB%E5%87%BB%E9%9C%80%E8%A6%81%E7%89%A9%E7%90%86%E6%8E%A5%E8%A7%A6%E8%AE%BE%E5%A4%87%EF%BC%8C%E4%BD%A0%E4%BC%9A%E5%A6%82%E4%BD%95%E8%B0%83%E6%95%B4%E4%BC%98%E5%85%88%E7%BA%A7%EF%BC%9F"><span class="nav-number">1.4.3.</span> <span class="nav-text">题 3：一个漏洞 CVSS 评分 9.5，但攻击需要物理接触设备，你会如何调整优先级？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E6%A0%87%E5%87%86%EF%BC%88%E8%BE%BE%E6%88%90%E5%88%A4%E5%AE%9A%EF%BC%89"><span class="nav-number">1.5.</span> <span class="nav-text">评估标准（达成判定）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E8%BE%BE%E6%88%90%E6%83%85%E5%86%B5%EF%BC%88%E7%94%B1%E5%AD%A6%E4%B9%A0%E8%80%85%E5%A1%AB%E5%86%99%EF%BC%89"><span class="nav-number">1.6.</span> <span class="nav-text">学习成果达成情况（由学习者填写）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%AA%E5%9B%BE%E4%B8%8E%E8%AF%81%E6%8D%AE"><span class="nav-number">1.6.1.</span> <span class="nav-text">截图与证据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%91%BD%E4%BB%A4%E4%B8%8E%E8%BE%93%E5%87%BA%EF%BC%88%E7%B2%98%E8%B4%B4%E5%85%B3%E9%94%AE%E7%89%87%E6%AE%B5%EF%BC%89"><span class="nav-number">1.6.2.</span> <span class="nav-text">关键命令与输出（粘贴关键片段）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E4%B8%8E%E5%8F%8D%E6%80%9D"><span class="nav-number">1.6.3.</span> <span class="nav-text">结论与反思</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9B%86%E4%B8%AD%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88%EF%BC%88%E5%90%AB%E6%80%9D%E8%B7%AF%EF%BC%89"><span class="nav-number">1.7.</span> <span class="nav-text">集中参考答案（含思路）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-1-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88"><span class="nav-number">1.7.1.</span> <span class="nav-text">题 1 参考答案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-2-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88"><span class="nav-number">1.7.2.</span> <span class="nav-text">题 2 参考答案</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%A2%98-3-%E5%8F%82%E8%80%83%E7%AD%94%E6%A1%88"><span class="nav-number">1.7.3.</span> <span class="nav-text">题 3 参考答案</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E7%A4%BA%E4%BE%8B%E5%A1%AB%E5%86%99%EF%BC%88%E5%8F%AF%E7%85%A7%E6%8A%84%EF%BC%89"><span class="nav-number">1.8.</span> <span class="nav-text">学习成果示例填写（可照抄）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%88%AA%E5%9B%BE%E4%B8%8E%E8%AF%81%E6%8D%AE%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.8.1.</span> <span class="nav-text">截图与证据（示例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%85%B3%E9%94%AE%E5%91%BD%E4%BB%A4%E4%B8%8E%E8%BE%93%E5%87%BA%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.8.2.</span> <span class="nav-text">关键命令与输出（示例）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E8%AE%BA%E4%B8%8E%E5%8F%8D%E6%80%9D%EF%BC%88%E7%A4%BA%E4%BE%8B%EF%BC%89"><span class="nav-number">1.8.3.</span> <span class="nav-text">结论与反思（示例）</span></a></li></ol></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">75</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Tigercoll" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/6de128c9.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day022：漏洞扫描与基线 - 漏洞类型与编号体系 | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day022：漏洞扫描与基线 - 漏洞类型与编号体系
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-01-15 00:00:00" itemprop="dateCreated datePublished" datetime="2026-01-15T00:00:00+08:00">2026-01-15</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Day022：漏洞扫描与基线-漏洞类型与编号体系"><a href="#Day022：漏洞扫描与基线-漏洞类型与编号体系" class="headerlink" title="Day022：漏洞扫描与基线 - 漏洞类型与编号体系"></a>Day022：漏洞扫描与基线 - 漏洞类型与编号体系</h1><ul>
+<li>日期：2026-01-15</li>
+<li>周次：第4周</li>
+</ul>
+<h2 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h2><p>今天你将搞清楚：</p>
+<ul>
+<li><strong>CVE&#x2F;CWE&#x2F;CVSS</strong> 三个编号体系分别做什么用</li>
+<li>能根据 <strong>CVSS 评分</strong>初步判断漏洞风险等级</li>
+<li>理解常见漏洞分类（配置类&#x2F;逻辑类&#x2F;输入校验类等）</li>
+<li>能快速查阅官方漏洞数据库并理解缓解建议</li>
+</ul>
+<hr>
+<span id="more"></span>
+
+<h2 id="学习内容"><a href="#学习内容" class="headerlink" title="学习内容"></a>学习内容</h2><h3 id="1️⃣-漏洞编号体系三兄弟：CVE-x2F-CWE-x2F-CVSS"><a href="#1️⃣-漏洞编号体系三兄弟：CVE-x2F-CWE-x2F-CVSS" class="headerlink" title="1️⃣ 漏洞编号体系三兄弟：CVE&#x2F;CWE&#x2F;CVSS"></a>1️⃣ 漏洞编号体系三兄弟：CVE&#x2F;CWE&#x2F;CVSS</h3><p>在网络安全领域，漏洞管理有三个核心编号体系，就像给漏洞办”身份证”：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">漏洞管理三要素</span><br><span class="line">├─ CVE  → 漏洞的&quot;身份证号&quot;（这是哪个漏洞）</span><br><span class="line">├─ CWE  → 漏洞的&quot;病因分类&quot;（这是什么类型的漏洞）</span><br><span class="line">└─ CVSS → 漏洞的&quot;危险程度&quot;（这个漏洞有多严重）</span><br></pre></td></tr></table></figure>
+
+<h4 id="CVE（Common-Vulnerabilities-and-Exposures）"><a href="#CVE（Common-Vulnerabilities-and-Exposures）" class="headerlink" title="CVE（Common Vulnerabilities and Exposures）"></a>CVE（Common Vulnerabilities and Exposures）</h4><p><strong>定义</strong>：漏洞的唯一标识符，由 MITRE 组织维护。</p>
+<p><strong>格式</strong>：<code>CVE-年份-编号</code><br><strong>示例</strong>：<code>CVE-2021-44228</code>（Log4Shell）</p>
+<p><strong>作用</strong>：</p>
+<ul>
+<li>全球统一引用标准</li>
+<li>避免同一漏洞被不同厂商用不同名字描述</li>
+<li>方便跨平台、跨工具追踪</li>
+</ul>
+<p><strong>查询地址</strong>：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://cve.mitre.org/">https://cve.mitre.org</a></li>
+<li><a target="_blank" rel="noopener" href="https://nvd.nist.gov(美国国家漏洞数据库,包含更详细评分和缓解建议)/">https://nvd.nist.gov（美国国家漏洞数据库，包含更详细评分和缓解建议）</a></li>
+</ul>
+<h4 id="CWE（Common-Weakness-Enumeration）"><a href="#CWE（Common-Weakness-Enumeration）" class="headerlink" title="CWE（Common Weakness Enumeration）"></a>CWE（Common Weakness Enumeration）</h4><p><strong>定义</strong>：软件缺陷&#x2F;弱点的分类体系，描述”漏洞的根本原因”。</p>
+<p><strong>格式</strong>：<code>CWE-编号</code><br><strong>示例</strong>：</p>
+<ul>
+<li><code>CWE-79</code>: Cross-site Scripting (XSS)</li>
+<li><code>CWE-89</code>: SQL Injection</li>
+<li><code>CWE-78</code>: OS Command Injection</li>
+<li><code>CWE-287</code>: Improper Authentication</li>
+</ul>
+<p><strong>作用</strong>：</p>
+<ul>
+<li>帮助开发者理解漏洞本质</li>
+<li>用于代码审计工具的规则分类</li>
+<li>指导安全编码规范</li>
+</ul>
+<p><strong>查询地址</strong>：<a target="_blank" rel="noopener" href="https://cwe.mitre.org/">https://cwe.mitre.org</a></p>
+<h4 id="CVSS（Common-Vulnerability-Scoring-System）"><a href="#CVSS（Common-Vulnerability-Scoring-System）" class="headerlink" title="CVSS（Common Vulnerability Scoring System）"></a>CVSS（Common Vulnerability Scoring System）</h4><p><strong>定义</strong>：漏洞严重程度的标准化评分系统（0-10分）。</p>
+<p><strong>版本</strong>：目前主流为 <strong>CVSS v3.1</strong>（2019年发布）</p>
+<p><strong>评分维度</strong>（Base Score）：</p>
+<ol>
+<li><p><strong>Attack Vector (AV)</strong> - 攻击向量</p>
+<ul>
+<li>Network (N): 远程攻击</li>
+<li>Adjacent (A): 相邻网络攻击</li>
+<li>Local (L): 本地访问</li>
+<li>Physical (P): 物理接触</li>
+</ul>
+</li>
+<li><p><strong>Attack Complexity (AC)</strong> - 攻击复杂度</p>
+<ul>
+<li>Low (L): 容易利用</li>
+<li>High (H): 需要特殊条件</li>
+</ul>
+</li>
+<li><p><strong>Privileges Required (PR)</strong> - 所需权限</p>
+<ul>
+<li>None (N): 无需权限</li>
+<li>Low (L): 普通用户权限</li>
+<li>High (H): 管理员权限</li>
+</ul>
+</li>
+<li><p><strong>User Interaction (UI)</strong> - 用户交互</p>
+<ul>
+<li>None (N): 无需用户操作</li>
+<li>Required (R): 需要用户点击&#x2F;操作</li>
+</ul>
+</li>
+<li><p><strong>Scope (S)</strong> - 影响范围</p>
+<ul>
+<li>Unchanged (U): 仅影响vulnerable component</li>
+<li>Changed (C): 影响其他组件</li>
+</ul>
+</li>
+<li><p><strong>CIA Impact</strong> - 机密性&#x2F;完整性&#x2F;可用性影响</p>
+<ul>
+<li>None (N) &#x2F; Low (L) &#x2F; High (H)</li>
+</ul>
+</li>
+</ol>
+<p><strong>风险等级分级</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>分数区间</th>
+<th>等级</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0.0</td>
+<td>None</td>
+<td>无风险</td>
+</tr>
+<tr>
+<td>0.1-3.9</td>
+<td>🟢 Low</td>
+<td>低危</td>
+</tr>
+<tr>
+<td>4.0-6.9</td>
+<td>🟡 Medium</td>
+<td>中危</td>
+</tr>
+<tr>
+<td>7.0-8.9</td>
+<td>🟠 High</td>
+<td>高危</td>
+</tr>
+<tr>
+<td>9.0-10.0</td>
+<td>🔴 Critical</td>
+<td>严重</td>
+</tr>
+</tbody></table>
+<p><strong>查询地址</strong>：<a target="_blank" rel="noopener" href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator">https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator</a></p>
+<hr>
+<h3 id="2️⃣-常见漏洞分类（按成因）"><a href="#2️⃣-常见漏洞分类（按成因）" class="headerlink" title="2️⃣ 常见漏洞分类（按成因）"></a>2️⃣ 常见漏洞分类（按成因）</h3><table>
+<thead>
+<tr>
+<th>类别</th>
+<th>代表性 CWE</th>
+<th>常见场景</th>
+<th>典型案例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>输入校验不足</strong></td>
+<td>CWE-20</td>
+<td>用户输入未过滤&#x2F;转义</td>
+<td>SQL 注入、XSS、命令注入</td>
+</tr>
+<tr>
+<td><strong>认证&#x2F;授权缺陷</strong></td>
+<td>CWE-287</td>
+<td>弱密码、会话劫持</td>
+<td>未经认证的 API 访问</td>
+</tr>
+<tr>
+<td><strong>配置错误</strong></td>
+<td>CWE-16</td>
+<td>默认密码、权限过大</td>
+<td>数据库暴露在公网</td>
+</tr>
+<tr>
+<td><strong>加密问题</strong></td>
+<td>CWE-327</td>
+<td>弱算法、硬编码密钥</td>
+<td>使用 MD5 存储密码</td>
+</tr>
+<tr>
+<td><strong>逻辑漏洞</strong></td>
+<td>CWE-840</td>
+<td>业务流程绕过</td>
+<td>支付金额可被篡改</td>
+</tr>
+<tr>
+<td><strong>资源管理</strong></td>
+<td>CWE-400</td>
+<td>内存泄漏、DoS</td>
+<td>无限制上传导致磁盘满</td>
+</tr>
+<tr>
+<td><strong>代码注入</strong></td>
+<td>CWE-94</td>
+<td>动态执行恶意代码</td>
+<td>eval() 执行用户输入</td>
+</tr>
+</tbody></table>
+<hr>
+<h3 id="3️⃣-实战案例：Log4Shell（CVE-2021-44228）"><a href="#3️⃣-实战案例：Log4Shell（CVE-2021-44228）" class="headerlink" title="3️⃣ 实战案例：Log4Shell（CVE-2021-44228）"></a>3️⃣ 实战案例：Log4Shell（CVE-2021-44228）</h3><p><strong>漏洞信息</strong>：</p>
+<ul>
+<li><strong>CVE</strong>: CVE-2021-44228</li>
+<li><strong>CWE</strong>: CWE-502 (Deserialization of Untrusted Data)</li>
+<li><strong>CVSS</strong>: 10.0（满分严重）</li>
+<li><strong>影响组件</strong>: Apache Log4j 2.x (&lt; 2.17.0)</li>
+</ul>
+<p><strong>CVSS 评分解析</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">AV:N  → 远程可利用（Network）</span><br><span class="line">AC:L  → 攻击复杂度低（Low）</span><br><span class="line">PR:N  → 无需权限（None）</span><br><span class="line">UI:N  → 无需用户交互（None）</span><br><span class="line">S:C   → 影响范围变化（Changed）</span><br><span class="line">C:H / I:H / A:H → 机密性/完整性/可用性均为高影响</span><br></pre></td></tr></table></figure>
+
+<p><strong>为什么是 10.0 分？</strong></p>
+<ul>
+<li>远程可利用 + 无需认证 + 容易利用 + 影响全面 &#x3D; 完美风暴</li>
+</ul>
+<p><strong>缓解措施</strong>：</p>
+<ol>
+<li>立即升级到 Log4j 2.17.0+</li>
+<li>临时措施：设置 JVM 参数 <code>-Dlog4j2.formatMsgNoLookups=true</code></li>
+<li>WAF 规则拦截 <code>$&#123;jndi:</code> 特征字符串</li>
+<li>网络层面限制 LDAP&#x2F;RMI 出站流量</li>
+</ol>
+<hr>
+<h3 id="4️⃣-如何快速评估一个漏洞"><a href="#4️⃣-如何快速评估一个漏洞" class="headerlink" title="4️⃣ 如何快速评估一个漏洞"></a>4️⃣ 如何快速评估一个漏洞</h3><p><strong>五步法</strong>：</p>
+<ol>
+<li><strong>查 CVE 编号</strong> → 确认漏洞存在</li>
+<li><strong>看 CVSS 分数</strong> → 判断严重程度</li>
+<li><strong>查受影响版本</strong> → 对照自己系统版本</li>
+<li><strong>看利用条件</strong> → 评估自己是否满足被攻击条件</li>
+<li><strong>找缓解方案</strong> → 升级&#x2F;打补丁&#x2F;临时加固</li>
+</ol>
+<p><strong>典型判断逻辑</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CVSS &gt;= 9.0  → 立即处理（24小时内）</span><br><span class="line">CVSS 7.0-8.9 → 高优先级（1周内）</span><br><span class="line">CVSS 4.0-6.9 → 规划修复（1个月内）</span><br><span class="line">CVSS &lt; 4.0   → 低优先级（视情况处理）</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="实践任务（合法授权范围内）"><a href="#实践任务（合法授权范围内）" class="headerlink" title="实践任务（合法授权范围内）"></a>实践任务（合法授权范围内）</h2><h3 id="任务-1（必做）：查询-3-个真实-CVE-并分析"><a href="#任务-1（必做）：查询-3-个真实-CVE-并分析" class="headerlink" title="任务 1（必做）：查询 3 个真实 CVE 并分析"></a>任务 1（必做）：查询 3 个真实 CVE 并分析</h3><p>选择以下 3 个经典漏洞，查询并记录信息：</p>
+<table>
+<thead>
+<tr>
+<th>CVE编号</th>
+<th>名称</th>
+<th>CVSS</th>
+<th>影响组件</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>CVE-2021-44228</td>
+<td>Log4Shell</td>
+<td>10.0</td>
+<td>Apache Log4j</td>
+</tr>
+<tr>
+<td>CVE-2017-0144</td>
+<td>EternalBlue</td>
+<td>8.1</td>
+<td>Windows SMBv1</td>
+</tr>
+<tr>
+<td>CVE-2014-0160</td>
+<td>Heartbleed</td>
+<td>7.5</td>
+<td>OpenSSL</td>
+</tr>
+</tbody></table>
+<p><strong>步骤</strong>：</p>
+<ol>
+<li>访问 <a target="_blank" rel="noopener" href="https://nvd.nist.gov/">https://nvd.nist.gov</a></li>
+<li>搜索每个 CVE 编号</li>
+<li>记录以下信息：<ul>
+<li>CVSS Base Score</li>
+<li>Attack Vector (AV)</li>
+<li>Privileges Required (PR)</li>
+<li>影响的产品&#x2F;版本</li>
+<li>官方建议的缓解措施</li>
+</ul>
+</li>
+</ol>
+<p><strong>记录模板</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CVE-2021-44228 (Log4Shell)</span><br><span class="line">├─ CVSS: 10.0 (Critical)</span><br><span class="line">├─ AV: Network (远程可利用)</span><br><span class="line">├─ PR: None (无需权限)</span><br><span class="line">├─ 影响: Apache Log4j 2.0 - 2.14.1</span><br><span class="line">└─ 缓解: 升级至 2.17.0 或设置 formatMsgNoLookups=true</span><br></pre></td></tr></table></figure>
+
+<h3 id="任务-2（必做）：使用-CVSS-计算器评估一个漏洞"><a href="#任务-2（必做）：使用-CVSS-计算器评估一个漏洞" class="headerlink" title="任务 2（必做）：使用 CVSS 计算器评估一个漏洞"></a>任务 2（必做）：使用 CVSS 计算器评估一个漏洞</h3><p>访问 <a target="_blank" rel="noopener" href="https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator">https://nvd.nist.gov/vuln-metrics/cvss/v3-calculator</a></p>
+<p><strong>模拟场景</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">你发现一个 Web 应用漏洞：</span><br><span class="line">- 攻击者可通过网络（无需认证）访问</span><br><span class="line">- 利用复杂度低（只需发送特定 HTTP 请求）</span><br><span class="line">- 无需用户交互</span><br><span class="line">- 可读取数据库中所有用户信息（机密性影响高）</span><br><span class="line">- 可修改数据（完整性影响高）</span><br><span class="line">- 不影响可用性（可用性影响无）</span><br></pre></td></tr></table></figure>
+
+<p><strong>操作步骤</strong>：</p>
+<ol>
+<li><p>在计算器中选择各个维度的值：</p>
+<ul>
+<li>Attack Vector: <strong>Network</strong></li>
+<li>Attack Complexity: <strong>Low</strong></li>
+<li>Privileges Required: <strong>None</strong></li>
+<li>User Interaction: <strong>None</strong></li>
+<li>Scope: <strong>Unchanged</strong></li>
+<li>Confidentiality: <strong>High</strong></li>
+<li>Integrity: <strong>High</strong></li>
+<li>Availability: <strong>None</strong></li>
+</ul>
+</li>
+<li><p>记录生成的 CVSS 分数和向量字符串</p>
+</li>
+<li><p>判断该漏洞的风险等级（低&#x2F;中&#x2F;高&#x2F;严重）</p>
+</li>
+</ol>
+<h3 id="任务-3（必做）：识别-CWE-类型"><a href="#任务-3（必做）：识别-CWE-类型" class="headerlink" title="任务 3（必做）：识别 CWE 类型"></a>任务 3（必做）：识别 CWE 类型</h3><p>根据以下漏洞描述,匹配正确的 CWE 类型：</p>
+<p><strong>场景 A</strong>：<br>Web 应用登录页面允许无限次尝试密码，未实施账户锁定策略。</p>
+<p><strong>场景 B</strong>：<br>用户输入的文件名直接拼接到系统命令中执行，如：<code>os.system(&quot;cat &quot; + filename)</code></p>
+<p><strong>场景 C</strong>：<br>数据库密码硬编码在源代码中：<code>password = &quot;admin123&quot;</code></p>
+<p><strong>场景 D</strong>：<br>用户可修改 URL 参数中的用户 ID 查看其他人的订单详情，系统未验证权限。</p>
+<p><strong>待匹配的 CWE</strong>：</p>
+<ul>
+<li>CWE-78: OS Command Injection</li>
+<li>CWE-287: Improper Authentication</li>
+<li>CWE-798: Use of Hard-coded Credentials</li>
+<li>CWE-639: Authorization Bypass Through User-Controlled Key</li>
+</ul>
+<p><strong>提示</strong>：访问 <a target="_blank" rel="noopener" href="https://cwe.mitre.org/">https://cwe.mitre.org</a> 查看每个 CWE 的详细说明。</p>
+<hr>
+<h2 id="巩固练习（题与复盘）"><a href="#巩固练习（题与复盘）" class="headerlink" title="巩固练习（题与复盘）"></a>巩固练习（题与复盘）</h2><h3 id="题-1：CVSS-中的攻击向量（Attack-Vector）如何影响评分？"><a href="#题-1：CVSS-中的攻击向量（Attack-Vector）如何影响评分？" class="headerlink" title="题 1：CVSS 中的攻击向量（Attack Vector）如何影响评分？"></a>题 1：CVSS 中的攻击向量（Attack Vector）如何影响评分？</h3><p><strong>思路提示</strong>：</p>
+<ul>
+<li>Network（远程）vs Physical（物理接触）哪个更危险？</li>
+<li>为什么远程可利用的漏洞通常分数更高？</li>
+</ul>
+<h3 id="题-2：为什么需要-CWE-分类，只有-CVE-编号不够吗？"><a href="#题-2：为什么需要-CWE-分类，只有-CVE-编号不够吗？" class="headerlink" title="题 2：为什么需要 CWE 分类，只有 CVE 编号不够吗？"></a>题 2：为什么需要 CWE 分类，只有 CVE 编号不够吗？</h3><p><strong>思路提示</strong>：</p>
+<ul>
+<li>CVE 只是”这个漏洞”的编号</li>
+<li>CWE 告诉我们”这类漏洞”的根本原因</li>
+<li>对开发者和安全工程师分别有什么价值？</li>
+</ul>
+<h3 id="题-3：一个漏洞-CVSS-评分-9-5，但攻击需要物理接触设备，你会如何调整优先级？"><a href="#题-3：一个漏洞-CVSS-评分-9-5，但攻击需要物理接触设备，你会如何调整优先级？" class="headerlink" title="题 3：一个漏洞 CVSS 评分 9.5，但攻击需要物理接触设备，你会如何调整优先级？"></a>题 3：一个漏洞 CVSS 评分 9.5，但攻击需要物理接触设备，你会如何调整优先级？</h3><p><strong>思路提示</strong>：</p>
+<ul>
+<li>CVSS Base Score 只是基础评分</li>
+<li>还需考虑 Temporal Score（时效性）和 Environmental Score（环境因素）</li>
+<li>你的环境中物理安全控制如何？</li>
+</ul>
+<hr>
+<h2 id="评估标准（达成判定）"><a href="#评估标准（达成判定）" class="headerlink" title="评估标准（达成判定）"></a>评估标准（达成判定）</h2><ul>
+<li>✅ 能解释 CVE&#x2F;CWE&#x2F;CVSS 三者的区别和用途</li>
+<li>✅ 能在 NVD 上查询漏洞并提取关键信息</li>
+<li>✅ 能使用 CVSS 计算器评估漏洞严重程度</li>
+<li>✅ 能根据漏洞描述匹配正确的 CWE 分类</li>
+<li>✅ 能根据 CVSS 评分初步判断修复优先级</li>
+</ul>
+<hr>
+<h2 id="学习成果达成情况（由学习者填写）"><a href="#学习成果达成情况（由学习者填写）" class="headerlink" title="学习成果达成情况（由学习者填写）"></a>学习成果达成情况（由学习者填写）</h2><h3 id="截图与证据"><a href="#截图与证据" class="headerlink" title="截图与证据"></a>截图与证据</h3><ul>
+<li><input disabled="" type="checkbox"> NVD 查询 Log4Shell 的截图</li>
+<li><input disabled="" type="checkbox"> CVSS 计算器评分截图</li>
+<li><input disabled="" type="checkbox"> 3 个 CVE 的分析笔记</li>
+</ul>
+<h3 id="关键命令与输出（粘贴关键片段）"><a href="#关键命令与输出（粘贴关键片段）" class="headerlink" title="关键命令与输出（粘贴关键片段）"></a>关键命令与输出（粘贴关键片段）</h3><p><strong>CVE-2021-44228 查询结果</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">CVSS:</span><br><span class="line">Attack Vector:</span><br><span class="line">Privileges Required:</span><br><span class="line">缓解措施:</span><br></pre></td></tr></table></figure>
+
+<p><strong>CVSS 计算器结果</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Base Score:</span><br><span class="line">Vector String:</span><br><span class="line">Severity:</span><br></pre></td></tr></table></figure>
+
+<h3 id="结论与反思"><a href="#结论与反思" class="headerlink" title="结论与反思"></a>结论与反思</h3><p><strong>我今天搞清楚了</strong>：</p>
+<ul>
+<li>CVE 是漏洞的身份证，CWE 是病因分类，CVSS 是风险评分</li>
+<li>CVSS 评分越高不一定优先级越高，还要看实际环境</li>
+</ul>
+<p><strong>我差点搞混的是</strong>：</p>
+<ul>
+<li>以前以为 CVE 和漏洞名称是一回事</li>
+<li>不知道 CVSS 有基础评分&#x2F;时效评分&#x2F;环境评分三个维度</li>
+</ul>
+<p><strong>明天我要继续补的是</strong>：</p>
+<ul>
+<li>实际使用漏洞扫描器（如 Nessus&#x2F;OpenVAS）</li>
+<li>理解漏洞扫描报告的结构</li>
+</ul>
+<p><strong>本次学习耗时</strong>：约 ___ 小时</p>
+<p><strong>掌握程度自评</strong>：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 😕 看懂了但没动手</li>
+<li><input disabled="" type="checkbox"> 🙂 跑通了基础任务</li>
+<li><input disabled="" type="checkbox"> 😃 完成了所有任务并理解原理</li>
+<li><input disabled="" type="checkbox"> 🤩 额外查询了更多 CVE 案例</li>
+</ul>
+<hr>
+<h2 id="集中参考答案（含思路）"><a href="#集中参考答案（含思路）" class="headerlink" title="集中参考答案（含思路）"></a>集中参考答案（含思路）</h2><h3 id="题-1-参考答案"><a href="#题-1-参考答案" class="headerlink" title="题 1 参考答案"></a>题 1 参考答案</h3><p><strong>Attack Vector 对评分的影响</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>Attack Vector</th>
+<th>说明</th>
+<th>风险程度</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Network (N)</td>
+<td>远程可利用，无需物理接触</td>
+<td>最高</td>
+<td>Web 应用 SQL 注入</td>
+</tr>
+<tr>
+<td>Adjacent (A)</td>
+<td>需要在相邻网络（如同一 VLAN）</td>
+<td>较高</td>
+<td>ARP 欺骗攻击</td>
+</tr>
+<tr>
+<td>Local (L)</td>
+<td>需要本地登录权限</td>
+<td>中等</td>
+<td>本地提权漏洞</td>
+</tr>
+<tr>
+<td>Physical (P)</td>
+<td>需要物理接触设备</td>
+<td>较低</td>
+<td>通过 USB 设备攻击</td>
+</tr>
+</tbody></table>
+<p><strong>为什么远程更危险？</strong></p>
+<ul>
+<li>攻击面更大（全球任何人可尝试）</li>
+<li>自动化扫描工具容易发现</li>
+<li>传播速度快（蠕虫&#x2F;勒索软件）</li>
+</ul>
+<h3 id="题-2-参考答案"><a href="#题-2-参考答案" class="headerlink" title="题 2 参考答案"></a>题 2 参考答案</h3><p><strong>为什么需要 CWE 分类？</strong></p>
+<ol>
+<li><p><strong>对开发者</strong>：</p>
+<ul>
+<li>理解漏洞根本原因（是输入校验问题还是权限问题？）</li>
+<li>建立安全编码规范（如何避免 CWE-79 XSS？）</li>
+<li>代码审计工具基于 CWE 规则检查</li>
+</ul>
+</li>
+<li><p><strong>对安全工程师</strong>：</p>
+<ul>
+<li>漏洞分类统计（我们最常见的是哪类漏洞？）</li>
+<li>培训重点（团队在 CWE-89 SQL 注入防护上薄弱）</li>
+<li>加固策略（针对 CWE-287 认证问题部署多因素认证）</li>
+</ul>
+</li>
+<li><p><strong>CVE vs CWE 的关系</strong>：</p>
+<ul>
+<li>1 个 CWE 可能对应成百上千个 CVE</li>
+<li>CVE 是”实例”，CWE 是”类别”</li>
+<li>类比：CWE-79 是”XSS 这类病”，CVE-2023-12345 是”某个产品的具体 XSS 漏洞”</li>
+</ul>
+</li>
+</ol>
+<h3 id="题-3-参考答案"><a href="#题-3-参考答案" class="headerlink" title="题 3 参考答案"></a>题 3 参考答案</h3><p><strong>CVSS 9.5 但需物理接触的优先级评估</strong>：</p>
+<p><strong>考虑因素</strong>：</p>
+<ol>
+<li><p><strong>环境评分调整</strong>：</p>
+<ul>
+<li>如果设备在数据中心（物理安全严格）→ 优先级降低</li>
+<li>如果设备在公共场所（如 ATM、Kiosk）→ 优先级提升</li>
+</ul>
+</li>
+<li><p><strong>时效性评分</strong>：</p>
+<ul>
+<li>是否有公开 EXP（Exploit Code）？</li>
+<li>是否已被在野利用？</li>
+</ul>
+</li>
+<li><p><strong>业务影响</strong>：</p>
+<ul>
+<li>如果是关键基础设施（如工控系统），即使物理接触也应高优先级</li>
+<li>如果是办公终端且有严格的门禁控制，可降低优先级</li>
+</ul>
+</li>
+</ol>
+<p><strong>建议处理流程</strong>：</p>
+<ul>
+<li>短期：强化物理安全控制（如禁用 USB 端口、监控访问）</li>
+<li>中期：规划补丁部署（在维护窗口更新）</li>
+<li>长期：评估设备替换方案（如已停止支持的老旧设备）</li>
+</ul>
+<hr>
+<h2 id="学习成果示例填写（可照抄）"><a href="#学习成果示例填写（可照抄）" class="headerlink" title="学习成果示例填写（可照抄）"></a>学习成果示例填写（可照抄）</h2><blockquote>
+<p>可将”示例”内容替换为你自己的时间与截图文件名。</p>
+</blockquote>
+<h3 id="截图与证据（示例）"><a href="#截图与证据（示例）" class="headerlink" title="截图与证据（示例）"></a>截图与证据（示例）</h3><ul>
+<li>任务 1：<code>images/day022_cve_log4shell.png</code>（NVD 上 Log4Shell 详情页）</li>
+<li>任务 2：<code>images/day022_cvss_calculator.png</code>（CVSS 计算器评分结果）</li>
+<li>任务 3：<code>images/day022_cwe_matching.png</code>（CWE 分类笔记）</li>
+</ul>
+<h3 id="关键命令与输出（示例）"><a href="#关键命令与输出（示例）" class="headerlink" title="关键命令与输出（示例）"></a>关键命令与输出（示例）</h3><p><strong>CVE-2021-44228 分析</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">CVE: CVE-2021-44228</span><br><span class="line">名称: Log4Shell</span><br><span class="line">CVSS: 10.0 (Critical)</span><br><span class="line">向量: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:C/C:H/I:H/A:H</span><br><span class="line">影响: Apache Log4j 2.0-beta9 到 2.14.1</span><br><span class="line">缓解: 升级至 2.17.0 或设置 log4j2.formatMsgNoLookups=true</span><br></pre></td></tr></table></figure>
+
+<p><strong>CVSS 计算器示例</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">场景: 无认证远程 SQL 注入</span><br><span class="line">Base Score: 9.8 (Critical)</span><br><span class="line">Vector String: CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H</span><br><span class="line">Severity: CRITICAL</span><br></pre></td></tr></table></figure>
+
+<h3 id="结论与反思（示例）"><a href="#结论与反思（示例）" class="headerlink" title="结论与反思（示例）"></a>结论与反思（示例）</h3><p><strong>我今天搞清楚了</strong>：</p>
+<ul>
+<li>CVE 是漏洞的唯一编号，CWE 是漏洞类型分类，CVSS 是风险评分标准</li>
+<li>CVSS 评分从攻击向量、复杂度、所需权限等多个维度综合计算</li>
+<li>同一个 CWE 类型（如 CWE-79 XSS）可能有成千上万个不同的 CVE</li>
+</ul>
+<p><strong>我差点搞混的是</strong>：</p>
+<ul>
+<li>以前以为 CVSS 只有一个分数，不知道还有基础&#x2F;时效&#x2F;环境三个评分维度</li>
+<li>混淆了”漏洞严重性”和”修复优先级”（高分漏洞在不适用的环境中可降低优先级）</li>
+</ul>
+<p><strong>明天我要继续补的是</strong>：</p>
+<ul>
+<li>实际操作漏洞扫描器（Nessus&#x2F;OpenVAS）</li>
+<li>学习如何解读扫描报告中的 CVE&#x2F;CVSS 信息</li>
+<li>了解漏洞生命周期管理</li>
+</ul>
+<p><strong>本次学习耗时</strong>：约 2 小时</p>
+<p><strong>掌握程度自评</strong>：</p>
+<ul>
+<li><input checked="" disabled="" type="checkbox"> 😃 完成了所有任务并理解原理</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Tigercoll 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+              <a href="/tags/%E5%AE%89%E5%85%A8/" rel="tag"># 安全</a>
+              <a href="/tags/%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" rel="tag"># 学习计划</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/96499f8c.html" rel="prev" title="Day021：操作系统与脚本 - 第 3 周综合实验与测评（OS+枚举+脚本，傻瓜版能照做）">
+                  <i class="fa fa-chevron-left"></i> Day021：操作系统与脚本 - 第 3 周综合实验与测评（OS+枚举+脚本，傻瓜版能照做）
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/18fcaf71.html" rel="next" title="Day023:漏洞扫描器(合规用途)安装与配置,报告解读">
+                  Day023:漏洞扫描器(合规用途)安装与配置,报告解读 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true,"react":{"opacity":0.7}}});</script></body>
+</html>

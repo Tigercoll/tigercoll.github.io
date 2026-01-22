@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/animate.css@3.1.1/animate.min.css" integrity="sha256-PR7ttpcvz8qrF57fur/yAx1qXMFJeJFiA6pSzWi0OIE=" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/themes/blue/pace-theme-center-simple.css">
+  <script src="https://cdn.jsdelivr.net/npm/pace-js@1.2.4/pace.min.js" integrity="sha256-gqd7YTjg/BtfqWSwsJOvndl0Bxc8gFImLEkXQT8+qj0=" crossorigin="anonymous"></script>
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":true,"async":true,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+    <meta name="description" content="Day005：网络与协议基础 - DNS 工作流 日期：2025-12-29 周次：第 1 周  学习目标 理解 DNS 的“分层命名 + 分布式数据库”设计，以及一次解析从本机到权威服务器的关键环节 熟悉常见记录类型：A&#x2F;AAAA&#x2F;CNAME&#x2F;MX&#x2F;TXT&#x2F;NS&#x2F;SOA 能在 Windows 上用 nslookup &#x2F; Res">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Day005：网络与协议基础 - DNS 工作流">
+<meta property="og:url" content="https://tigercoll.top/post/c822c636.html">
+<meta property="og:site_name" content="Tigercoll&#39;s Blog">
+<meta property="og:description" content="Day005：网络与协议基础 - DNS 工作流 日期：2025-12-29 周次：第 1 周  学习目标 理解 DNS 的“分层命名 + 分布式数据库”设计，以及一次解析从本机到权威服务器的关键环节 熟悉常见记录类型：A&#x2F;AAAA&#x2F;CNAME&#x2F;MX&#x2F;TXT&#x2F;NS&#x2F;SOA 能在 Windows 上用 nslookup &#x2F; Res">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2025-12-28T16:00:00.000Z">
+<meta property="article:modified_time" content="2025-12-28T16:00:00.000Z">
+<meta property="article:author" content="Tigercoll">
+<meta property="article:tag" content="网络">
+<meta property="article:tag" content="安全">
+<meta property="article:tag" content="学习计划">
+<meta name="twitter:card" content="summary">
+
+
+<link rel="canonical" href="https://tigercoll.top/post/c822c636.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/c822c636.html","path":"post/c822c636.html","title":"Day005：网络与协议基础 - DNS 工作流"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day005：网络与协议基础 - DNS 工作流 | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" class="use-motion">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Day005%EF%BC%9A%E7%BD%91%E7%BB%9C%E4%B8%8E%E5%8D%8F%E8%AE%AE%E5%9F%BA%E7%A1%80-DNS-%E5%B7%A5%E4%BD%9C%E6%B5%81"><span class="nav-number">1.</span> <span class="nav-text">Day005：网络与协议基础 - DNS 工作流</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E7%9B%AE%E6%A0%87"><span class="nav-number">1.1.</span> <span class="nav-text">学习目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E5%86%85%E5%AE%B9"><span class="nav-number">1.2.</span> <span class="nav-text">学习内容</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1%EF%B8%8F%E2%83%A3-DNS-%E5%9C%A8%E2%80%9C%E4%B8%8A%E7%BD%91%E2%80%9D%E9%87%8C%E6%89%AE%E6%BC%94%E4%BB%80%E4%B9%88%E8%A7%92%E8%89%B2"><span class="nav-number">1.2.1.</span> <span class="nav-text">1️⃣ DNS 在“上网”里扮演什么角色</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2%EF%B8%8F%E2%83%A3-%E9%80%92%E5%BD%92%E8%A7%A3%E6%9E%90-vs-%E8%BF%AD%E4%BB%A3%E8%A7%A3%E6%9E%90%EF%BC%88%E9%9D%9E%E5%B8%B8%E5%85%B3%E9%94%AE%EF%BC%89"><span class="nav-number">1.2.2.</span> <span class="nav-text">2️⃣ 递归解析 vs 迭代解析（非常关键）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3%EF%B8%8F%E2%83%A3-DNS-%E6%8A%A5%E6%96%87%E4%B8%8E%E5%AD%97%E6%AE%B5%EF%BC%9A%E6%8A%93%E5%8C%85%E6%97%B6%E7%9C%8B%E4%BB%80%E4%B9%88"><span class="nav-number">1.2.3.</span> <span class="nav-text">3️⃣ DNS 报文与字段：抓包时看什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4%EF%B8%8F%E2%83%A3-%E5%B8%B8%E8%A7%81%E8%AE%B0%E5%BD%95%E7%B1%BB%E5%9E%8B%E9%80%9F%E6%9F%A5"><span class="nav-number">1.2.4.</span> <span class="nav-text">4️⃣ 常见记录类型速查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5%EF%B8%8F%E2%83%A3-%E7%BC%93%E5%AD%98%E4%B8%8E-TTL%EF%BC%9A%E4%B8%BA%E4%BB%80%E4%B9%88%E2%80%9C%E6%94%B9%E4%BA%86%E8%A7%A3%E6%9E%90%E4%B8%8D%E7%94%9F%E6%95%88%E2%80%9D"><span class="nav-number">1.2.5.</span> <span class="nav-text">5️⃣ 缓存与 TTL：为什么“改了解析不生效”</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AE%9E%E8%B7%B5%E4%BB%BB%E5%8A%A1%EF%BC%88%E5%90%88%E6%B3%95%E6%8E%88%E6%9D%83%E8%8C%83%E5%9B%B4%E5%86%85%EF%BC%89"><span class="nav-number">1.3.</span> <span class="nav-text">实践任务（合法授权范围内）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A8%E8%8D%90%E7%BB%83%E4%B9%A0%E5%9F%9F%E5%90%8D%E6%B8%85%E5%8D%95%EF%BC%88A-x2F-AAAA-x2F-TXT%EF%BC%89"><span class="nav-number">1.3.1.</span> <span class="nav-text">推荐练习域名清单（A &#x2F; AAAA &#x2F; TXT）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-1%EF%BC%9A%E7%94%A8-nslookup-%E5%81%9A%E5%9F%BA%E7%A1%80%E6%9F%A5%E8%AF%A2"><span class="nav-number">1.3.2.</span> <span class="nav-text">任务 1：用 nslookup 做基础查询</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-2%EF%BC%9A%E7%94%A8-Resolve-DnsName%EF%BC%88%E6%9B%B4%E5%BC%BA%EF%BC%8C%E6%8E%A8%E8%8D%90%EF%BC%89"><span class="nav-number">1.3.3.</span> <span class="nav-text">任务 2：用 Resolve-DnsName（更强，推荐）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-3%EF%BC%9A%E6%B8%85%E7%90%86%E6%9C%AC%E6%9C%BA-DNS-%E7%BC%93%E5%AD%98%E5%B9%B6%E5%A4%8D%E6%9F%A5"><span class="nav-number">1.3.4.</span> <span class="nav-text">任务 3：清理本机 DNS 缓存并复查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-4%EF%BC%9AWireshark-%E6%8A%93%E5%8C%85%E5%B9%B6%E8%A7%A3%E9%87%8A%E4%B8%80%E6%AC%A1%E6%9F%A5%E8%AF%A2"><span class="nav-number">1.3.5.</span> <span class="nav-text">任务 4：Wireshark 抓包并解释一次查询</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B8%B8%E8%A7%81%E5%9D%91%E4%B8%8E%E6%8E%92%E6%9F%A5%E6%80%9D%E8%B7%AF"><span class="nav-number">1.4.</span> <span class="nav-text">常见坑与排查思路</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-NXDOMAIN-x2F-SERVFAIL-x2F-%E8%B6%85%E6%97%B6%E5%88%86%E5%88%AB%E6%84%8F%E5%91%B3%E7%9D%80%E4%BB%80%E4%B9%88"><span class="nav-number">1.4.1.</span> <span class="nav-text">1) NXDOMAIN &#x2F; SERVFAIL &#x2F; 超时分别意味着什么</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-%E4%B8%BA%E4%BB%80%E4%B9%88%E5%90%8C%E4%B8%80%E4%B8%AA%E5%9F%9F%E5%90%8D%E5%9C%A8%E4%B8%8D%E5%90%8C%E7%BD%91%E7%BB%9C%E8%A7%A3%E6%9E%90%E7%BB%93%E6%9E%9C%E4%B8%8D%E5%90%8C"><span class="nav-number">1.4.2.</span> <span class="nav-text">2) 为什么同一个域名在不同网络解析结果不同</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-%E5%AE%89%E5%85%A8%E8%A7%86%E8%A7%92%EF%BC%9ADNS-%E4%B9%9F%E4%BC%9A%E8%A2%AB%E6%94%BB%E5%87%BB-x2F-%E5%88%A9%E7%94%A8"><span class="nav-number">1.4.3.</span> <span class="nav-text">3) 安全视角：DNS 也会被攻击&#x2F;利用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%B7%A9%E5%9B%BA%E7%BB%83%E4%B9%A0%EF%BC%88%E9%A2%98%E4%B8%8E%E5%A4%8D%E7%9B%98%EF%BC%89"><span class="nav-number">1.5.</span> <span class="nav-text">巩固练习（题与复盘）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%AF%84%E4%BC%B0%E6%A0%87%E5%87%86%EF%BC%88%E8%BE%BE%E6%88%90%E5%88%A4%E5%AE%9A%EF%BC%89"><span class="nav-number">1.6.</span> <span class="nav-text">评估标准（达成判定）</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%AD%A6%E4%B9%A0%E6%88%90%E6%9E%9C%E8%BE%BE%E6%88%90%E6%83%85%E5%86%B5%EF%BC%88%E7%94%B1%E5%AD%A6%E4%B9%A0%E8%80%85%E5%A1%AB%E5%86%99%EF%BC%89"><span class="nav-number">1.7.</span> <span class="nav-text">学习成果达成情况（由学习者填写）</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">75</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i>GitHub</a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+  <a href="https://github.com/Tigercoll" class="github-corner" title="Follow me on GitHub" aria-label="Follow me on GitHub" rel="noopener" target="_blank"><svg width="80" height="80" viewBox="0 0 250 250" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path></svg></a>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/c822c636.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day005：网络与协议基础 - DNS 工作流 | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day005：网络与协议基础 - DNS 工作流
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2025-12-29 00:00:00" itemprop="dateCreated datePublished" datetime="2025-12-29T00:00:00+08:00">2025-12-29</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Day005：网络与协议基础-DNS-工作流"><a href="#Day005：网络与协议基础-DNS-工作流" class="headerlink" title="Day005：网络与协议基础 - DNS 工作流"></a>Day005：网络与协议基础 - DNS 工作流</h1><ul>
+<li>日期：2025-12-29</li>
+<li>周次：第 1 周</li>
+</ul>
+<h2 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h2><ul>
+<li>理解 DNS 的“分层命名 + 分布式数据库”设计，以及一次解析从本机到权威服务器的关键环节</li>
+<li>熟悉常见记录类型：A&#x2F;AAAA&#x2F;CNAME&#x2F;MX&#x2F;TXT&#x2F;NS&#x2F;SOA</li>
+<li>能在 Windows 上用 <code>nslookup</code> &#x2F; <code>Resolve-DnsName</code> 做查询，并能用 Wireshark 抓包解释一次完整的 DNS 查询与响应</li>
+<li>理解缓存与 TTL、递归与迭代、失败场景（NXDOMAIN&#x2F;SERVFAIL&#x2F;超时）含义</li>
+</ul>
+<span id="more"></span>
+
+<h2 id="学习内容"><a href="#学习内容" class="headerlink" title="学习内容"></a>学习内容</h2><h3 id="1️⃣-DNS-在“上网”里扮演什么角色"><a href="#1️⃣-DNS-在“上网”里扮演什么角色" class="headerlink" title="1️⃣ DNS 在“上网”里扮演什么角色"></a>1️⃣ DNS 在“上网”里扮演什么角色</h3><p>DNS（Domain Name System）是把“人类可读的域名”映射为“机器可路由的 IP 地址”的系统。</p>
+<p>你每天打开网页时，典型顺序是：</p>
+<ol>
+<li><strong>DNS 解析</strong>：<code>www.example.com</code> → IP</li>
+<li><strong>建立连接</strong>：对该 IP 发起 TCP&#x2F;TLS&#x2F;HTTP</li>
+<li><strong>应用层交互</strong>：请求页面&#x2F;接口</li>
+</ol>
+<p>因此，DNS 的问题会表现为：</p>
+<ul>
+<li>浏览器提示“找不到服务器 &#x2F; 无法解析域名”（解析失败）</li>
+<li>Ping 不通域名，但 Ping IP 可以（DNS 问题更可能）</li>
+</ul>
+<h3 id="2️⃣-递归解析-vs-迭代解析（非常关键）"><a href="#2️⃣-递归解析-vs-迭代解析（非常关键）" class="headerlink" title="2️⃣ 递归解析 vs 迭代解析（非常关键）"></a>2️⃣ 递归解析 vs 迭代解析（非常关键）</h3><p>把角色分清楚：</p>
+<ul>
+<li><strong>客户端（Stub Resolver）</strong>：你电脑上的解析器（由系统&#x2F;浏览器调用）</li>
+<li><strong>递归解析器（Recursive Resolver）</strong>：通常是你配置的 DNS 服务器（运营商&#x2F;路由器&#x2F;公司&#x2F;公共 DNS）</li>
+<li><strong>根服务器（Root）&#x2F; 顶级域（TLD）&#x2F; 权威服务器（Authoritative）</strong>：负责逐级指引和最终回答</li>
+</ul>
+<p><strong>客户端通常发起的是“递归查询”</strong>：</p>
+<ul>
+<li>“请你给我最终答案，不要让我自己去问根&#x2F;TLD&#x2F;权威。”</li>
+</ul>
+<p><strong>递归解析器对外通常做“迭代查询”</strong>：</p>
+<ul>
+<li>先问根：“.com 的权威在哪？”</li>
+<li>再问 TLD：”example.com 的权威在哪？”</li>
+<li>再问权威：”<a target="_blank" rel="noopener" href="http://www.example.com/">www.example.com</a> 的 A&#x2F;AAAA 是多少？”</li>
+</ul>
+<p>你在 Wireshark 里抓包时，很多时候只能看到 <strong>客户端 ↔ 递归解析器</strong> 这一跳。</p>
+<h3 id="3️⃣-DNS-报文与字段：抓包时看什么"><a href="#3️⃣-DNS-报文与字段：抓包时看什么" class="headerlink" title="3️⃣ DNS 报文与字段：抓包时看什么"></a>3️⃣ DNS 报文与字段：抓包时看什么</h3><p>DNS 既可以走 UDP（默认 53 端口）也可以走 TCP：</p>
+<ul>
+<li><strong>UDP 53</strong>：大多数查询（快）</li>
+<li><strong>TCP 53</strong>：响应太大需要截断&#x2F;重试（TC&#x3D;1），或进行区域传送（AXFR，通常只允许内部）</li>
+</ul>
+<p>在 Wireshark 里建议重点看：</p>
+<ul>
+<li><strong>Transaction ID</strong>：查询与响应的“配对 ID”</li>
+<li><strong>Flags</strong>：<ul>
+<li><code>QR</code>（Query&#x2F;Response）</li>
+<li><code>RD</code>（Recursion Desired，客户端希望递归）</li>
+<li><code>RA</code>（Recursion Available，服务器支持递归）</li>
+<li><code>RCODE</code>（返回码：NOERROR&#x2F;NXDOMAIN&#x2F;SERVFAIL…）</li>
+</ul>
+</li>
+<li><strong>Questions</strong>：查询的域名 + 类型（A&#x2F;AAAA…）</li>
+<li><strong>Answers</strong>：返回记录（含 TTL）</li>
+<li><strong>Authority &#x2F; Additional</strong>：权威信息、附加信息（比如 NS + glue 记录）</li>
+</ul>
+<h3 id="4️⃣-常见记录类型速查"><a href="#4️⃣-常见记录类型速查" class="headerlink" title="4️⃣ 常见记录类型速查"></a>4️⃣ 常见记录类型速查</h3><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>作用</th>
+<th>你会在什么场景看到</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>A</td>
+<td>域名 → IPv4</td>
+<td>most common</td>
+</tr>
+<tr>
+<td>AAAA</td>
+<td>域名 → IPv6</td>
+<td>IPv6 环境</td>
+</tr>
+<tr>
+<td>CNAME</td>
+<td>别名 → 正式名</td>
+<td>CDN、统一入口（如 <code>www</code> 指向 <code>xxx.cdn.net</code>）</td>
+</tr>
+<tr>
+<td>MX</td>
+<td>邮件服务器</td>
+<td>邮件系统</td>
+</tr>
+<tr>
+<td>TXT</td>
+<td>文本记录</td>
+<td>SPF&#x2F;DKIM&#x2F;站点验证&#x2F;一些验证 token</td>
+</tr>
+<tr>
+<td>NS</td>
+<td>指定某域的权威 DNS</td>
+<td>委派关系</td>
+</tr>
+<tr>
+<td>SOA</td>
+<td>区域起始授权信息</td>
+<td>区域版本、刷新时间等</td>
+</tr>
+</tbody></table>
+<blockquote>
+<p>记忆要点：<strong>CNAME 不能和同名的 A&#x2F;AAAA 同时存在</strong>（同一名字要么别名，要么地址）。</p>
+</blockquote>
+<h3 id="5️⃣-缓存与-TTL：为什么“改了解析不生效”"><a href="#5️⃣-缓存与-TTL：为什么“改了解析不生效”" class="headerlink" title="5️⃣ 缓存与 TTL：为什么“改了解析不生效”"></a>5️⃣ 缓存与 TTL：为什么“改了解析不生效”</h3><p>DNS 会大量缓存：</p>
+<ul>
+<li>你的电脑可能缓存</li>
+<li>浏览器&#x2F;应用可能缓存</li>
+<li>递归解析器一定会缓存</li>
+</ul>
+<p>每条记录都带 <strong>TTL（Time To Live）</strong>，表示“缓存能保留多久”。</p>
+<p>因此：</p>
+<ul>
+<li>权威服务器更新记录后，旧缓存需要等待 TTL 过期才会刷新</li>
+<li>排查时常用方式：换一个递归解析器、清本机缓存、或者直接查询权威</li>
+</ul>
+<h2 id="实践任务（合法授权范围内）"><a href="#实践任务（合法授权范围内）" class="headerlink" title="实践任务（合法授权范围内）"></a>实践任务（合法授权范围内）</h2><blockquote>
+<p>目标：在 Windows 上完成一次 DNS A&#x2F;AAAA&#x2F;CNAME&#x2F;TXT 查询，并用 Wireshark 抓包解释一条请求与响应。</p>
+</blockquote>
+<h3 id="推荐练习域名清单（A-x2F-AAAA-x2F-TXT）"><a href="#推荐练习域名清单（A-x2F-AAAA-x2F-TXT）" class="headerlink" title="推荐练习域名清单（A &#x2F; AAAA &#x2F; TXT）"></a>推荐练习域名清单（A &#x2F; AAAA &#x2F; TXT）</h3><blockquote>
+<p>说明：不同网络&#x2F;地区&#x2F;CDN 策略会导致结果不同；如果某域名查不到 AAAA 属于正常现象（不一定是你操作错）。</p>
+</blockquote>
+<p><strong>A（IPv4）常见稳定样本：</strong></p>
+<ul>
+<li><code>example.com</code></li>
+<li><code>www.cloudflare.com</code></li>
+<li><code>www.microsoft.com</code></li>
+<li><code>www.bing.com</code></li>
+</ul>
+<p><strong>AAAA（IPv6）常见样本：</strong></p>
+<ul>
+<li><code>ipv6.google.com</code></li>
+<li><code>www.cloudflare.com</code></li>
+<li><code>one.one.one.one</code></li>
+<li><code>www.facebook.com</code></li>
+</ul>
+<p><strong>TXT（文本记录）常见样本（常含 SPF&#x2F;验证信息）：</strong></p>
+<ul>
+<li><code>google.com</code></li>
+<li><code>microsoft.com</code></li>
+<li><code>cloudflare.com</code></li>
+<li><code>github.com</code></li>
+</ul>
+<p><strong>一键复制的 PowerShell 查询示例：</strong></p>
+<ul>
+<li><code>Resolve-DnsName example.com -Type A</code></li>
+<li><code>Resolve-DnsName ipv6.google.com -Type AAAA</code></li>
+<li><code>Resolve-DnsName google.com -Type TXT</code></li>
+</ul>
+<h3 id="任务-1：用-nslookup-做基础查询"><a href="#任务-1：用-nslookup-做基础查询" class="headerlink" title="任务 1：用 nslookup 做基础查询"></a>任务 1：用 <code>nslookup</code> 做基础查询</h3><p>在 PowerShell 里执行（示例域名可换成你常用网站）：</p>
+<ul>
+<li>查询 A 记录：<ul>
+<li><code>nslookup www.bing.com</code></li>
+</ul>
+</li>
+<li>指定类型查询：<ul>
+<li><code>nslookup -type=AAAA www.bing.com</code></li>
+<li><code>nslookup -type=CNAME www.bing.com</code></li>
+<li><code>nslookup -type=TXT microsoft.com</code></li>
+</ul>
+</li>
+</ul>
+<p>记录：</p>
+<ul>
+<li>Server 是谁（你正在使用哪个递归 DNS）</li>
+<li>Name &#x2F; Address &#x2F; canonical name（CNAME）结果</li>
+</ul>
+<h3 id="任务-2：用-Resolve-DnsName（更强，推荐）"><a href="#任务-2：用-Resolve-DnsName（更强，推荐）" class="headerlink" title="任务 2：用 Resolve-DnsName（更强，推荐）"></a>任务 2：用 <code>Resolve-DnsName</code>（更强，推荐）</h3><p>PowerShell 示例：</p>
+<ul>
+<li><code>Resolve-DnsName www.bing.com</code></li>
+<li><code>Resolve-DnsName www.bing.com -Type A</code></li>
+<li><code>Resolve-DnsName www.bing.com -Type AAAA</code></li>
+<li><code>Resolve-DnsName microsoft.com -Type TXT</code></li>
+</ul>
+<p>指定某个 DNS 服务器（例如公共 DNS，只用于学习测试）：</p>
+<ul>
+<li><code>Resolve-DnsName www.bing.com -Type A -Server 1.1.1.1</code></li>
+</ul>
+<p>你可以对比不同递归解析器返回的结果是否一致、TTL 是否不同。</p>
+<h3 id="任务-3：清理本机-DNS-缓存并复查"><a href="#任务-3：清理本机-DNS-缓存并复查" class="headerlink" title="任务 3：清理本机 DNS 缓存并复查"></a>任务 3：清理本机 DNS 缓存并复查</h3><p>执行：</p>
+<ul>
+<li><code>ipconfig /displaydns</code>（查看缓存）</li>
+<li><code>ipconfig /flushdns</code>（清空缓存）</li>
+</ul>
+<p>再执行一遍 <code>Resolve-DnsName</code>，观察输出是否变化。</p>
+<h3 id="任务-4：Wireshark-抓包并解释一次查询"><a href="#任务-4：Wireshark-抓包并解释一次查询" class="headerlink" title="任务 4：Wireshark 抓包并解释一次查询"></a>任务 4：Wireshark 抓包并解释一次查询</h3><ol>
+<li>打开 Wireshark，选择你正在联网的网卡（Wi-Fi&#x2F;以太网）</li>
+<li>设置显示过滤器：<ul>
+<li><code>dns</code></li>
+<li>或：<code>udp.port == 53 || tcp.port == 53</code></li>
+</ul>
+</li>
+<li>开始抓包</li>
+<li>另开一个 PowerShell，执行：<ul>
+<li><code>Resolve-DnsName www.bing.com -Type A</code></li>
+</ul>
+</li>
+<li>回到 Wireshark，找到对应的 DNS Query&#x2F;Response</li>
+</ol>
+<p>写出你的观察（建议按下面模板）：</p>
+<ul>
+<li>Query：查询名是什么？类型是什么（A&#x2F;AAAA&#x2F;TXT）？</li>
+<li>Flags：RD&#x2F;RA 是否为 1？RCODE 是什么？</li>
+<li>Answer：返回了几条记录？每条 TTL 是多少？</li>
+<li>UDP 还是 TCP？如果是 TCP，是什么原因（是否看到 TC&#x3D;1）？</li>
+</ul>
+<h2 id="常见坑与排查思路"><a href="#常见坑与排查思路" class="headerlink" title="常见坑与排查思路"></a>常见坑与排查思路</h2><h3 id="1-NXDOMAIN-x2F-SERVFAIL-x2F-超时分别意味着什么"><a href="#1-NXDOMAIN-x2F-SERVFAIL-x2F-超时分别意味着什么" class="headerlink" title="1) NXDOMAIN &#x2F; SERVFAIL &#x2F; 超时分别意味着什么"></a>1) NXDOMAIN &#x2F; SERVFAIL &#x2F; 超时分别意味着什么</h3><ul>
+<li><strong>NXDOMAIN</strong>：权威 DNS 明确表示“这个名字不存在”</li>
+<li><strong>SERVFAIL</strong>：递归解析器无法完成解析（上游异常、DNSSEC 校验问题、策略阻断等）</li>
+<li><strong>超时</strong>：网络到 DNS 服务器不可达、防火墙拦截、或服务器负载&#x2F;丢包</li>
+</ul>
+<h3 id="2-为什么同一个域名在不同网络解析结果不同"><a href="#2-为什么同一个域名在不同网络解析结果不同" class="headerlink" title="2) 为什么同一个域名在不同网络解析结果不同"></a>2) 为什么同一个域名在不同网络解析结果不同</h3><p>常见原因：</p>
+<ul>
+<li>CDN 按地域&#x2F;运营商调度</li>
+<li>分流策略（EDNS Client Subnet 影响）</li>
+<li>公司内网 DNS 做了内部解析（Split-horizon DNS）</li>
+</ul>
+<h3 id="3-安全视角：DNS-也会被攻击-x2F-利用"><a href="#3-安全视角：DNS-也会被攻击-x2F-利用" class="headerlink" title="3) 安全视角：DNS 也会被攻击&#x2F;利用"></a>3) 安全视角：DNS 也会被攻击&#x2F;利用</h3><p>本日先建立概念（后续会深入）：</p>
+<ul>
+<li><strong>DNS 欺骗&#x2F;投毒</strong>：让你解析到攻击者的 IP</li>
+<li><strong>重绑定（DNS Rebinding）</strong>：利用浏览器同源策略边界进行绕过（与内网访问相关）</li>
+<li><strong>隧道（DNS Tunnel）</strong>：把数据编码进子域名&#x2F;响应里，实现隐蔽通信</li>
+</ul>
+<h2 id="巩固练习（题与复盘）"><a href="#巩固练习（题与复盘）" class="headerlink" title="巩固练习（题与复盘）"></a>巩固练习（题与复盘）</h2><ol>
+<li><strong>CNAME 与 A 记录的关系是什么？</strong></li>
+</ol>
+<ul>
+<li>用一句话解释：CNAME 是“别名”，最终仍要落到 A&#x2F;AAAA</li>
+<li>思考：为什么同名不能同时存在 CNAME 和 A？</li>
+</ul>
+<ol start="2">
+<li><strong>解释一次失败解析的可能原因</strong>（至少写 3 条）</li>
+</ol>
+<p>建议从链路分层去想：</p>
+<ul>
+<li>本机缓存&#x2F;hosts 覆盖</li>
+<li>到递归 DNS 的网络不可达</li>
+<li>递归 DNS 自身故障&#x2F;策略拦截</li>
+<li>权威 DNS 不可达或配置错误</li>
+<li>DNSSEC 校验失败（未来会讲）</li>
+</ul>
+<ol start="3">
+<li>加分题：</li>
+</ol>
+<ul>
+<li>在 Wireshark 里找到一次返回多条 A 记录的响应，解释这通常用于什么（负载均衡&#x2F;高可用）</li>
+</ul>
+<h2 id="评估标准（达成判定）"><a href="#评估标准（达成判定）" class="headerlink" title="评估标准（达成判定）"></a>评估标准（达成判定）</h2><ul>
+<li>能用自己的话画出（或描述）一次解析链路：本机 → 递归 → 根 → TLD → 权威</li>
+<li>能在 Wireshark 里指出一条 DNS 报文的 Query&#x2F;Response，并说清楚 Query 类型 + Answer + TTL</li>
+<li>能说出 TTL 的作用，以及为什么会导致“解析修改延迟生效”</li>
+</ul>
+<h2 id="学习成果达成情况（由学习者填写）"><a href="#学习成果达成情况（由学习者填写）" class="headerlink" title="学习成果达成情况（由学习者填写）"></a>学习成果达成情况（由学习者填写）</h2><ul>
+<li>截图与证据：<ul>
+<li>Wireshark 抓包截图（Query + Response 各 1 张）</li>
+<li><code>Resolve-DnsName</code> 输出截图或复制粘贴</li>
+</ul>
+</li>
+<li>关键命令与输出：<ul>
+<li><code>Resolve-DnsName &lt;domain&gt; -Type A/AAAA/TXT</code></li>
+<li><code>ipconfig /displaydns</code>（可选）</li>
+</ul>
+</li>
+<li>结论与反思：<ul>
+<li>今天你最清楚的一个点：</li>
+<li>仍然模糊的一个点（明天回看&#x2F;补充）：</li>
+</ul>
+</li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="reward-container">
+  <div>Buy me a coffee</div>
+  <button>
+    赞赏
+  </button>
+  <div class="post-reward">
+      <div>
+        <img src="/images/wechatpay.jpg" alt="Tigercoll 微信">
+        <span>微信</span>
+      </div>
+
+  </div>
+</div>
+
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C/" rel="tag"># 网络</a>
+              <a href="/tags/%E5%AE%89%E5%85%A8/" rel="tag"># 安全</a>
+              <a href="/tags/%E5%AD%A6%E4%B9%A0%E8%AE%A1%E5%88%92/" rel="tag"># 学习计划</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/ccce0add.html" rel="prev" title="Day004：网络与协议基础 - TCP/UDP 与会话">
+                  <i class="fa fa-chevron-left"></i> Day004：网络与协议基础 - TCP/UDP 与会话
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/d8a842e9.html" rel="next" title="Day006：网络与协议基础 - HTTP 基础">
+                  Day006：网络与协议基础 - HTTP 基础 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.js.org/pisces/" rel="noopener" target="_blank">NexT.Pisces</a> 强力驱动
+  </div>
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/motion.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+  <script src="/js/third-party/pace.js"></script>
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"pluginRootPath":"live2dw/","pluginJsPath":"lib/","pluginModelPath":"assets/","tagMode":false,"log":false,"model":{"jsonPath":"/live2dw/assets/z16.model.json"},"display":{"position":"left","width":150,"height":300},"mobile":{"show":true,"react":{"opacity":0.7}}});</script></body>
+</html>
