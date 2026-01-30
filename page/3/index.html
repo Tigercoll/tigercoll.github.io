@@ -148,18 +148,18 @@
   <nav class="site-state">
       <div class="site-state-item site-state-posts">
         <a href="/archives">
-          <span class="site-state-item-count">82</span>
+          <span class="site-state-item-count">54</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
           <a href="/categories">
-        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-count">39</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
           <a href="/tags">
-        <span class="site-state-item-count">75</span>
+        <span class="site-state-item-count">76</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -202,7 +202,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/b5624f93.html">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/4a4c502f.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -220,7 +220,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/post/b5624f93.html" class="post-title-link" itemprop="url">Day019：操作系统与脚本 - Nmap 端口扫描安全使用</a>
+          <a href="/post/4a4c502f.html" class="post-title-link" itemprop="url">ppp协议</a>
         </h2>
 
         <div class="post-meta-container">
@@ -231,7 +231,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2026-01-12 00:00:00" itemprop="dateCreated datePublished" datetime="2026-01-12T00:00:00+08:00">2026-01-12</time>
+      <time title="创建时间：2023-05-09 16:11:56" itemprop="dateCreated datePublished" datetime="2023-05-09T16:11:56+08:00">2023-05-09</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -239,7 +239,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+          <a href="/categories/ppp/" itemprop="url" rel="index"><span itemprop="name">ppp</span></a>
         </span>
     </span>
 
@@ -253,22 +253,19 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="Day019：操作系统与脚本-Nmap-端口扫描安全使用"><a href="#Day019：操作系统与脚本-Nmap-端口扫描安全使用" class="headerlink" title="Day019：操作系统与脚本 - Nmap 端口扫描安全使用"></a>Day019：操作系统与脚本 - Nmap 端口扫描安全使用</h1><ul>
-<li>日期：2026-01-12</li>
-<li>周次：第 3 周</li>
-</ul>
-<h2 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h2><p>学完今天你应该能做到：</p>
+          <p>PPP协议是在串行线IP协议SLIP（Serial Line Internet Protocol）的基础上发展起来的。由于SLIP协议具有只支持异步传输方式、无协商过程（尤其不能协商如双方IP地址等网络层属性）、只能承载IP一种网络层报文等缺陷，在发展过程中，逐步被PPP协议所替代。</p>
+<p>PPP协议有如下优点：</p>
 <ul>
-<li>明确知道一句底线：<strong>扫描是有”扰动”的行为，只能在自建&#x2F;明确授权目标上做</strong></li>
-<li>能解释 <code>-sS</code> 和 <code>-sT</code> 的差异（别背，理解就行）</li>
-<li>能做一次最小扫描并导出结果，然后把结果整理成表（给 Day020 用）</li>
-<li>掌握 Nmap 常用参数、端口状态含义、扫描策略选择</li>
-<li>能输出一份规范的扫描报告（含授权说明、时间窗口、结果分析）</li>
+<li>对物理层而言，PPP既支持同步链路又支持异步链路，而X.25、FR（Frame Relay）等数据链路层协议仅支持同步链路，SLIP仅支持异步链路。</li>
+<li>PPP协议具有良好的扩展性，例如，当需要在以太网链路上承载PPP协议时，PPP可以扩展为PPPoE。</li>
+<li>提供LCP（Link Control Protocol）协议，用于各种链路层参数的协商。</li>
+<li>提供各种NCP（Network Control Protocol）协议（如IPCP、IPXCP），用于各网络层参数的协商，更好地支持了网络层协议。</li>
+<li>提供认证协议CHAP（Challenge-Handshake Authentication Protocol）、PAP（Password Authentication Protocol），更好的保证了网络的安全性。</li>
+<li>无重传机制，网络开销小，速度快。</li>
 </ul>
-<hr>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/post/b5624f93.html#more" rel="contents">
+              <a class="btn" href="/post/4a4c502f.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -299,7 +296,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/250cf72c.html">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/2a46438c.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -317,7 +314,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/post/250cf72c.html" class="post-title-link" itemprop="url">Day018：操作系统与脚本 - Python 脚本入门（文本与网络，傻瓜版能照做）</a>
+          <a href="/post/2a46438c.html" class="post-title-link" itemprop="url">NAT地址转换</a>
         </h2>
 
         <div class="post-meta-container">
@@ -328,7 +325,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2026-01-11 00:00:00" itemprop="dateCreated datePublished" datetime="2026-01-11T00:00:00+08:00">2026-01-11</time>
+      <time title="创建时间：2023-05-08 13:57:57" itemprop="dateCreated datePublished" datetime="2023-05-08T13:57:57+08:00">2023-05-08</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -336,7 +333,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+          <a href="/categories/%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">网络</span></a>
         </span>
     </span>
 
@@ -350,22 +347,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="Day018：操作系统与脚本-Python-脚本入门（文本与网络，傻瓜版能照做）"><a href="#Day018：操作系统与脚本-Python-脚本入门（文本与网络，傻瓜版能照做）" class="headerlink" title="Day018：操作系统与脚本 - Python 脚本入门（文本与网络，傻瓜版能照做）"></a>Day018：操作系统与脚本 - Python 脚本入门（文本与网络，傻瓜版能照做）</h1><ul>
-<li>日期：2026-01-11</li>
-<li>周次：第 3 周</li>
-</ul>
-<h2 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h2><p>学完今天你应该能做到：</p>
-<ul>
-<li>用 Python 读文件、用正则提取字段、输出 JSON&#x2F;CSV</li>
-<li>用 <strong>标准库</strong> 发起一个 HTTP GET 请求并解析 JSON</li>
-<li>写出”不会一报错就崩”的脚本：会用 <code>try/except</code> 给出可读错误</li>
-<li>掌握 Python 文件操作、正则表达式、数据处理、网络请求的核心技能</li>
-<li>能独立完成日志解析、API 调用、数据导出等自动化任务</li>
-</ul>
-<hr>
+          <p>随着Internet的发展和网络应用的增多，IPv4地址枯竭已成为制约网络发展的瓶颈。尽管IPv6可以从根本上解决IPv4地址空间不足问题，但目前众多网络设备和网络应用大多是基于IPv4的，因此在IPv6广泛应用之前，一些过渡技术（如CIDR、私网地址等）的使用是解决这个问题最主要的技术手段。NAT主要用于实现内部网络（简称内网，使用私有IP地址）访问外部网络（简称外网，使用公有IP地址）的功能。当内网的主机要访问外网时，通过NAT技术可以将其私网地址转换为公网地址，可以实现多个私网用户共用一个公网地址来访问外部网络，这样既可保证网络互通，又节省了公网地址。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/post/250cf72c.html#more" rel="contents">
+              <a class="btn" href="/post/2a46438c.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -396,7 +381,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/44b1dfb5.html">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/fb84813c.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -414,7 +399,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/post/44b1dfb5.html" class="post-title-link" itemprop="url">Day017：操作系统与脚本 - Shell/PowerShell 脚本入门与批处理</a>
+          <a href="/post/fb84813c.html" class="post-title-link" itemprop="url">DHCP</a>
         </h2>
 
         <div class="post-meta-container">
@@ -425,7 +410,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2026-01-10 00:00:00" itemprop="dateCreated datePublished" datetime="2026-01-10T00:00:00+08:00">2026-01-10</time>
+      <time title="创建时间：2023-04-03 14:54:09" itemprop="dateCreated datePublished" datetime="2023-04-03T14:54:09+08:00">2023-04-03</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -433,7 +418,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+          <a href="/categories/%E4%BA%A4%E6%8D%A2%E6%9C%BA/" itemprop="url" rel="index"><span itemprop="name">交换机</span></a>
         </span>
     </span>
 
@@ -447,22 +432,11 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="Day017：操作系统与脚本-Shell-x2F-PowerShell-脚本入门与批处理"><a href="#Day017：操作系统与脚本-Shell-x2F-PowerShell-脚本入门与批处理" class="headerlink" title="Day017：操作系统与脚本 - Shell&#x2F;PowerShell 脚本入门与批处理"></a>Day017：操作系统与脚本 - Shell&#x2F;PowerShell 脚本入门与批处理</h1><ul>
-<li>日期：2026-01-10</li>
-<li>周次：第 3 周</li>
-</ul>
-<h2 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h2><p>学完今天你应该能做到：</p>
-<ul>
-<li>用一句话解释：<strong>管道</strong>、<strong>重定向</strong>、<strong>变量</strong>、<strong>循环</strong>分别是干嘛的</li>
-<li>写一个“能重复跑”的日志整理脚本（PowerShell 版，Windows 直接可用）</li>
-<li>把结果输出成 CSV（后面 Day019&#x2F;Day020 做枚举时直接能复用）</li>
-<li>掌握 PowerShell 的对象管道、条件判断、循环、函数、错误处理</li>
-<li>能独立完成日志批量处理、数据统计、导出等自动化任务</li>
-</ul>
-<hr>
+          <p>动态主机配置协议是一个局域网的<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE/328636?fromModule=lemma_inlink">网络协议</a>。指的是由<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E6%9C%8D%E5%8A%A1%E5%99%A8/100571?fromModule=lemma_inlink">服务器</a>控制一段IP地址范围，客户机登录服务器时就可以自动获得服务器分配的IP地址和<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E5%AD%90%E7%BD%91%E6%8E%A9%E7%A0%81/100207?fromModule=lemma_inlink">子网掩码</a>。担任DHCP服务器的计算机需要安装<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/TCP%2FIP%E5%8D%8F%E8%AE%AE?fromModule=lemma_inlink">TCP&#x2F;IP协议</a>，并为其设置<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E9%9D%99%E6%80%81IP%E5%9C%B0%E5%9D%80?fromModule=lemma_inlink">静态IP地址</a>、子网掩码、<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E9%BB%98%E8%AE%A4%E7%BD%91%E5%85%B3/2152622?fromModule=lemma_inlink">默认网关</a>等内容。</p>
+<p>DHCP是由<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/IETF?fromModule=lemma_inlink">IETF</a>（internet 工作任务小组）开发设计的，于1993年10月成为标准协议，其前身是BOOTP协议。当前的DHCP定义可以在RFC 2131中找到，而基于<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/IPv6?fromModule=lemma_inlink">IPv6</a>的建议标准（DHCPv6）可以在RFC 3315中找到。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/post/44b1dfb5.html#more" rel="contents">
+              <a class="btn" href="/post/fb84813c.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -493,7 +467,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/f97e6e0d.html">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/bf9393d0.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -511,7 +485,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/post/f97e6e0d.html" class="post-title-link" itemprop="url">Day016：操作系统与脚本 - Windows 安全基础</a>
+          <a href="/post/bf9393d0.html" class="post-title-link" itemprop="url">单臂路由</a>
         </h2>
 
         <div class="post-meta-container">
@@ -522,7 +496,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2026-01-09 00:00:00" itemprop="dateCreated datePublished" datetime="2026-01-09T00:00:00+08:00">2026-01-09</time>
+      <time title="创建时间：2023-03-29 13:24:40" itemprop="dateCreated datePublished" datetime="2023-03-29T13:24:40+08:00">2023-03-29</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -530,7 +504,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+          <a href="/categories/%E5%8D%95%E8%87%82%E8%B7%AF%E7%94%B1/" itemprop="url" rel="index"><span itemprop="name">单臂路由</span></a>
         </span>
     </span>
 
@@ -544,20 +518,10 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="Day016：操作系统与脚本-Windows-安全基础"><a href="#Day016：操作系统与脚本-Windows-安全基础" class="headerlink" title="Day016：操作系统与脚本 - Windows 安全基础"></a>Day016：操作系统与脚本 - Windows 安全基础</h1><ul>
-<li>日期：2026-01-09</li>
-<li>周次：第 3 周</li>
-</ul>
-<h2 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h2><p>学完今天你应该能做到：</p>
-<ul>
-<li>掌握 Windows 操作系统安全基础，包括 UAC 原理、用户与组管理、事件日志分析、防火墙配置、本地安全策略、端口监听排查</li>
-<li>学会通过 GUI + PowerShell 双工具进行 Windows 安全审计与加固</li>
-<li>能输出一份 15 条的 Windows 加固清单</li>
-</ul>
-<hr>
+          <p>单臂路由（router-on-a-stick）是指在路由器的一个接口上通过配置<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E5%AD%90%E6%8E%A5%E5%8F%A3/10693062?fromModule=lemma_inlink">子接口</a>（或“<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E9%80%BB%E8%BE%91%E6%8E%A5%E5%8F%A3/8509464?fromModule=lemma_inlink">逻辑接口</a>”，并不存在真正<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E7%89%A9%E7%90%86%E6%8E%A5%E5%8F%A3/5922620?fromModule=lemma_inlink">物理接口</a>）的方式，实现原来相互隔离的不同VLAN（<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E8%99%9A%E6%8B%9F%E5%B1%80%E5%9F%9F%E7%BD%91/419962?fromModule=lemma_inlink">虚拟局域网</a>）之间的<a target="_blank" rel="noopener" href="https://baike.baidu.com/item/%E4%BA%92%E8%81%94%E4%BA%92%E9%80%9A/1848381?fromModule=lemma_inlink">互联互通</a>。</p>
           <!--noindex-->
             <div class="post-button">
-              <a class="btn" href="/post/f97e6e0d.html#more" rel="contents">
+              <a class="btn" href="/post/bf9393d0.html#more" rel="contents">
                 阅读全文 &raquo;
               </a>
             </div>
@@ -588,7 +552,7 @@
   
 
   <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="">
-    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/3ca7da61.html">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/5bb83ec0.html">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.jpg">
@@ -606,7 +570,7 @@
     </span>
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
-          <a href="/post/3ca7da61.html" class="post-title-link" itemprop="url">Day015：操作系统与脚本 - Linux 安全基础</a>
+          <a href="/post/5bb83ec0.html" class="post-title-link" itemprop="url">交换机VLAN命令</a>
         </h2>
 
         <div class="post-meta-container">
@@ -617,7 +581,7 @@
       </span>
       <span class="post-meta-item-text">发表于</span>
 
-      <time title="创建时间：2026-01-08 00:00:00" itemprop="dateCreated datePublished" datetime="2026-01-08T00:00:00+08:00">2026-01-08</time>
+      <time title="创建时间：2023-03-29 10:15:01" itemprop="dateCreated datePublished" datetime="2023-03-29T10:15:01+08:00">2023-03-29</time>
     </span>
     <span class="post-meta-item">
       <span class="post-meta-item-icon">
@@ -625,7 +589,7 @@
       </span>
       <span class="post-meta-item-text">分类于</span>
         <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-          <a href="/categories/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" itemprop="url" rel="index"><span itemprop="name">网络安全</span></a>
+          <a href="/categories/VLAN/" itemprop="url" rel="index"><span itemprop="name">VLAN</span></a>
         </span>
     </span>
 
@@ -639,34 +603,9 @@
     
     
     <div class="post-body" itemprop="articleBody">
-          <h1 id="Day015：操作系统与脚本-Linux-安全基础"><a href="#Day015：操作系统与脚本-Linux-安全基础" class="headerlink" title="Day015：操作系统与脚本 - Linux 安全基础"></a>Day015：操作系统与脚本 - Linux 安全基础</h1><ul>
-<li>日期：2026-01-08</li>
-<li>周次：第 3 周</li>
-</ul>
-<h2 id="学习目标"><a href="#学习目标" class="headerlink" title="学习目标"></a>学习目标</h2><p>学完今天你应该能做到：</p>
-<ul>
-<li>能用一句话解释 Linux 安全三件套：<strong>用户&#x2F;组</strong>、<strong>权限</strong>、<strong>服务</strong></li>
-<li>看懂 <code>-rwxr-xr-x</code> 权限字符串，能算出 <code>755/644</code>，理解特殊权限（SUID&#x2F;SGID&#x2F;Sticky Bit）</li>
-<li>在”自建或明确授权”的 Linux 环境里完成最小加固动作：<ul>
-<li>新建普通用户并配置 sudo</li>
-<li>理解”禁止 root 直接登录”的原理（谨慎实施）</li>
-<li>查看安全日志并识别关键事件（登录成功&#x2F;失败&#x2F;sudo 使用）</li>
-<li>盘点监听端口（攻击面最小化）</li>
-</ul>
-</li>
-<li>输出一份 Linux 加固清单（至少 10 条可执行措施）</li>
-</ul>
-<blockquote>
-<p><strong>环境说明</strong>：没有 Linux 也能学！可用 WSL&#x2F;虚拟机&#x2F;云主机，或者先把”概念&#x2F;命令&#x2F;清单”整理出来。</p>
-</blockquote>
-          <!--noindex-->
-            <div class="post-button">
-              <a class="btn" href="/post/3ca7da61.html#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          <!--/noindex-->
-        
+          <h3 id="VLAN基本命令"><a href="#VLAN基本命令" class="headerlink" title="VLAN基本命令"></a>VLAN基本命令</h3><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">vlan 10  # 创建单个VALN</span><br><span class="line">vlan batch 10 to 20 # 创建多个vlan</span><br><span class="line">port link-type access/trunk/hybird # 配置接口类型</span><br><span class="line">port default vlan 10 # 配置access关联vlan/pvid</span><br><span class="line">port trunk allow-pass vlan 10 # 配置trunk允许vlan 默认只允许vlan1</span><br><span class="line">port trunk pvid vlan 10 # 配置trunk的pvid</span><br><span class="line">port hybird tagged/untagged vlan 10 # 配置hybird标记的vlan</span><br><span class="line">port hybird pvid vlan 10 # 配置hybird 的pvid</span><br><span class="line">display vlan # 验证vlan</span><br><span class="line">display port vlan # 验证vlan端口</span><br></pre></td></tr></table></figure>
+
+
       
     </div>
 
@@ -685,7 +624,7 @@
 
 
   <nav class="pagination">
-    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/17/">17</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
+    <a class="extend prev" rel="prev" href="/page/2/"><i class="fa fa-angle-left" aria-label="上一页"></i></a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><span class="space">&hellip;</span><a class="page-number" href="/page/11/">11</a><a class="extend next" rel="next" href="/page/4/"><i class="fa fa-angle-right" aria-label="下一页"></i></a>
   </nav>
 
 </div>

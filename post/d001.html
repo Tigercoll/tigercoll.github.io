@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+
+
+<link rel="canonical" href="https://tigercoll.top/post/d001.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/d001.html","path":"post/d001.html","title":"Day001：破冰 - 搭建你的黑客实验室"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Day001：破冰 - 搭建你的黑客实验室 | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-nav-active sidebar-toc-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+            <div class="post-toc animated"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Day001%EF%BC%9A%E7%A0%B4%E5%86%B0-%E6%90%AD%E5%BB%BA%E4%BD%A0%E7%9A%84%E9%BB%91%E5%AE%A2%E5%AE%9E%E9%AA%8C%E5%AE%A4"><span class="nav-number">1.</span> <span class="nav-text">Day001：破冰 - 搭建你的黑客实验室</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%93%8B-%E5%9F%BA%E6%9C%AC%E4%BF%A1%E6%81%AF"><span class="nav-number">1.1.</span> <span class="nav-text">📋 基本信息</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%94%A5-%E4%BB%8A%E6%97%A5%E7%97%9B%E7%82%B9%E5%9C%BA%E6%99%AF"><span class="nav-number">1.2.</span> <span class="nav-text">🔥 今日痛点场景</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%8E%AF-%E4%BB%8A%E6%97%A5%E7%9B%AE%E6%A0%87"><span class="nav-number">1.3.</span> <span class="nav-text">🎯 今日目标</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E2%9A%94%EF%B8%8F-%E5%AE%9E%E6%88%98%E4%BB%BB%E5%8A%A1%EF%BC%88%E5%85%88%E5%8A%A8%E6%89%8B%EF%BC%81%EF%BC%89"><span class="nav-number">1.4.</span> <span class="nav-text">⚔️ 实战任务（先动手！）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-1%EF%BC%9A%E4%B8%8B%E8%BD%BD%E5%B9%B6%E5%AE%89%E8%A3%85%E8%99%9A%E6%8B%9F%E6%9C%BA%E8%BD%AF%E4%BB%B6%EF%BC%8830-%E5%88%86%E9%92%9F%EF%BC%89"><span class="nav-number">1.4.1.</span> <span class="nav-text">任务 1：下载并安装虚拟机软件（30 分钟）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-2%EF%BC%9A%E4%B8%8B%E8%BD%BD-Kali-Linux-%E9%95%9C%E5%83%8F%EF%BC%8820-%E5%88%86%E9%92%9F%EF%BC%89"><span class="nav-number">1.4.2.</span> <span class="nav-text">任务 2：下载 Kali Linux 镜像（20 分钟）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-3%EF%BC%9A%E5%AF%BC%E5%85%A5-Kali-%E8%99%9A%E6%8B%9F%E6%9C%BA%EF%BC%8815-%E5%88%86%E9%92%9F%EF%BC%89"><span class="nav-number">1.4.3.</span> <span class="nav-text">任务 3：导入 Kali 虚拟机（15 分钟）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-4%EF%BC%9A%E9%85%8D%E7%BD%AE-Host-Only-%E7%BD%91%E7%BB%9C%EF%BC%8820-%E5%88%86%E9%92%9F%EF%BC%89"><span class="nav-number">1.4.4.</span> <span class="nav-text">任务 4：配置 Host-Only 网络（20 分钟）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-5%EF%BC%9A%E9%AA%8C%E8%AF%81%E7%BD%91%E7%BB%9C%E9%85%8D%E7%BD%AE%EF%BC%8810-%E5%88%86%E9%92%9F%EF%BC%89"><span class="nav-number">1.4.5.</span> <span class="nav-text">任务 5：验证网络配置（10 分钟）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%BB%E5%8A%A1-6%EF%BC%9A%E7%86%9F%E6%82%89-Kali-%E5%9F%BA%E6%9C%AC%E5%91%BD%E4%BB%A4%EF%BC%8820-%E5%88%86%E9%92%9F%EF%BC%89"><span class="nav-number">1.4.6.</span> <span class="nav-text">任务 6：熟悉 Kali 基本命令（20 分钟）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E2%9C%85-%E4%BB%8A%E6%97%A5%E9%97%AF%E5%85%B3%E6%A3%80%E6%9F%A5"><span class="nav-number">1.5.</span> <span class="nav-text">✅ 今日闯关检查</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%93%96-%E5%BA%95%E5%B1%82%E8%A1%A5%E8%AF%BE%EF%BC%88%E5%81%9A%E5%AE%8C%E5%AE%9E%E9%AA%8C%E5%86%8D%E7%9C%8B%EF%BC%89"><span class="nav-number">1.6.</span> <span class="nav-text">📖 底层补课（做完实验再看）</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%A6%81%E7%94%A8%E8%99%9A%E6%8B%9F%E6%9C%BA%EF%BC%9F"><span class="nav-number">1.6.1.</span> <span class="nav-text">为什么要用虚拟机？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E7%94%A8-Kali-Linux%EF%BC%9F"><span class="nav-number">1.6.2.</span> <span class="nav-text">为什么用 Kali Linux？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF-Host-Only-%E7%BD%91%E7%BB%9C%EF%BC%9F"><span class="nav-number">1.6.3.</span> <span class="nav-text">什么是 Host-Only 网络？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E2%9A%A0%EF%B8%8F-%E9%81%BF%E5%9D%91%E6%8C%87%E5%8D%97"><span class="nav-number">1.7.</span> <span class="nav-text">⚠️ 避坑指南</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%92%A1-%E7%9F%A5%E8%AF%86%E5%8D%A1%E7%89%87%E9%80%9F%E6%9F%A5"><span class="nav-number">1.8.</span> <span class="nav-text">💡 知识卡片速查</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Linux-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4%E9%80%9F%E6%9F%A5"><span class="nav-number">1.8.1.</span> <span class="nav-text">Linux 常用命令速查</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E6%A8%A1%E5%BC%8F%E5%AF%B9%E6%AF%94"><span class="nav-number">1.8.2.</span> <span class="nav-text">网络模式对比</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E2%9D%93-%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98"><span class="nav-number">1.9.</span> <span class="nav-text">❓ 常见问题</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%9A%80-%E6%98%8E%E6%97%A5%E9%A2%84%E5%91%8A"><span class="nav-number">1.10.</span> <span class="nav-text">🚀 明日预告</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%F0%9F%93%8A-%E5%AD%A6%E4%B9%A0%E8%AE%B0%E5%BD%95%EF%BC%88%E5%AD%A6%E4%B9%A0%E8%80%85%E5%A1%AB%E5%86%99%EF%BC%89"><span class="nav-number">1.11.</span> <span class="nav-text">📊 学习记录（学习者填写）</span></a></li></ol></li></ol></div>
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">54</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">39</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">76</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/d001.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Day001：破冰 - 搭建你的黑客实验室 | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Day001：破冰 - 搭建你的黑客实验室
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-01-23 00:00:00" itemprop="dateCreated datePublished" datetime="2026-01-23T00:00:00+08:00">2026-01-23</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar-check"></i>
+      </span>
+      <span class="post-meta-item-text">更新于</span>
+      <time title="修改时间：2026-01-28 00:00:00" itemprop="dateModified" datetime="2026-01-28T00:00:00+08:00">2026-01-28</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/90%E5%A4%A9%E5%AE%89%E5%85%A8%E7%AA%81%E5%87%BB/" itemprop="url" rel="index"><span itemprop="name">90天安全突击</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <h1 id="Day001：破冰-搭建你的黑客实验室"><a href="#Day001：破冰-搭建你的黑客实验室" class="headerlink" title="Day001：破冰 - 搭建你的黑客实验室"></a>Day001：破冰 - 搭建你的黑客实验室</h1><h2 id="📋-基本信息"><a href="#📋-基本信息" class="headerlink" title="📋 基本信息"></a>📋 基本信息</h2><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>所属阶段</strong></td>
+<td>🔨 筑基（第一阶段）</td>
+</tr>
+<tr>
+<td><strong>所属周次</strong></td>
+<td>Week 1：破冰——你的第一次”黑客行动”</td>
+</tr>
+<tr>
+<td><strong>今日主题</strong></td>
+<td>搭建 Kali Linux 攻击机</td>
+</tr>
+<tr>
+<td><strong>预计时间</strong></td>
+<td>2-3 小时</td>
+</tr>
+<tr>
+<td><strong>难度等级</strong></td>
+<td>⭐ 入门</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="🔥-今日痛点场景"><a href="#🔥-今日痛点场景" class="headerlink" title="🔥 今日痛点场景"></a>🔥 今日痛点场景</h2><blockquote>
+<p><strong>场景</strong>：你注册了一个网站，密码设成了 <code>123456</code>。三天后账号被盗，个人信息被挂在暗网出售。</p>
+<p><strong>问题</strong>：黑客是怎么拿到你密码的？他们用的是什么工具？</p>
+<p><strong>今天的任务</strong>：搭建和黑客一样的工具环境，为后续的”攻击实验”做准备。</p>
+</blockquote>
+<hr>
+<h2 id="🎯-今日目标"><a href="#🎯-今日目标" class="headerlink" title="🎯 今日目标"></a>🎯 今日目标</h2><p>完成今天的学习后，你应该能够：</p>
+<ul>
+<li><input disabled="" type="checkbox"> 在虚拟机中成功安装 Kali Linux</li>
+<li><input disabled="" type="checkbox"> 配置 Host-Only 网络，让虚拟机之间能互相通信</li>
+<li><input disabled="" type="checkbox"> 在 Kali 中执行基本的 Linux 命令</li>
+<li><input disabled="" type="checkbox"> 理解为什么要用虚拟机（安全隔离）</li>
+</ul>
+<p><strong>闯关条件</strong>：<code>ping 192.168.56.1</code> 能通，说明网络配置成功。</p>
+<hr>
+<h2 id="⚔️-实战任务（先动手！）"><a href="#⚔️-实战任务（先动手！）" class="headerlink" title="⚔️ 实战任务（先动手！）"></a>⚔️ 实战任务（先动手！）</h2><blockquote>
+<p>💡 <strong>原则</strong>：先做再说，遇到问题再查资料。别一开始就去背理论。</p>
+</blockquote>
+<h3 id="任务-1：下载并安装虚拟机软件（30-分钟）"><a href="#任务-1：下载并安装虚拟机软件（30-分钟）" class="headerlink" title="任务 1：下载并安装虚拟机软件（30 分钟）"></a>任务 1：下载并安装虚拟机软件（30 分钟）</h3><p><strong>操作步骤</strong>：</p>
+<ol>
+<li>下载 VMware Workstation Player（免费）或 VirtualBox<ul>
+<li>VMware：<a target="_blank" rel="noopener" href="https://www.vmware.com/products/workstation-player.html">https://www.vmware.com/products/workstation-player.html</a></li>
+<li>VirtualBox：<a target="_blank" rel="noopener" href="https://www.virtualbox.org/">https://www.virtualbox.org/</a></li>
+</ul>
+</li>
+<li>安装到你的电脑上（一路下一步即可）</li>
+<li>打开软件，确认能正常启动</li>
+</ol>
+<p><strong>预期结果</strong>：看到虚拟机软件的主界面。</p>
+<p><strong>新手常见问题</strong>：</p>
+<ul>
+<li>如果提示”VT-x 未启用”，需要进 BIOS 开启虚拟化（搜索”你的电脑型号 + 开启虚拟化”）</li>
+</ul>
+<hr>
+<h3 id="任务-2：下载-Kali-Linux-镜像（20-分钟）"><a href="#任务-2：下载-Kali-Linux-镜像（20-分钟）" class="headerlink" title="任务 2：下载 Kali Linux 镜像（20 分钟）"></a>任务 2：下载 Kali Linux 镜像（20 分钟）</h3><p><strong>操作步骤</strong>：</p>
+<ol>
+<li>访问 Kali 官网：<a target="_blank" rel="noopener" href="https://www.kali.org/get-kali/">https://www.kali.org/get-kali/</a></li>
+<li>选择 <strong>Virtual Machines</strong> → 下载对应你虚拟机软件的版本<ul>
+<li>VMware 用户下载 <code>.vmx</code> 格式</li>
+<li>VirtualBox 用户下载 <code>.ova</code> 格式</li>
+</ul>
+</li>
+<li>文件约 3-4GB，耐心等待</li>
+</ol>
+<p><strong>为什么选预装版</strong>：省去安装步骤，开箱即用。</p>
+<hr>
+<h3 id="任务-3：导入-Kali-虚拟机（15-分钟）"><a href="#任务-3：导入-Kali-虚拟机（15-分钟）" class="headerlink" title="任务 3：导入 Kali 虚拟机（15 分钟）"></a>任务 3：导入 Kali 虚拟机（15 分钟）</h3><p><strong>VMware 用户</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">文件 → 打开 → 选择下载的 .vmx 文件 → 启动</span><br></pre></td></tr></table></figure>
+
+<p><strong>VirtualBox 用户</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">文件 → 导入虚拟电脑 → 选择 .ova 文件 → 导入 → 启动</span><br></pre></td></tr></table></figure>
+
+<p><strong>默认登录凭据</strong>：</p>
+<ul>
+<li>用户名：<code>kali</code></li>
+<li>密码：<code>kali</code></li>
+</ul>
+<p><strong>预期结果</strong>：成功进入 Kali Linux 桌面。</p>
+<hr>
+<h3 id="任务-4：配置-Host-Only-网络（20-分钟）"><a href="#任务-4：配置-Host-Only-网络（20-分钟）" class="headerlink" title="任务 4：配置 Host-Only 网络（20 分钟）"></a>任务 4：配置 Host-Only 网络（20 分钟）</h3><blockquote>
+<p>这一步很关键！错了后面所有实验都做不了。</p>
+</blockquote>
+<p><strong>为什么要 Host-Only</strong>：</p>
+<ul>
+<li>虚拟机之间能互相通信</li>
+<li>虚拟机不连接真实互联网（安全！）</li>
+<li>你的攻击不会影响到真实网络</li>
+</ul>
+<p><strong>VMware 配置</strong>：</p>
+<ol>
+<li>关闭 Kali 虚拟机</li>
+<li>编辑 → 虚拟网络编辑器 → 添加 Host-Only 网络（VMnet1）</li>
+<li>记住子网地址（如 192.168.56.0）</li>
+<li>回到 Kali 设置 → 网络适配器 → 选择 Host-Only</li>
+<li>启动 Kali</li>
+</ol>
+<p><strong>VirtualBox 配置</strong>：</p>
+<ol>
+<li>管理 → 主机网络管理器 → 创建</li>
+<li>记住 IP 地址（如 192.168.56.1）</li>
+<li>Kali 设置 → 网络 → 连接方式 → 仅主机(Host-Only)网络</li>
+<li>启动 Kali</li>
+</ol>
+<hr>
+<h3 id="任务-5：验证网络配置（10-分钟）"><a href="#任务-5：验证网络配置（10-分钟）" class="headerlink" title="任务 5：验证网络配置（10 分钟）"></a>任务 5：验证网络配置（10 分钟）</h3><p><strong>在 Kali 终端中执行</strong>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 查看 IP 地址</span></span><br><span class="line">ip addr</span><br><span class="line"></span><br><span class="line"><span class="comment"># 你应该看到类似 192.168.56.xxx 的地址</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 测试与宿主机的连通性</span></span><br><span class="line">ping 192.168.56.1</span><br><span class="line"></span><br><span class="line"><span class="comment"># 如果能 ping 通，恭喜你，环境搭建成功！</span></span><br></pre></td></tr></table></figure>
+
+<p><strong>预期结果</strong>：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">PING 192.168.56.1 (192.168.56.1) 56(84) bytes of data.</span><br><span class="line">64 bytes from 192.168.56.1: icmp_seq=1 ttl=64 time=0.5 ms</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h3 id="任务-6：熟悉-Kali-基本命令（20-分钟）"><a href="#任务-6：熟悉-Kali-基本命令（20-分钟）" class="headerlink" title="任务 6：熟悉 Kali 基本命令（20 分钟）"></a>任务 6：熟悉 Kali 基本命令（20 分钟）</h3><p>既然进来了，先熟悉一下这个”黑客操作系统”：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 我是谁？</span></span><br><span class="line"><span class="built_in">whoami</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 我在哪？</span></span><br><span class="line"><span class="built_in">pwd</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 这里有什么？</span></span><br><span class="line"><span class="built_in">ls</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 去别的地方看看</span></span><br><span class="line"><span class="built_in">cd</span> /home/kali</span><br><span class="line"><span class="built_in">ls</span> -la</span><br><span class="line"></span><br><span class="line"><span class="comment"># Kali 里装了哪些黑客工具？</span></span><br><span class="line"><span class="built_in">ls</span> /usr/share/</span><br><span class="line"></span><br><span class="line"><span class="comment"># 更新系统（可选，网络好的话）</span></span><br><span class="line">sudo apt update</span><br></pre></td></tr></table></figure>
+
+<p><strong>预期结果</strong>：能流畅执行这些命令，对 Linux 不再陌生。</p>
+<hr>
+<h2 id="✅-今日闯关检查"><a href="#✅-今日闯关检查" class="headerlink" title="✅ 今日闯关检查"></a>✅ 今日闯关检查</h2><p>完成以下所有项目，今天的任务就算通过：</p>
+<table>
+<thead>
+<tr>
+<th>检查项</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Kali Linux 成功启动</td>
+<td>⬜</td>
+</tr>
+<tr>
+<td>能用 kali&#x2F;kali 登录系统</td>
+<td>⬜</td>
+</tr>
+<tr>
+<td><code>ip addr</code> 显示 192.168.56.x 地址</td>
+<td>⬜</td>
+</tr>
+<tr>
+<td><code>ping 192.168.56.1</code> 能通</td>
+<td>⬜</td>
+</tr>
+<tr>
+<td>能执行 <code>ls</code>, <code>cd</code>, <code>pwd</code> 等基本命令</td>
+<td>⬜</td>
+</tr>
+</tbody></table>
+<p><strong>全部打勾 &#x3D; Day 1 通关！</strong></p>
+<hr>
+<h2 id="📖-底层补课（做完实验再看）"><a href="#📖-底层补课（做完实验再看）" class="headerlink" title="📖 底层补课（做完实验再看）"></a>📖 底层补课（做完实验再看）</h2><blockquote>
+<p>动手做完了？现在来理解”为什么”。</p>
+</blockquote>
+<h3 id="为什么要用虚拟机？"><a href="#为什么要用虚拟机？" class="headerlink" title="为什么要用虚拟机？"></a>为什么要用虚拟机？</h3><p><strong>类比</strong>：虚拟机就像一个”沙盒游戏”，你在里面怎么折腾都不会影响真实电脑。</p>
+<p><strong>安全原因</strong>：</p>
+<ol>
+<li>攻击实验可能搞坏系统 → 删了虚拟机重建就行</li>
+<li>恶意软件分析 → 在隔离环境运行，不怕感染真机</li>
+<li>模拟攻击环境 → 攻击机和靶机都在虚拟网络里</li>
+</ol>
+<h3 id="为什么用-Kali-Linux？"><a href="#为什么用-Kali-Linux？" class="headerlink" title="为什么用 Kali Linux？"></a>为什么用 Kali Linux？</h3><p>Kali 是专门为渗透测试设计的 Linux 发行版，预装了 600+ 安全工具：</p>
+<table>
+<thead>
+<tr>
+<th>工具类别</th>
+<th>代表工具</th>
+<th>用途</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>信息收集</td>
+<td>Nmap, theHarvester</td>
+<td>扫描目标</td>
+</tr>
+<tr>
+<td>漏洞分析</td>
+<td>Nikto, WPScan</td>
+<td>找漏洞</td>
+</tr>
+<tr>
+<td>Web 渗透</td>
+<td>Burp Suite, SQLMap</td>
+<td>攻击网站</td>
+</tr>
+<tr>
+<td>密码攻击</td>
+<td>Hydra, John</td>
+<td>破解密码</td>
+</tr>
+<tr>
+<td>后渗透</td>
+<td>Metasploit</td>
+<td>控制目标</td>
+</tr>
+</tbody></table>
+<h3 id="什么是-Host-Only-网络？"><a href="#什么是-Host-Only-网络？" class="headerlink" title="什么是 Host-Only 网络？"></a>什么是 Host-Only 网络？</h3><figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">┌─────────────────────────────────────────────┐</span><br><span class="line">│  你的真实电脑 (宿主机)                        │</span><br><span class="line">│  IP: 192.168.56.1                           │</span><br><span class="line">│                                              │</span><br><span class="line">│  ┌─────────────────────────────────────┐    │</span><br><span class="line">│  │  虚拟网络 (Host-Only)                │    │</span><br><span class="line">│  │                                      │    │</span><br><span class="line">│  │   Kali (攻击机)      靶机            │    │</span><br><span class="line">│  │   192.168.56.101    192.168.56.102  │    │</span><br><span class="line">│  │                                      │    │</span><br><span class="line">│  │   ← 它们能互相通信 →                  │    │</span><br><span class="line">│  │   ← 但不能访问互联网 →                │    │</span><br><span class="line">│  └─────────────────────────────────────┘    │</span><br><span class="line">│                                              │</span><br><span class="line">│  真实网络 / 互联网  ← 完全隔离！             │</span><br><span class="line">└─────────────────────────────────────────────┘</span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="⚠️-避坑指南"><a href="#⚠️-避坑指南" class="headerlink" title="⚠️ 避坑指南"></a>⚠️ 避坑指南</h2><table>
+<thead>
+<tr>
+<th>坑点</th>
+<th>症状</th>
+<th>解决方案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>VT-x 未启用</td>
+<td>虚拟机启动报错</td>
+<td>进 BIOS 开启虚拟化技术</td>
+</tr>
+<tr>
+<td>网络不通</td>
+<td>ping 不通任何地址</td>
+<td>检查网络模式是否选对了 Host-Only</td>
+</tr>
+<tr>
+<td>IP 地址不对</td>
+<td>显示 10.x.x.x 或 NAT 地址</td>
+<td>重新配置网络适配器</td>
+</tr>
+<tr>
+<td>忘记密码</td>
+<td>登录不进去</td>
+<td>默认是 kali&#x2F;kali</td>
+</tr>
+<tr>
+<td>磁盘空间不足</td>
+<td>导入失败</td>
+<td>清理磁盘或换个盘安装</td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="💡-知识卡片速查"><a href="#💡-知识卡片速查" class="headerlink" title="💡 知识卡片速查"></a>💡 知识卡片速查</h2><h3 id="Linux-常用命令速查"><a href="#Linux-常用命令速查" class="headerlink" title="Linux 常用命令速查"></a>Linux 常用命令速查</h3><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>作用</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>pwd</code></td>
+<td>显示当前目录</td>
+<td><code>pwd</code> → <code>/home/kali</code></td>
+</tr>
+<tr>
+<td><code>ls</code></td>
+<td>列出文件</td>
+<td><code>ls -la</code> 显示详细信息</td>
+</tr>
+<tr>
+<td><code>cd</code></td>
+<td>切换目录</td>
+<td><code>cd /tmp</code></td>
+</tr>
+<tr>
+<td><code>whoami</code></td>
+<td>显示当前用户</td>
+<td><code>whoami</code> → <code>kali</code></td>
+</tr>
+<tr>
+<td><code>ip addr</code></td>
+<td>查看 IP 地址</td>
+<td>找 inet 那一行</td>
+</tr>
+<tr>
+<td><code>ping</code></td>
+<td>测试网络连通</td>
+<td><code>ping 192.168.56.1</code></td>
+</tr>
+<tr>
+<td><code>sudo</code></td>
+<td>以管理员身份执行</td>
+<td><code>sudo apt update</code></td>
+</tr>
+</tbody></table>
+<h3 id="网络模式对比"><a href="#网络模式对比" class="headerlink" title="网络模式对比"></a>网络模式对比</h3><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>能上网</th>
+<th>能互通</th>
+<th>安全性</th>
+<th>适用场景</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>NAT</td>
+<td>✅</td>
+<td>❌</td>
+<td>中</td>
+<td>日常使用</td>
+</tr>
+<tr>
+<td>桥接</td>
+<td>✅</td>
+<td>✅</td>
+<td>低</td>
+<td>需要真实IP</td>
+</tr>
+<tr>
+<td><strong>Host-Only</strong></td>
+<td>❌</td>
+<td>✅</td>
+<td><strong>高</strong></td>
+<td><strong>安全实验</strong></td>
+</tr>
+</tbody></table>
+<hr>
+<h2 id="❓-常见问题"><a href="#❓-常见问题" class="headerlink" title="❓ 常见问题"></a>❓ 常见问题</h2><p><strong>Q1：我电脑配置低，能跑动吗？</strong></p>
+<p>A1：最低要求：</p>
+<ul>
+<li>CPU：双核</li>
+<li>内存：8GB（给 Kali 分 2-4GB）</li>
+<li>硬盘：50GB 空闲空间</li>
+</ul>
+<p><strong>Q2：Mac 电脑能用吗？</strong></p>
+<p>A2：可以。Intel Mac 用 VMware Fusion 或 VirtualBox；M1&#x2F;M2 Mac 用 UTM 或 Parallels。</p>
+<p><strong>Q3：为什么不直接装 Kali 双系统？</strong></p>
+<p>A3：不推荐。双系统容易误操作，而且后续要装靶机，虚拟化更方便。</p>
+<p><strong>Q4：Kali 里的工具是不是违法的？</strong></p>
+<p>A4：工具本身不违法，但未经授权使用这些工具攻击他人系统是违法的。我们只在自己搭建的实验环境中使用。</p>
+<hr>
+<h2 id="🚀-明日预告"><a href="#🚀-明日预告" class="headerlink" title="🚀 明日预告"></a>🚀 明日预告</h2><p><strong>Day 002：启动你的第一个靶场（DVWA）</strong></p>
+<p>明天你将：</p>
+<ul>
+<li>用 Docker 一键启动 DVWA 靶场</li>
+<li>第一次用 Burp Suite 抓包</li>
+<li>看到登录密码在网络上”裸奔”</li>
+</ul>
+<p><strong>准备工作</strong>：确保今天的 Kali 网络配置没问题！</p>
+<hr>
+<h2 id="📊-学习记录（学习者填写）"><a href="#📊-学习记录（学习者填写）" class="headerlink" title="📊 学习记录（学习者填写）"></a>📊 学习记录（学习者填写）</h2><table>
+<thead>
+<tr>
+<th>项目</th>
+<th>内容</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>实际学习日期</td>
+<td>2026年1月29日</td>
+</tr>
+<tr>
+<td>实际用时</td>
+<td>1 小时</td>
+</tr>
+<tr>
+<td>遇到的问题</td>
+<td>都很顺利</td>
+</tr>
+<tr>
+<td>解决方法</td>
+<td>无</td>
+</tr>
+<tr>
+<td>今日收获</td>
+<td>安装了基础环境</td>
+</tr>
+<tr>
+<td>自评分数</td>
+<td>⭐⭐⭐⭐⭐ (1-5星)</td>
+</tr>
+</tbody></table>
+<hr>
+<blockquote>
+<p>💬 <strong>导师点评</strong>：</p>
+<p>环境搭建是最无聊但最重要的一步。很多人卡在这里就放弃了。</p>
+<p>如果你成功看到了 <code>ping</code> 通的结果，恭喜你，你已经超过了 50% 的人。</p>
+<p>明天开始，真正的”黑客之旅”正式启程。</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 今日通关后执行</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;Day 001 Complete! 环境搭建成功！&quot;</span></span><br></pre></td></tr></table></figure>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E7%BD%91%E7%BB%9C%E5%AE%89%E5%85%A8/" rel="tag"># 网络安全</a>
+              <a href="/tags/%E6%B8%97%E9%80%8F%E6%B5%8B%E8%AF%95/" rel="tag"># 渗透测试</a>
+              <a href="/tags/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA/" rel="tag"># 环境搭建</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/507ba1e8.html" rel="prev" title="计算机网络体系结构">
+                  <i class="fa fa-chevron-left"></i> 计算机网络体系结构
+                </a>
+            </div>
+            <div class="post-nav-item">
+                <a href="/post/d002.html" rel="next" title="Day002：破冰 - 启动你的第一个靶场">
+                  Day002：破冰 - 启动你的第一个靶场 <i class="fa fa-chevron-right"></i>
+                </a>
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
