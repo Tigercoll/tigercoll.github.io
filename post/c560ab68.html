@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width">
+<meta name="theme-color" content="#222"><meta name="generator" content="Hexo 6.3.0">
+
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css" integrity="sha256-jTIdiMuX/e3DGJUGwl3pKSxuc6YOuqtJYkM0bGQESA4=" crossorigin="anonymous">
+
+<script class="next-config" data-name="main" type="application/json">{"hostname":"tigercoll.top","root":"/","images":"/images","scheme":"Pisces","darkmode":false,"version":"8.10.1","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12},"copycode":true,"bookmark":{"enable":false,"color":"#222","save":"auto"},"mediumzoom":true,"lazyload":true,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"stickytabs":false,"motion":{"enable":false,"transition":{"post_block":"fadeIn","post_header":"fadeInDown","post_body":"fadeInDown","coll_header":"fadeInLeft","sidebar":"fadeInUp"}},"prism":false,"i18n":{"placeholder":"搜索...","empty":"没有找到任何搜索结果：${query}","hits_time":"找到 ${hits} 个搜索结果（用时 ${time} 毫秒）","hits":"找到 ${hits} 个搜索结果"},"path":"/search.json","localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false}}</script><script src="/js/config.js"></script>
+
+
+
+<link rel="canonical" href="https://tigercoll.top/post/c560ab68.html">
+
+
+
+<script class="next-config" data-name="page" type="application/json">{"sidebar":"","isHome":false,"isPost":true,"lang":"zh-CN","comments":true,"permalink":"https://tigercoll.top/post/c560ab68.html","path":"post/c560ab68.html","title":"Vcenter 503 Service Unavailable 报错修复"}</script>
+
+<script class="next-config" data-name="calendar" type="application/json">""</script>
+<title>Vcenter 503 Service Unavailable 报错修复 | Tigercoll's Blog</title>
+  
+
+
+
+
+
+  <noscript>
+    <link rel="stylesheet" href="/css/noscript.css">
+  </noscript>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="headband"></div>
+
+  <main class="main">
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏" role="button">
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+        <span class="toggle-line"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <i class="logo-line"></i>
+      <p class="site-title">Tigercoll's Blog</p>
+      <i class="logo-line"></i>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  <ul class="main-menu menu">
+        <li class="menu-item menu-item-home"><a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a></li>
+        <li class="menu-item menu-item-tags"><a href="/tags" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a></li>
+        <li class="menu-item menu-item-categories"><a href="/categories" rel="section"><i class="fa fa-th fa-fw"></i>分类</a></li>
+        <li class="menu-item menu-item-archives"><a href="/archives" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a></li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup"><div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off" maxlength="80"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close" role="button">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div class="search-result-container no-result">
+  <div class="search-result-icon">
+    <i class="fa fa-spinner fa-pulse fa-5x"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+        
+  
+  <div class="toggle sidebar-toggle" role="button">
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+    <span class="toggle-line"></span>
+  </div>
+
+  <aside class="sidebar">
+
+    <div class="sidebar-inner sidebar-overview-active">
+      <ul class="sidebar-nav">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+	
+      <div class="sidebar-panel-container">
+        <!--noindex-->
+        <div class="post-toc-wrap sidebar-panel">
+        </div>
+        <!--/noindex-->
+
+        <div class="site-overview-wrap sidebar-panel">
+          <div class="site-author site-overview-item animated" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Tigercoll"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Tigercoll</p>
+  <div class="site-description" itemprop="description">万丈高楼平地起,勿在浮沙筑高台</div>
+</div>
+<div class="site-state-wrap site-overview-item animated">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+        <a href="/archives">
+          <span class="site-state-item-count">55</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+          <a href="/categories">
+        <span class="site-state-item-count">40</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+          <a href="/tags">
+        <span class="site-state-item-count">77</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author site-overview-item animated">
+      <span class="links-of-author-item">
+        <a href="https://github.com/Tigercoll" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;Tigercoll" rel="noopener" target="_blank"><i class="fab fa-github fa-fw"></i></a>
+      </span>
+  </div>
+
+
+
+        </div>
+      </div>
+    </div>
+  </aside>
+  <div class="sidebar-dimmer"></div>
+
+
+    </header>
+
+    
+  <div class="back-to-top" role="button" aria-label="返回顶部">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+<noscript>
+  <div class="noscript-warning">Theme NexT works best with JavaScript enabled</div>
+</noscript>
+
+
+    <div class="main-inner post posts-expand">
+
+
+  
+
+
+<div class="post-block">
+  
+  
+
+  <article itemscope itemtype="http://schema.org/Article" class="post-content" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://tigercoll.top/post/c560ab68.html">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Tigercoll">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Tigercoll's Blog">
+      <meta itemprop="description" content="万丈高楼平地起,勿在浮沙筑高台">
+    </span>
+    
+    <span hidden itemprop="post" itemscope itemtype="http://schema.org/CreativeWork">
+      <meta itemprop="name" content="Vcenter 503 Service Unavailable 报错修复 | Tigercoll's Blog">
+      <meta itemprop="description" content="">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Vcenter 503 Service Unavailable 报错修复
+        </h1>
+
+        <div class="post-meta-container">
+          <div class="post-meta">
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-calendar"></i>
+      </span>
+      <span class="post-meta-item-text">发表于</span>
+
+      <time title="创建时间：2026-03-20 13:31:25" itemprop="dateCreated datePublished" datetime="2026-03-20T13:31:25+08:00">2026-03-20</time>
+    </span>
+    <span class="post-meta-item">
+      <span class="post-meta-item-icon">
+        <i class="far fa-folder"></i>
+      </span>
+      <span class="post-meta-item-text">分类于</span>
+        <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+          <a href="/categories/%E8%BF%90%E7%BB%B4/" itemprop="url" rel="index"><span itemprop="name">运维</span></a>
+        </span>
+    </span>
+
+  
+</div>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+        <p><strong>事件信息</strong></p>
+<ul>
+<li>时间：2026-03-19 到 2026-03-20</li>
+<li>设备：VMware vCenter Server Appliance 6.0.0.30300</li>
+<li>架构：embedded PSC</li>
+<li>当前主机名：vcsa.chinadafeng.com</li>
+<li>当前短主机名：vcsa</li>
+<li>当前 PNID：192.168.7.8</li>
+<li>当前 SSO 域：vphere.local</li>
+</ul>
+<span id="more"></span>
+
+<p><strong>初始故障现象</strong></p>
+<ul>
+<li>Web 访问报错：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">503 Service Unavailable (Failed to connect to endpoint ... /var/run/vmware/vpxd-webserver-pipe) </span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>root 密码遗忘</li>
+<li>控制台启动阶段卡在 Waiting for vpxd to initialize</li>
+<li>后续发现：<ul>
+<li>&#x2F;、&#x2F;storage&#x2F;log、&#x2F;storage&#x2F;core 空间打满</li>
+<li>vpxd、invsvc、vdcs、workflow、vsphere-client 多个服务异常</li>
+<li>vmware-sts-idmd 报 LDAP error 49</li>
+<li>vmware-vdcs 报旧 pid 文件残留</li>
+</ul>
+</li>
+</ul>
+<p><strong>最终确认的根因</strong></p>
+<ol>
+<li>日志盘和核心转储盘打满，导致服务无法正常启动。</li>
+<li>主机名&#x2F;解析在处理中被改乱，曾一度把 hostname 弄成裸 IP，系统只识别成 192。</li>
+<li>SSO&#x2F;IDM 机器账户密码失配，导致 vmware-sts-idmd 无法绑定本地 LDAP：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LDAP error 49 cn=192.168.7.8,ou=Domain Controllers,DC=vphere,DC=local </span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>Content Library 残留旧文件：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/var/log/vmware/vdcs/vmware-vdcs.pid </span><br></pre></td></tr></table></figure>
+
+<p>导致 vmware-vdcs 启动失败。</p>
+<p><strong>处理经过</strong></p>
+<ol>
+<li>通过老版 VCSA 的 GRUB 单用户模式重置 root 密码。</li>
+<li>清理满盘：<ul>
+<li>清理 &#x2F;storage&#x2F;core</li>
+<li>清理 &#x2F;storage&#x2F;log</li>
+<li>删除 .hprof、旧压缩日志、历史大日志</li>
+</ul>
+</li>
+<li>修复主机名和解析：<ul>
+<li>hostname 恢复为 vcsa</li>
+<li>hostname -f 恢复为 vcsa.chinadafeng.com</li>
+<li>vmafdd 恢复正常</li>
+</ul>
+</li>
+<li>发现 vpxd 日志仍报：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SSO Admin server: Invalid response code: 404 Not Found </span><br></pre></td></tr></table></figure>
+
+<p>继续深挖 SSO。<br>\5. 在 &#x2F;var&#x2F;log&#x2F;vmware&#x2F;sso&#x2F;vmware-sts-idmd.log 确认真实根因：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">LDAP error 49 cannot bind connection: [ldap://localhost:389, cn=192.168.7.8,ou=Domain Controllers,DC=vphere,DC=local] </span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>用 vdcadmintool 重置机器账户密码，再用 lwregshell 写回本机注册表中的 dcAccountPassword。</li>
+<li>vmware-sts-idmd 恢复，认证成功。</li>
+<li>查看 &#x2F;var&#x2F;log&#x2F;vmware&#x2F;vdcs&#x2F;wrapper.log，发现：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pid file ... /var/log/vmware/vdcs/vmware-vdcs.pid already exists </span><br></pre></td></tr></table></figure>
+
+<ol>
+<li><p>移走旧</p>
+<p>vmware-vdcs.pid</p>
+<p>后，依次启动：</p>
+<ul>
+<li>vmware-vdcs</li>
+<li>vmware-vpx-workflow</li>
+<li>vsphere-client</li>
+</ul>
+</li>
+</ol>
+<p><strong>本次已恢复的关键服务</strong></p>
+<ul>
+<li>vmafdd</li>
+<li>vmdird</li>
+<li>vmcad</li>
+<li>vmware-sts-idmd</li>
+<li>vmware-stsd</li>
+<li>vmware-vpostgres</li>
+<li>vmware-vpxd</li>
+<li>vmware-invsvc</li>
+<li>vmware-vdcs</li>
+<li>vmware-vpx-workflow</li>
+<li>vsphere-client</li>
+</ul>
+<p><strong>仍可后续关注的非核心服务</strong></p>
+<ul>
+<li>vmware-mbcs</li>
+<li>vmware-netdumper</li>
+<li>vmware-perfcharts</li>
+<li>vmware-rbd-watchdog</li>
+<li>vmware-vsan-health</li>
+<li>vmware-vsm</li>
+<li>vmware-vws</li>
+</ul>
+<p>这些不一定影响当前登录和 vCenter 核心管理功能，可单独补查。</p>
+<p><strong>下次排查 SOP</strong></p>
+<ol>
+<li>先做快照<br>如果涉及 SSO、证书、vmdir、机器账户密码，优先做关机快照。</li>
+<li>先看空间</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">df -h df -i </span><br></pre></td></tr></table></figure>
+
+<p>重点看：</p>
+<ul>
+<li>&#x2F;</li>
+<li>&#x2F;storage&#x2F;log</li>
+<li>&#x2F;storage&#x2F;core</li>
+</ul>
+<ol>
+<li>查核心服务</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service-control --status --all </span><br></pre></td></tr></table></figure>
+
+<p>重点看：</p>
+<ul>
+<li>vmafdd</li>
+<li>vmdird</li>
+<li>vmware-sts-idmd</li>
+<li>vmware-stsd</li>
+<li>vmware-vpostgres</li>
+<li>vmware-vpxd</li>
+<li>vmware-invsvc</li>
+<li>vmware-vdcs</li>
+<li>vmware-vpx-workflow</li>
+<li>vsphere-client</li>
+</ul>
+<ol>
+<li>查 503 是否真是 vpxd 管道问题</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ls -l /var/run/vmware/vpxd-webserver-pipe tail -n 100 /var/log/vmware/vpxd/vpxd.log </span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>如果看到 SSO&#x2F;STS&#x2F;IDM 异常，查：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tail -n 100 /var/log/vmware/sso/vmware-sts-idmd.log tail -n 100 /var/log/vmware/sso/ssoAdminServer.log </span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>如果 vmware-sts-idmd.log 有 LDAP error 49<br>先查机器账户：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/opt/likewise/bin/lwregshell list_values &#x27;[HKEY_THIS_MACHINE\services\vmdir\]&#x27; | egrep -i &quot;dcAccountDN|dcAccountPassword&quot; </span><br></pre></td></tr></table></figure>
+
+<p>然后：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/usr/lib/vmware-vmdir/bin/vdcadmintool </span><br></pre></td></tr></table></figure>
+
+<p>选 3. Reset account password</p>
+<p>再写回：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/opt/likewise/bin/lwregshell cd HKEY_THIS_MACHINE\services\vmdir set_value dcAccountPassword &quot;新密码&quot; quit </span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>如果 vmware-vdcs 起不来，查：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tail -n 100 /var/log/vmware/vdcs/wrapper.log ls -l /var/log/vmware/vdcs/vmware-vdcs.pid </span><br></pre></td></tr></table></figure>
+
+<p>若存在旧 pid：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mkdir -p /var/log/vmware/vdcs/clspid mv /var/log/vmware/vdcs/vmware-vdcs.pid /var/log/vmware/vdcs/clspid/ service-control --start vmware-vdcs </span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>依次补启动：</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service-control --start vmware-vdcs service-control --start vmware-vpx-workflow service-control --start vsphere-client </span><br></pre></td></tr></table></figure>
+
+<ol>
+<li>最终验证</li>
+</ol>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">service-control --status --all | egrep &quot;vmware-vpxd|vmware-invsvc|vmware-vdcs|vmware-vpx-workflow|vsphere-client|vmware-sts-idmd&quot; </span><br></pre></td></tr></table></figure>
+
+<p><strong>本次关键配置结论</strong></p>
+<ul>
+<li>这台老环境的 SSO 域不是 vsphere.local，而是 vphere.local<br>不是笔误，不要手改。</li>
+<li>机器账户不是 Web 登录账户。<br><a href="mailto:&#49;&#57;&#50;&#46;&#x31;&#x36;&#56;&#x2e;&#55;&#46;&#x38;&#64;&#118;&#x70;&#104;&#101;&#114;&#x65;&#46;&#x6c;&#x6f;&#99;&#x61;&#x6c;">&#49;&#57;&#50;&#46;&#x31;&#x36;&#56;&#x2e;&#55;&#46;&#x38;&#64;&#118;&#x70;&#104;&#101;&#114;&#x65;&#46;&#x6c;&#x6f;&#99;&#x61;&#x6c;</a> 这类账户只给内部服务使用。</li>
+<li>Web 登录仍应使用：</li>
+</ul>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">administrator@vphere.local </span><br></pre></td></tr></table></figure>
+
+<p>配原 SSO 管理员密码。</p>
+<ul>
+<li>root 仍是 Linux&#x2F;SSH 登录账户。</li>
+</ul>
+<p><strong>避坑记录</strong></p>
+<ul>
+<li>不要把 VCSA 6.0 的 hostname 直接改成裸 IP。</li>
+<li>不要把管理 IP 写到 127.0.0.1 或 ::1 那两行。</li>
+<li>不要把机器账户密码当作 UI 登录密码。</li>
+<li>不要在没做快照时直接动 vmdir、证书、Lookup&#x2F;SSO 配置。</li>
+</ul>
+<p><strong>参考</strong></p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://knowledge.broadcom.com/external/article/327276/vcenter-server-vsphere-web-client-503.html">Broadcom KB 327276: vCenter 503 &#x2F; vpxd-webserver-pipe 排障</a></li>
+<li><a target="_blank" rel="noopener" href="https://knowledge.broadcom.com/external/article/313077/vcenter-log-disk-exhaustion-or-storagelo.html">Broadcom KB 313077: &#x2F;storage&#x2F;log 满导致 vCenter 异常</a></li>
+<li><a target="_blank" rel="noopener" href="https://knowledge.broadcom.com/external/article/319348/ldap-error-code-49error-49-error-in-vmdi.html">Broadcom KB 319348: LDAP error 49 &#x2F; 机器账户密码失配</a></li>
+<li><a target="_blank" rel="noopener" href="https://knowledge.broadcom.com/external/article/336009/content-library-service-component-manag.html">Broadcom KB 336009: vmware-vdcs.pid 残留导致 Content Library 起不来</a></li>
+<li><a target="_blank" rel="noopener" href="https://knowledge.broadcom.com/external/article/369576/vcenter-lookupsvc-may-fail-to-start-if-e.html">Broadcom KB 369576: 修改 &#x2F;etc&#x2F;hosts 可能导致 lookupsvc 启动失败</a></li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+    <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%BF%90%E7%BB%B4/" rel="tag"># 运维</a>
+          </div>
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-item">
+                <a href="/post/d002.html" rel="prev" title="Day002：破冰 - 启动你的第一个靶场">
+                  <i class="fa fa-chevron-left"></i> Day002：破冰 - 启动你的第一个靶场
+                </a>
+            </div>
+            <div class="post-nav-item">
+            </div>
+          </div>
+    </footer>
+  </article>
+</div>
+
+
+
+
+
+
+    <div class="comments" id="lv-container" data-id="city" data-uid="MTAyMC8zNDY4NC8xMTIyMQ=="></div>
+</div>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+
+
+<div class="copyright">
+  &copy; 
+  <span itemprop="copyrightYear">2026</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Tigercoll</span>
+</div>
+<!-- 网站运行时间的设置 -->
+<span id="timeDate">载入天数...</span>
+<span id="times">载入时分秒...</span>
+<script>
+    var now = new Date();
+    function createtime() {
+        var grt= new Date("04/21/2019 15:54:40");//此处修改你的建站时间或者网站上线时间
+        now.setTime(now.getTime()+250);
+        days = (now - grt ) / 1000 / 60 / 60 / 24; dnum = Math.floor(days);
+        hours = (now - grt ) / 1000 / 60 / 60 - (24 * dnum); hnum = Math.floor(hours);
+        if(String(hnum).length ==1 ){hnum = "0" + hnum;} minutes = (now - grt ) / 1000 /60 - (24 * 60 * dnum) - (60 * hnum);
+        mnum = Math.floor(minutes); if(String(mnum).length ==1 ){mnum = "0" + mnum;}
+        seconds = (now - grt ) / 1000 - (24 * 60 * 60 * dnum) - (60 * 60 * hnum) - (60 * mnum);
+        snum = Math.round(seconds); if(String(snum).length ==1 ){snum = "0" + snum;}
+        document.getElementById("timeDate").innerHTML = "等待与你相遇的 "+dnum+" 天 ";
+        document.getElementById("times").innerHTML = hnum + " 小时 " + mnum + " 分 " + snum + " 秒";
+    }
+setInterval("createtime()",250);
+</script>
+<!--
+-->
+
+    </div>
+  </footer>
+
+  
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js" integrity="sha256-XL2inqUJaslATFnHdJOi9GfQ60on8Wx1C2H8DYiN1xY=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/medium-zoom@1.0.6/dist/medium-zoom.min.js" integrity="sha256-EdPgYcPk/IIrw7FYeuJQexva49pVRZNmt3LculEr7zM=" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lozad@1.16.0/dist/lozad.min.js" integrity="sha256-mOFREFhqmHeQbXpK2lp4nA3qooVgACfh88fpJftLBbc=" crossorigin="anonymous"></script>
+<script src="/js/comments.js"></script><script src="/js/utils.js"></script><script src="/js/next-boot.js"></script>
+
+  
+<script src="https://cdn.jsdelivr.net/npm/hexo-generator-searchdb@1.4.0/dist/search.js" integrity="sha256-vXZMYLEqsROAXkEw93GGIvaB2ab+QW6w3+1ahD9nXXA=" crossorigin="anonymous"></script>
+<script src="/js/third-party/search/local-search.js"></script>
+
+
+
+
+
+  
+
+
+
+
+<script src="/js/third-party/comments/livere.js"></script>
+
+<script src="/live2dw/lib/L2Dwidget.min.js?094cbace49a39548bed64abff5988b05"></script><script>L2Dwidget.init({"log":false,"pluginJsPath":"lib/","pluginModelPath":"assets/","pluginRootPath":"live2dw/","tagMode":false});</script></body>
+</html>
